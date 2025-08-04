@@ -1,0 +1,792 @@
+/* Variables de colores */
+:root{
+    --c1:orangered;
+    --c2:white;
+    --c3:black;
+    --c4:rgb(1, 177, 1);
+    --c5:grey;}
+/* Variable de colores */
+.--c1{background-color: var(--c1);}
+.--c2{background-color: var(--c2)}
+.--c3{background-color: var(--c3)}
+.--c4{background-color: var(--c4)}
+.--c5{background-color: var(--c5)}
+/* ------------ TIPOS DE LETRA ----------------- */
+/* Texto variable uno */
+.-tx-v1{
+  font-family: "Special Gothic Expanded One", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-size: 30px;
+  color: var(--c1);
+  color: var(--c1); /* Color Naranja */
+  text-shadow: 3px 5px 5px rgba(0, 0, 0, 0.90); /* Sombra sutil */
+  letter-spacing: 2px; /* Espaciado entre letras */
+}
+/* Texto variable dos */
+.-tx-v2 {
+  font-family: "Teko", sans-serif;
+  font-optical-sizing: auto;
+  color: var(--c3);
+  font-weight:500;
+  font-style: normal;
+}
+/* Texto variable dos variable uno */
+.-tx-v2-v1 {
+  font-family: "Teko", sans-serif;
+  font-optical-sizing: auto;
+  color: var(--c4);
+  font-weight:500;
+  font-style: normal;
+}
+/* Texto variable tres */
+.-tx-v3 {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  color: var(--c3);
+  font-weight: 200;
+  font-style: normal;
+} 
+/* Texto varibale cuatro */
+.-tx-v4{
+  color: rgb(2, 2, 155);
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 200;
+  font-style: normal;
+}
+/* Cambiar este nombre en el js de notificacion y agregar estas mismas propiedades a la letra */
+.-e-v4{
+  margin: auto;
+  font-size: 14px;
+  line-height: 1.4;
+}
+/* Imagen variable uno */
+.-im-v1{
+  margin-top: 20vh;
+}
+.-im-v2{
+  width: 70px;
+  height: 70px;
+  border-radius:50%;
+}
+/* Imagen variable tres */
+.-im-v3{
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+}
+/* Imagen variable cuatro */
+.-im-v4{
+  width: 300px;
+  height: 300px;
+  margin: auto;
+}
+/* Imagen variable cinco */
+.-im-v5{
+  width: 100%;
+  height: auto;
+}
+/* -------------- ESTILO DE BLOQUES -------------- */
+/* Bloque Boton variable uno */
+.-b-v1{
+  background-color: var(--c4);
+  border-radius: 100px;
+  box-shadow: rgba(255, 255, 255, 0.562) 0 -25px 18px -14px inset,rgba(224, 220, 220, 0.767) 0 1px 2px,rgba(103, 236, 154, 0.15) 0 2px 4px,rgba(71, 114, 88, 0.15) 0 4px 8px,rgba(3, 53, 22, 0.15) 0 8px 16px,rgba(0, 0, 0, 0.15) 0 16px 32px;
+  cursor: pointer;
+  display: inline-block;
+  padding: 7px 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 250ms;
+  border: 0;
+  font-size: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.-b-v1:hover {
+  box-shadow: rgba(44,187,99,.35) 0 -25px 18px -14px inset,rgba(44,187,99,.25) 0 1px 2px,rgba(44,187,99,.25) 0 2px 4px,rgba(44,187,99,.25) 0 4px 8px,rgba(44,187,99,.25) 0 8px 16px,rgba(44,187,99,.25) 0 16px 32px;
+  transform: scale(1.05) rotate(-1deg);
+}
+/* Bloque Input variable dos */
+.-b-v2 {
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border-radius: 24px;
+  border-style: none;
+  box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+  box-sizing: border-box;
+  color: #3c4043;
+  cursor: pointer;
+  display: inline-flex;
+  fill: currentcolor;
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: .25px;
+  line-height: normal;
+  max-width: 100%;
+  overflow: visible;
+  padding: 2px 24px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform,opacity;
+  z-index: 0;
+}
+
+.-b-v2:hover {
+  background: var(--c2);
+}
+.-b-v2:active {
+  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+  outline: none;
+}
+
+.-b-v2:focus {
+  outline: none;
+  border: 1px solid var(--c5);
+}
+.-b-v2:not(:disabled) {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+.-b-v2:not(:disabled):hover {
+  box-shadow: rgba(60, 64, 67, .3) 0 2px 3px 0, rgba(60, 64, 67, .15) 0 6px 10px 4px;
+}
+.-b-v2:not(:disabled):focus {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+.-b-v2:not(:disabled):active {
+  box-shadow: rgba(60, 64, 67, .3) 0 4px 4px 0, rgba(60, 64, 67, .15) 0 8px 12px 6px;
+}
+.-b-v2:disabled {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+/* Bloque Input variable uno de variable dos */
+.-b-v2-v1 {
+    align-items: center;
+    appearance: none;
+    background-color: #fff;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-flex;
+    fill: currentcolor;
+    height: 48px;
+    justify-content: center;
+    letter-spacing: .25px;
+    line-height: normal;
+    width: 100%;
+    overflow: visible;
+    padding: 2px 24px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width:75vw;
+    border-radius: 10PX;
+    will-change: transform,opacity;
+    z-index: 0;
+  }
+  
+  .-b-v2-v1:hover {
+    background: var(--c2);
+    border: var(--c4) solid 1px;
+  }
+  .-b-v2-v1:active {
+    box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+    outline: none;
+  }
+  
+  .-b-v2-v1:focus {
+    outline: none;
+    border: 1px solid var(--c5);
+  }
+  .-b-v2-v1:not(:disabled) {
+    box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  }
+  .-b-v2-v1:not(:disabled):hover {
+    box-shadow: rgba(60, 64, 67, .3) 0 2px 3px 0, rgba(60, 64, 67, .15) 0 6px 10px 4px;
+  }
+  .-b-v2-v1:not(:disabled):focus {
+    box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  }
+  .-b-v2-v1:not(:disabled):active {
+    box-shadow: rgba(60, 64, 67, .3) 0 4px 4px 0, rgba(60, 64, 67, .15) 0 8px 12px 6px;
+  }
+  .-b-v2-v1:disabled {
+    box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  }
+/* Bloque Boton variable tres */
+.-b-v3{
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid var(--c5);
+  border-radius: 50px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  line-height: normal;
+  margin: 3px;
+  min-height: 60px;
+  min-width: 0;
+  outline: none;
+  padding: 16px 24px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform;
+}
+.-b-v3:disabled{
+  pointer-events: none;
+}
+.-b-v3:hover{
+  color: #fff;
+  background-color: var(--c5);
+  box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+  transform: translateY(-2px);
+}
+.-b-v3:active{
+  box-shadow: none;
+  transform: translateY(0);
+}
+/* Bloque boton varible cuatro */
+.-b-v4 {
+  background-image: linear-gradient(-180deg, var(--c1) 0%, rgb(240, 183, 136) 100%);
+  border-radius: .5rem;
+  box-sizing: border-box;
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  padding: 1rem 1.75rem;
+  text-decoration: none;
+  width: auto;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.-b-v4:hover {
+  background-image: linear-gradient(-180deg, orangered 0%, #ff0000 100%);
+}
+/* Bloque boton varible cuatro variable uno */
+.-b-v4-v1 {
+  background-image:linear-gradient(-180deg, rgba(255, 68, 0, 0.719) 0%, rgb(240, 183, 136) 100%);
+  border-radius: .5rem;
+  box-sizing: border-box;
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  padding: 1rem 1.75rem;
+  text-decoration: none;
+  width: auto;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  
+}
+.-b-v4-v1:hover {
+  background-image: linear-gradient(-180deg, orangered 0%, #f0a17c 100%);
+  
+}
+/* Bloque Boton variable cinco */
+.-b-v5 {
+  min-width: 90px;
+  background-color:var(--c4);
+  border: 0;
+  border-radius: 56px;
+  cursor: pointer;
+  display: inline-block;
+  outline: 0;
+  padding: 10px;
+  position: relative;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  transition: all .3s;
+  touch-action: manipulation;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.11);
+}
+.-b-v5:before {
+  background-color: initial;
+  background-image: linear-gradient(#fff 0, rgba(255, 255, 255, 0) 100%);
+  border-radius: 125px;
+  content: "";
+  height: 50%;
+  left: 4%;
+  opacity: .5;
+  position: absolute;
+  top: 0;
+  transition: all .3s;
+  width: 92%;
+}
+.-b-v5:hover {
+  transform: scale(1.05);
+}
+/* Bloque Boton variable uno de variable cinco */
+.-b-v5-v1 {
+    min-width: 90px;
+    background-color:var(--c5);
+    border: 0;
+    border-radius: 56px;
+    cursor: pointer;
+    display: inline-block;
+    outline: 0;
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: all .3s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .-b-v5-v1:before {
+    background-color: initial;
+    background-image: linear-gradient(#fff 0, rgba(255, 255, 255, 0) 100%);
+    border-radius: 125px;
+    content: "";
+    height: 50%;
+    left: 4%;
+    opacity: .5;
+    position: absolute;
+    top: 0;
+    transition: all .3s;
+    width: 92%;
+  }
+  .-b-v5-v1:hover {
+    box-shadow: rgba(255, 255, 255, .2) 0 3px 15px inset, rgba(0, 0, 0, .1) 0 3px 5px, rgba(0, 0, 0, .1) 0 10px 13px;
+    transform: scale(1.05);
+  }
+/* Bloque Boton variable dos de variable cinco */
+.-b-v5-v2 {
+    min-width: 90px;
+    background-color:var(--c1);
+    border: 0;
+    border-radius: 56px;
+    cursor: pointer;
+    display: inline-block;
+    outline: 0;
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: all .3s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .-b-v5-v2:before {
+    background-color: initial;
+    background-image: linear-gradient(#fff 0, rgba(255, 255, 255, 0) 100%);
+    border-radius: 125px;
+    content: "";
+    height: 50%;
+    left: 4%;
+    opacity: .5;
+    position: absolute;
+    top: 0;
+    transition: all .3s;
+    width: 92%;
+  }
+  .-b-v5-v2:hover {
+    box-shadow: rgba(255, 255, 255, .2) 0 3px 15px inset, rgba(0, 0, 0, .1) 0 3px 5px, rgba(0, 0, 0, .1) 0 10px 13px;
+    transform: scale(1.05);
+  }
+  /* Bloque variable seis */
+  .-b-v6 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+  }
+
+  .-b-v6 button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background-color: var(--c1);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+
+  .-b-v6 button:hover {
+    background-color: var(--c4);
+  }
+
+  .-b-v6 input {
+    width: 60px;
+    text-align: center;
+    font-size: 16px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+/* -------------- ESTILO DE CONTENEDORES -------------- */
+/* Contenedor variable uno */
+.-c-v1{
+    width:90%;
+    height: auto;
+    margin-left: 5%;
+    margin-right: 5%;
+    background-color:var(--c2);
+    border: var(--c5) dotted 1px;
+    border-radius: 30px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.089);
+    padding: 10px;
+    text-align: center;
+}
+/* Contenedor variable uno varibale uno */
+.-c-v1-v1{
+  width:90%;
+  height: auto;
+  margin-left: 5%;
+  margin-right: 5%;
+  background-color:var(--c1);
+  border-radius: 30px;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Contenedor variable dos */
+.-c-v2{
+  position:fixed;
+  z-index: 1000;
+  width:100%;
+  height: 100px;
+  background-color:var(--c1);
+  padding: 10px;
+  display: flex;
+  top: 0;
+}
+/* Contenedor variable uno de variable dos */
+.-c-v2-v1{
+  position: fixed;
+  z-index: 1000;
+  justify-content: space-between;
+  width:100%;
+  height: auto;
+  background-color:var(--c5);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  bottom: 0;
+}
+/* Contenedor variable tres */
+.-c-v3{
+  width:90%;
+  height: auto;
+  margin-left: 5%;
+  margin-right: 5%;
+  background-color:var(--c2);
+  border: 1px solid rgba(128, 128, 128, 0.308);
+  border-radius: 10px;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.158);
+  padding: 10px;
+  text-align: center;
+  display: block;
+  align-items: center;
+}
+/* Contenedor variable tres variable uno */
+.-c-v3-v1{
+  width:90%;
+  height: auto;
+  margin-left: 5%;
+  margin-right: 5%;
+  background-color:var(--c1);
+  padding: 10px;
+  text-align: center;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Contenedor variable cuatro */
+.-c-v4{
+  width: 100%;
+  height: auto;
+  display:flex;
+  justify-content: center;
+  text-align: center;
+}
+/* Contenedor variable cuatro varibale uno */
+.-c-v4-v1{
+  width: 100px;
+  height: auto;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+/* Contenedor variable cuatro varibale dos */
+.-c-v4-v2{
+  width: 90vw;
+  height: auto;
+  display:block;
+  justify-content: center;
+  align-items: center;
+}
+/* Contenedor variable cuatro varibale tres */
+.-c-v4-v3{
+  width: 100%;
+  height: auto;
+  display:block;
+}
+/* Contenedor variable cuatro variable cuatro */
+.-c-v4-v4{
+  background-color: var(--c2);
+  width: 100%;
+  border-radius: 0 30px 0 0;
+  height: 50px;
+  display:flex;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+/* Contenedor varibale cuatro variable cuatro variable cero */
+.-c-v4-v4-v0{
+  width: 100%;
+  border-radius: 0 30px 0 0;
+  height: 50px;
+  display:flex;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+/* Contenedor varibale cuatro variable cuatro variable uno */
+.-c-v4-v4-v1{
+  background-color: var(--c2);
+  width: 100%;
+  border-radius: 30px 0 0 0;
+  height: 50px;
+  display:flex;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+/* Contenedor variable cinco */
+.-c-v5{
+  width: 100px;
+  height: 120px;
+  background-color: var(--c2);
+  border: var(--c5) dotted 1px;
+  border-radius: 10px;
+  padding: 10px;
+  line-height: 1;
+  margin: auto;
+}
+.-c-v5:hover{
+  color: var(--c1);
+}
+/* imagen del contenedor variable cinco */
+.-c-v5 img{
+  width: 100%;
+}
+/* Contenedor variable seis */
+.-c-v6 {
+  position:fixed;
+  top: 10vh;
+  margin-left:-200px;
+  background-color:var(--c1);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Segoe UI', sans-serif;
+  max-width: 290px;
+  z-index: 1000;
+  animation: fadeInDown 0.5s ease-out;
+}
+/* Contenedor variable siete */
+.-c-v7{
+  margin-top:110px;
+}
+/* Contenedor variable ocho */
+.-c-v8{
+  display:flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  padding: 10px;
+  gap: 5px;
+}
+/* Contenedor varibale nueve */
+.-c-v9 {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+/* Contenedor variable diez */
+.-c-v10 {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: auto;
+  display:flex;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--c5);
+}
+/* Contenedor variable diez variable uno */
+.-c-v10-v1{
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: auto;
+  display:block;
+  padding: 10px;
+  text-align: center;
+  background-color: var(--c5);
+  border-radius: 50px;
+}
+/* -------------- ESTILO DE iCONOS -------------- */
+/* Tamaño de los iconos*/
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-50 { font-size: 50px; }
+/* Colores de los iconos */
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(240, 3, 3, 0.26); }
+/* -------------- ESTILO DE ELEMENTOS -------------- */
+/* Elemento variable uno */
+.-e-v1{
+  width:auto;
+  padding: 10px;
+  text-align: center;
+}
+/* Imagene del elemento variable uno */
+.-e-v1 img{
+  max-width: 100%;
+}
+/* Elemento variable uno variable uno */
+.-e-v1-v1{
+  width:auto;
+  padding: 5px;
+  margin-left: 80%;
+  margin-right: 5%;
+  cursor: pointer;
+}
+/* Elemento variable dos */
+.-e-v2{
+  max-width:auto;
+  margin-left: auto;
+  margin-right: auto;
+  
+}
+/* Elemento variable tres */
+.-e-v3{
+  color:var(--c3);
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+.-e-v3:hover{
+  color:var(--c2);
+  transform: scale(1.3) rotate(2deg);
+}
+/* El -e-v4 esta en el tipo de letra */
+/* Elemento variable cinco */
+.-e-v5 {
+  background-color: var(--c1);
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  position: relative;
+}
+/* Elemento variable seis */
+.-e-v6 {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+/* Elemento variable siete */
+.-e-v7{
+  width: 10%;
+  left: 0;
+  min-height: 100px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Elemento variable siete variable uno*/
+.-e-v7-v1{
+  width: 90%;
+  min-height: 100px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Elemento variable nueve */
+.-e-v9{
+  border: var(--c3) solid 2px;
+}
+
+/* Elemento del modal subirfoto */
+#preview {
+  max-width: 100%;
+  margin-top: 10px;
+  display: none;
+}
+.-c-v4 table{
+  width: 100%;
+}
+/* -------------- ESTILO DE BODY -------------- */
+.-bd-v1{max-width: 400px;margin: auto;background-color: red;}
+.-bd-v2{width: 350px;margin: auto;margin-top: 10vh;}
+.-bd-v3{width: 430px;margin: auto;}
+
+/* link */
+a{
+  color: var(--c);
+}
+/* --------------------------------- Estilos Html ----------------------------------- */
+table {
+  table-layout: fixed; /* Evita que las columnas cambien de tamaño */
+  width: 100%; /* Ajusta al 100% del contenedor */
+  border-collapse: collapse; /* Bordes unidos */
+}
+
+th, td {
+  border: 1px solid #ccc; /* Borde sutil */
+  padding: 8px;
+  text-align: left; /* Alineación a la izquierda */
+  overflow: hidden; /* Oculta contenido que se desborde */
+  text-overflow: ellipsis; /* Muestra "..." si el contenido es muy largo */
+  white-space: nowrap; /* No permite salto de línea */
+}
+/* Crear una linea de decoracion para enlaces */
+/* a{
+  text-decoration: none;
+} */

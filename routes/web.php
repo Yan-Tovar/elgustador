@@ -1,22 +1,62 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Middleware\VerificarRol;
+use App\Http\Controllers\OpcionesUsuarioController;
+use App\Http\Controllers\AjustesUsuarioController;
 
+/*
+|--------------------------------------------------------------------------
+| Rutas Públicas (sin autenticación)
+|--------------------------------------------------------------------------
+*/
+
+// Página principal (Index)
 Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    return view('index');
+})->name('inicio');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Vista de Login
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
 
-Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+// Procesa el Login (Formulario POST)
+Route::post('/login', [LoginController::class, 'autenticar'])->name('login.procesar');
 
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-});
+// Cierre de sesión (Logout)
+Route::get('/logout', function () {
+    Session::flush();  // Limpia toda la sesión
+    return redirect()->route('login');
+})->name('logout');
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| Rutas Protegidas por Rol (Middleware VerificarRol)
+|--------------------------------------------------------------------------
+*/
+
+// Dashboard Unico de Entrada (Pagina Principal)
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Vista de Usuario (Para todos los roles)
+Route::get('/opcionesUsuario', [OpcionesUsuarioController::class, 'index'])->name('opcionesUsuario');
+
+// Vista de AjustesUsuario (Para todos los roles)
+Route::get('/ajustesUsuario', [AjustesUsuarioController::class, 'index'])->name('ajustesUsuario');
+
+/*
+|--------------------------------------------------------------------------
+| Ruta Dashboard General (Para pruebas o uso básico)
+|--------------------------------------------------------------------------
+| Esta ruta verifica si hay sesión iniciada (usuario_id), si no redirige al login.
+| Si existe sesión, muestra un mensaje básico.
+|--------------------------------------------------------------------------
+*/
+
