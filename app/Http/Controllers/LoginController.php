@@ -21,7 +21,10 @@ class LoginController extends Controller
             Session::put('usuario_id', $usuario->id);
             Session::put('usuario_nombre', $usuario->nombre);
             Session::put('usuario_email', $usuario->email);
+            Session::put('usuario_direccion', $usuario->direccion);
+            Session::put('usuario_identificacion', $usuario->identificacion);
             Session::put('usuario_rol', $usuario->rol);
+            Session::put('usuario_foto', $usuario->foto);
 
             return redirect('/dashboard');
             

@@ -1,3 +1,11 @@
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+@endif
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,35 +30,85 @@
     <div class="row">
       <div class="col-sm-12 col-md-12 col-lg-5">
         <div class="-c-v4">
-          <img src="Imagenes/usuario.jpg" class="-im-v3">
+          @if($usuario_foto)
+              <img src="{{ asset('storage/imagenes/' . $usuario->foto) }}" class="-im-v3">
+          @else
+              <img src="{{ asset('imagenes/perfil_oculto.png') }}" class="-im-v3">
+          @endif
         </div>
         <br>
-        <!-- Botón para abrir el modal -->
-        <div class="-c-v4">
-          <button class="-b-v4" onclick="abrirModal()">Cambiar Foto</button>
-        </div>
+        <!-- Formulario para subir foto -->
+        <form action="{{ route('ajustesUsuario.subir') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-3">
+                <input type="file" name="foto" class="form-control" required>
+                @error('foto') <small class="text-danger">{{ $message }}</small> @enderror
+            </div>
+            <div class="-c-v4">
+              <button type="submit" class="-b-v4" >Cambiar Foto</button>
+            </div>
+        </form>
+        
         <br>
-        <!-- Modal -->
-        <div id="miModal" class="-c-v9">
-          <div class="-e-v5">
-            <span class="-e-v6" onclick="cerrarModal()">&times;</span>
-            <h3>Sube una imagen</h3>
-            <input type="file" accept="image/*" onchange="mostrarPreview(event)">
-            <img id="preview" alt="Vista previa" class="-im-v2">
-          </div>
-        </div>
       </div>
       <br>
       <div class="col-sm-12 col-md-12 col-lg-5">
-        <div class="-c-v4">Editar Datos Personales<i class="material-icons -e-v3">edit</i></div>
-        <form class="-c-v3">
-          <label>Nombre</label><br>
-          <input type="text" value="{{ Session::get('usuario_nombre') }}" class="-b-v2" placeholder="Ingrese su Nombre" required>
-          <br><label>Correo</label><br>
-          <input type="text" value="{{ Session::get('usuario_email') }}" class="-b-v2" placeholder="Ingrese su Correo" required>
-          <br><br>
-          <button class="-b-v5">Guardar Cambios</button>
-        </form>
+        <div class="-c-v4">Editar Datos Personales</div>
+        <ul class="list-group">
+          <li class="list-group-item"><strong>Identificación:</strong> {{ $usuario->identificacion }}</li>
+          <li class="list-group-item"><strong>Nombre:</strong> <span id="nombre-display">{{ $usuario->nombre }}</span></li>
+          <li class="list-group-item"><strong>Email:</strong> <span id="email-display">{{ $usuario->email }}</span></li>
+          <li class="list-group-item"><strong>Teléfono:</strong> <span id="telefono-display">{{ $usuario->telefono }}</span></li>
+          <li class="list-group-item"><strong>Dirección:</strong> <span id="direccion-display">{{ $usuario->direccion }}</span></li>
+        </ul>
+
+      <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editarModal">Editar Usuario</button>
+
+<!-- MODAL BOOTSTRAP -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{{ route('ajustesUsuario.update') }}" method="POST">
+          @csrf
+          @method('PUT')
+          <div class="modal-header">
+              <h5 class="modal-title" id="editarModalLabel">Editar Usuario</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label for="identificacion" class="form-label">Identificacion</label>
+                  <input type="text" class="form-control" id="identificacion" name="identificacion" value="{{ $usuario->identificacion }}">
+              </div>
+              <div class="mb-3">
+                  <label for="nombre" class="form-label">Nombre</label>
+                  <input type="text" class="form-control" id="nombre" name="nombre" value="{{ $usuario->nombre }}">
+              </div>
+              <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" value="{{ $usuario->email }}">
+              </div>
+              <div class="mb-3">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input type="text" class="form-control" id="telefono" name="telefono" value="{{ $usuario->telefono }}">
+              </div>
+              <div class="mb-3">
+                  <label for="direccion" class="form-label">Dirección</label>
+                  <input type="text" class="form-control" id="direccion" name="direccion" value="{{ $usuario->direccion }}">
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
         <br>
         <!-- Button trigger modal -->
          <div class="-c-v4">

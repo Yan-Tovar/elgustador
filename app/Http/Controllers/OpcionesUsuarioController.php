@@ -17,7 +17,8 @@ class OpcionesUsuarioController extends Controller
 
         $usuario_nombre = Session::get('usuario_nombre');
         $usuario_rol = Session::get('usuario_rol');
+        $usuario_foto = session('usuario_foto');
 
-        return view('opcionesUsuario', compact('usuario_nombre', 'usuario_rol'));
+        return view('opcionesUsuario', compact('usuario_nombre', 'usuario_rol', 'usuario_foto'));
     }
 }

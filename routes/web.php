@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\VerificarRol;
 use App\Http\Controllers\OpcionesUsuarioController;
 use App\Http\Controllers\AjustesUsuarioController;
+use App\Http\Controllers\ProductosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +50,14 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::get('/opcionesUsuario', [OpcionesUsuarioController::class, 'index'])->name('opcionesUsuario');
 
 // Vista de AjustesUsuario (Para todos los roles)
-Route::get('/ajustesUsuario', [AjustesUsuarioController::class, 'index'])->name('ajustesUsuario');
+Route::get('/ajustesUsuario', [AjustesUsuarioController::class, 'show'])->name('ajustesUsuario.show');
+Route::put('/ajustesUsuario', [AjustesUsuarioController::class, 'update'])->name('ajustesUsuario.update');
+// Estas son las rutas para las subir y eliminar imagenes
+Route::post('/ajustesUsuario', [AjustesUsuarioController::class, 'subir'])->name('ajustesUsuario.subir');
+Route::delete('/ajustesUsuario', [AjustesUsuarioController::class, 'eliminar'])->name('ajustesUsuario.eliminar');
+// Estas Son las rutas para el Crud de Productos
+Route::resource('productos', ProductosController::class);
+
 
 /*
 |--------------------------------------------------------------------------
