@@ -90,13 +90,13 @@
           </a>
           <!-- FinBoton -->
           <!-- Boton -->
-          <a href="Cliente_Categoria.html">
+          <a href="{{ route('categorias.index') }}">
             <div class="-c-v5">
               <div>
                 <img src="Imagenes/Producto1.png" alt="">
               </div>
               <div>
-                <p>Categoria1</p>
+                <p>Categorias</p>
               </div>
             </div>
           </a>

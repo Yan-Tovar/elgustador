@@ -3,51 +3,48 @@
     @section('content')
 
     <div class="container">
-        <h1>Lista de Productos</h1>
+        <h1>Lista de Categorias</h1>
 
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearProductoModal">
-            Crear Producto
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearCategoriaModal">
+            Crear Categoria
         </button>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        @if(!$productos || $productos->isEmpty())
+        @if(!$categorias || $categorias->isEmpty())
             <div class="alert alert-warning mt-3">
-                No hay productos.
+                No hay categorias.
             </div>
         @else
             <table class="table mt-3">
                 <thead>
                     <tr>
                         <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
+                        <th>Descripcion</th>
                         <th>Imagen</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($productos as $producto)
+                    @foreach($categorias as $categoria)
                         <tr>
-                            <td>{{ $producto->nombre }}</td>
-                            <td>{{ $producto->categoria->nombre }}</td>
-                            <td>$ {{ $producto->precio }}</td>
-                            <td>{{ $producto->stock }}</td>
+                            
+                            <td>{{ $categoria->nombre }}</td>
+                            <td>{{ $categoria->descripcion }}</td>
                             <td>
-                                @if($producto->imagen)
-                                    <img src="{{ asset('storage/productos/' . $producto->imagen) }}" width="100 px">
+                                @if($categoria->imagen)
+                                    <img src="{{ asset('storage/categorias/' . $categoria->imagen) }}" width="100 px">
                                 @else
                                     <img src="{{ asset('imagenes/perfil_oculto.png') }}" width="100 px">
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('productos.edit', $producto->id) }}" class="btn btn-primary">
+                                <a href="{{ route('categorias.edit', $categoria->id) }}" class="btn btn-primary">
                                     Editar
                                 </a>
-                                <form action="{{ route('productos.destroy', $producto) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('categorias.destroy', $categoria) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
@@ -60,15 +57,15 @@
         @endif
     </div>
 
-    <!-- Modal para agregar Productos -->
-    <div class="modal fade" id="crearProductoModal" tabindex="-1" aria-labelledby="crearProductoLabel" aria-hidden="true">
+    <!-- Modal para agregar Categoria -->
+    <div class="modal fade" id="crearCategoriaModal" tabindex="-1" aria-labelledby="crearCateogoriaLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-            <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('categorias.store') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="estado" value="Habilitada">
                 @csrf
-                <input type="hidden" name="estado" value="Habilitado" >
                 <div class="modal-header">
-                <h5 class="modal-title" id="crearProductoLabel">Crear Producto</h5>
+                <h5 class="modal-title" id="crearCategoriaLabel">Crear Producto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -79,22 +76,6 @@
                 <div class="mb-3">
                     <label>Descripción</label>
                     <textarea name="descripcion" class="form-control"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label>Precio</label>
-                    <input type="number" step="0.01" name="precio" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Stock</label>
-                    <input type="number" name="stock" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Categoría</label>
-                    <select name="categoria_id" class="form-control" required>
-                        @foreach($categorias as $categoria)
-                            <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
-                        @endforeach
-                    </select>
                 </div>
                 <div class="mb-3">
                     <label>Imagen</label>
@@ -109,5 +90,5 @@
             </div>
         </div>
         </div>
-    
+
 @endsection

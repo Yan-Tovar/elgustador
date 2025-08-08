@@ -770,6 +770,7 @@
 /* link */
 a{
   color: var(--c);
+  text-decoration: none;
 }
 /* --------------------------------- Estilos Html ----------------------------------- */
 table {
