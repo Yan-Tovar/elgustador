@@ -1,17 +1,11 @@
-# Laravel + Livewire Starter Kit
+# Proyecto Formativo con el FrameWork Laravel 
 
 ## Introduction
 
-Our Laravel + [Livewire](https://livewire.laravel.com) starter kit provides a robust, modern starting point for building Laravel applications with a Livewire frontend.
+Los requisitos descritos en la guía (Creación del CRUD) están creados en las funcionalidades de producto y categorias al igual que está creado el inicio de sesion y validacion de usuario. Para poder ejecutar este documento es necesario contar con un computador que contengan los programas necesarios para inicializar laravel, al igual que ejecutar los comandos para crear la carpeta Vendor, .env de ejemplo y la llave de laravel.
+Cuando realice las migraciones Nombre la base de datos como: "elgustadorbd" Y ejecute el comando para crear las migraciones, agregue usuarios de prueba con la contraseña hackeada y en el campo rol agruegue "Administrador", "Cliente" ó "Empleado" según lo necesite.
 
-Livewire is a powerful way of building dynamic, reactive, frontend UIs using just PHP. It's a great fit for teams that primarily use Blade templates and are looking for a simpler alternative to JavaScript-driven SPA frameworks like React and Vue.
-
-This Livewire starter kit utilizes Livewire 3, Laravel Volt (optionally), TypeScript, Tailwind, and the [Flux UI](https://fluxui.dev) component library.
-
-If you are looking for the alternate configurations of this starter kit, they can be found in the following branches:
-
-- [components](https://github.com/laravel/livewire-starter-kit/tree/components) - if Volt is not selected
-- [workos](https://github.com/laravel/livewire-starter-kit/tree/workos) - if WorkOS is selected for authentication
+Solamente estan habilitados los botones productos y categorias.
 
 ## Official Documentation
 

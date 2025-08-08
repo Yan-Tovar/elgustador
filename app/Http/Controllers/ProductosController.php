@@ -15,13 +15,13 @@ class ProductosController extends Controller
     {
         $productos = Productos::with('categoria')->get();
         $usuario_rol = Session::get('usuario_rol');
-        $categorias = Categorias::all();
+        $categorias = Categorias::where('estado', '!=', 'Inhabilitada')->get();
         return view('productos', compact('productos', 'usuario_rol', 'categorias'));
     }
 
     public function create()
     {
-        $categorias = Categorias::all();
+        $categorias = Categorias::where('estado', '!=', 'Inhabilitada')->get();
         return view('productos.index', compact('categorias'));
     }
 
@@ -34,6 +34,7 @@ class ProductosController extends Controller
             'stock' => 'required|integer',
             'categoria_id' => 'required|exists:categorias,id',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'estado' => 'required',
         ]);
 
         $datos = $request->except('imagen');
@@ -52,7 +53,7 @@ class ProductosController extends Controller
 
     public function edit(Productos $producto)
     {
-        $categorias = Categorias::all();
+        $categorias = Categorias::where('estado', '!=', 'Inhabilitada')->get();
         $usuario_rol = Session::get('usuario_rol');
         return view('productosEditar', compact('producto', 'categorias', 'usuario_rol'));
     }
@@ -78,7 +79,7 @@ class ProductosController extends Controller
 
             $imagen = $request->file('imagen');
             $nombreImagen = time() . '.' . $imagen->getClientOriginalExtension();
-            $imagen->storeAs('public/productos', $nombreImagen);
+            $imagen->storeAs('productos', $nombreImagen, 'public');
             $datos['imagen'] = $nombreImagen;
         }
 

@@ -11,6 +11,7 @@ use App\Http\Middleware\VerificarRol;
 use App\Http\Controllers\OpcionesUsuarioController;
 use App\Http\Controllers\AjustesUsuarioController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\CategoriasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,8 @@ Route::post('/ajustesUsuario', [AjustesUsuarioController::class, 'subir'])->name
 Route::delete('/ajustesUsuario', [AjustesUsuarioController::class, 'eliminar'])->name('ajustesUsuario.eliminar');
 // Estas Son las rutas para el Crud de Productos
 Route::resource('productos', ProductosController::class);
+// Estas Son las rutas para el Crud de Categorias
+Route::resource('categorias', CategoriasController::class);
 
 
 /*

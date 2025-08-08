@@ -195,93 +195,37 @@
                   <!-- Carrusel Destacado -->
                   <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                      <div class="carousel-item active" data-bs-interval="10000">
-                        <!-- Contenedor de producto -->
-                        <div class="-c-v3">
-                          <div class="-c-v4">
-                            <div class="-e-v1">
-                              <img src="Imagenes/Producto1.png" alt="">
+                      @foreach($productos as $producto)
+                        <div class="carousel-item active" data-bs-interval="10000">
+                          <!-- Contenedor de producto -->
+                          <div class="-c-v3">
+                            <div class="-c-v4">
+                              <div class="-e-v1">
+                                <img src="Imagenes/Producto1.png" alt="">
+                              </div>
+                              <div class="-e-v1">
+                                <p><strong>{{ $producto->nombre }}</strong></p>
+                              </div>
                             </div>
-                            <div class="-e-v1">
-                              <p><strong> Cenela molida 10g x 100 unidades</strong></p>
+                            <div class="-c-v4">
+                              <div class="-e-v2">
+                                <p><strong>{{ $producto->precio }}</strong></p>
+                              </div>
+                              <div class="-e-v2">
+                                <a href="Cliente_Producto.html">Más Información</a>
+                              </div>
+                            </div><hr>
+                            <div class="-c-v4">
+                              <div class="-b-v6 -e-v2">
+                                <button onclick="updateCount(-1)">−</button>
+                                <input type="number" id="productCount" value="1" min="0">
+                                <button onclick="updateCount(1)">+</button>
+                              </div>
+                              <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
                             </div>
-                          </div>
-                          <div class="-c-v4">
-                            <div class="-e-v2">
-                              <p><strong>$ 1.000,00</strong></p>
-                            </div>
-                            <div class="-e-v2">
-                              <a href="Cliente_Producto.html">Más Información</a>
-                            </div>
-                          </div><hr>
-                          <div class="-c-v4">
-                            <div class="-b-v6 -e-v2">
-                              <button onclick="updateCount(-1)">−</button>
-                              <input type="number" id="productCount" value="1" min="0">
-                              <button onclick="updateCount(1)">+</button>
-                            </div>
-                            <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
                           </div>
                         </div>
-                      </div>
-                      <div class="carousel-item" data-bs-interval="2000">
-                        <!-- Contenedor de producto -->
-                        <div class="-c-v3">
-                          <div class="-c-v4">
-                            <div class="-e-v1">
-                              <img src="Imagenes/Producto1.png" alt="">
-                            </div>
-                            <div class="-e-v1">
-                              <p><strong> Cenela molida 10g x 100 unidades</strong></p>
-                            </div>
-                          </div>
-                          <div class="-c-v4">
-                            <div class="-e-v2">
-                              <p><strong>$ 1.000,00</strong></p>
-                            </div>
-                            <div class="-e-v2">
-                              <a href="Cliente_Producto.html">Más Información</a>
-                            </div>
-                          </div><hr>
-                          <div class="-c-v4">
-                            <div class="-b-v6 -e-v2">
-                              <button onclick="updateCount(-1)">−</button>
-                              <input type="number" id="productCount" value="1" min="0">
-                              <button onclick="updateCount(1)">+</button>
-                            </div>
-                            <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <!-- Contenedor de producto -->
-                        <div class="-c-v3">
-                          <div class="-c-v4">
-                            <div class="-e-v1">
-                              <img src="Imagenes/Producto1.png" alt="">
-                            </div>
-                            <div class="-e-v1">
-                              <p><strong> Cenela molida 10g x 100 unidades</strong></p>
-                            </div>
-                          </div>
-                          <div class="-c-v4">
-                            <div class="-e-v2">
-                              <p><strong>$ 1.000,00</strong></p>
-                            </div>
-                            <div class="-e-v2">
-                              <a href="Cliente_Producto.html">Más Información</a>
-                            </div>
-                          </div><hr>
-                          <div class="-c-v4">
-                            <div class="-b-v6 -e-v2">
-                              <button onclick="updateCount(-1)">−</button>
-                              <input type="number" id="productCount" value="1" min="0">
-                              <button onclick="updateCount(1)">+</button>
-                            </div>
-                            <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
-                          </div>
-                        </div>
-                      </div>
+                      @endforeach
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
                       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
