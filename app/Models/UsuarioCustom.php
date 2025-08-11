@@ -25,4 +25,14 @@ class UsuarioCustom extends Model
     protected $hidden = [
         'password',
     ];
+
+     public function carrito()
+    {
+        return $this->hasOne(Carrito::class, 'usuario_id');
+    }
+
+    public function facturas()
+    {
+        return $this->hasMany(Factura::class, 'usuario_id');
+    }
 }

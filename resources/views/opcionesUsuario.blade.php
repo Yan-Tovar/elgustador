@@ -77,42 +77,26 @@
       <div class="col-sm-12 col-md-12 col-lg-4">
         <div class="-c-v8">
           <br>
-          <!-- Boton -->
-          <a href="{{ route('productos.index') }}">
-            <div class="-c-v5">
-              <div>
-                <img src="{{ asset('imagenes/gestionProductos.jpeg') }}" alt="Gestion de Productos">
+          <!-- Inicio Boton Productos -->
+            <a href="{{ route('productos.index') }}">
+              <div class="-c-v5">
+                <div class="-e-v2">
+                  <img src="{{ asset('imagenes/GestionProductos.jpeg') }}" class="-im-v2">
+                  <p class="-c-v4">Productos</p>
+                </div>
               </div>
-              <div>
-                <p>Productos</p>
+            </a>
+          <!-- Fin Boton -->
+          <!-- Inicio Boton Categorias -->
+            <a href="{{ route('categorias.index') }}">
+              <div class="-c-v5">
+                <div class="-e-v2">
+                  <img src="{{ asset('imagenes/GestionCategorias.jpeg') }}" class="-im-v2">
+                  <p class="-c-v4">Categorias</p>
+                </div>
               </div>
-            </div>
-          </a>
-          <!-- FinBoton -->
-          <!-- Boton -->
-          <a href="{{ route('categorias.index') }}">
-            <div class="-c-v5">
-              <div>
-                <img src="Imagenes/Producto1.png" alt="">
-              </div>
-              <div>
-                <p>Categorias</p>
-              </div>
-            </div>
-          </a>
-          <!-- FinBoton -->
-          <!-- Boton -->
-          <a href="Cliente_Categoria.html">
-            <div class="-c-v5">
-              <div>
-                <img src="Imagenes/Producto1.png" alt="">
-              </div>
-              <div>
-                <p>Categoria1</p>
-              </div>
-            </div>
-          </a>
-          <!-- FinBoton -->
+            </a>
+          <!-- Fin Boton -->
         </div>
       </div>
       <br>

@@ -22,3 +22,5 @@ In order to ensure that the Laravel community is welcoming to all, please review
 ## License
 
 The Laravel + Livewire starter kit is open-sourced software licensed under the MIT license.
+
+<!-- <a href="{{ route('producto.detalle', $producto->id) }}">Más Información</a> -->

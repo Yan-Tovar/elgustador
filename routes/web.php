@@ -12,6 +12,7 @@ use App\Http\Controllers\OpcionesUsuarioController;
 use App\Http\Controllers\AjustesUsuarioController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\CategoriasController;
+use App\Http\Controllers\CarritoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,8 @@ Route::delete('/ajustesUsuario', [AjustesUsuarioController::class, 'eliminar'])-
 Route::resource('productos', ProductosController::class);
 // Estas Son las rutas para el Crud de Categorias
 Route::resource('categorias', CategoriasController::class);
+// Estas son las rutas para el fujo de compra
+Route::resource('carrito', CarritoController::class);
 
 
 /*
@@ -70,4 +73,3 @@ Route::resource('categorias', CategoriasController::class);
 | Si existe sesión, muestra un mensaje básico.
 |--------------------------------------------------------------------------
 */
-
