@@ -680,13 +680,14 @@
 /* -------------- ESTILO DE ELEMENTOS -------------- */
 /* Elemento variable uno */
 .-e-v1{
-  width:auto;
+  max-width:50%;
   padding: 10px;
   text-align: center;
 }
 /* Imagene del elemento variable uno */
 .-e-v1 img{
   max-width: 100%;
+  border-radius: 10px;
 }
 /* Elemento variable uno variable uno */
 .-e-v1-v1{

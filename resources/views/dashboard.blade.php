@@ -35,32 +35,28 @@
                   </div>
                   <hr>
                   <div class="-c-v4 -c-v8">
-                    <a href="Administrador_EstadisticasYReportes_General.html"><div class="-c-v5">
-                      <div class="-e-v1">
-                        <i class="material-icons">equalizer</i>
-                      </div>
-                      <div class="-e-v1">
-                        <p>Estadisticas</p>
-                      </div>
-                    </div></a>
-                    <a href="Administrador_EstadisticasYReportes_General.html"><div class="-c-v5">
-                      <div class="-e-v1">
-                        <i class="material-icons">equalizer</i>
-                      </div>
-                      <div class="-e-v1">
-                        <p>Estadisticas</p>
-                      </div>
-                    </div></a>
-                    <a href="Administrador_EstadisticasYReportes_General.html"><div class="-c-v5">
-                      <div class="-e-v1">
-                        <i class="material-icons">equalizer</i>
-                      </div>
-                      <div class="-e-v1">
-                        <p>Estadisticas</p>
-                      </div>
-                    </div></a>
-                </div>
-                <br>
+                    <!-- Inicio Boton Productos -->
+                      <a href="{{ route('productos.index') }}">
+                        <div class="-c-v5">
+                          <div class="-e-v2">
+                            <img src="{{ asset('imagenes/GestionProductos.jpeg') }}" class="-im-v2">
+                            <p class="-c-v4">Productos</p>
+                          </div>
+                        </div>
+                      </a>
+                    <!-- Fin Boton -->
+                    <!-- Inicio Boton Categorias -->
+                      <a href="{{ route('categorias.index') }}">
+                        <div class="-c-v5">
+                          <div class="-e-v2">
+                            <img src="{{ asset('imagenes/GestionCategorias.jpeg') }}" class="-im-v2">
+                            <p class="-c-v4">Categorias</p>
+                          </div>
+                        </div>
+                      </a>
+                    <!-- Fin Boton -->
+                  </div>
+                  <br>
                 </div>
               </div>
               <div class="-c-v4">
@@ -196,35 +192,46 @@
                   <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
                       @foreach($productos as $producto)
+                      <!-- Este es el contenedor de presentación para los productos -->
                         <div class="carousel-item active" data-bs-interval="10000">
-                          <!-- Contenedor de producto -->
                           <div class="-c-v3">
                             <div class="-c-v4">
-                              <div class="-e-v1">
-                                <img src="Imagenes/Producto1.png" alt="">
-                              </div>
-                              <div class="-e-v1">
-                                <p><strong>{{ $producto->nombre }}</strong></p>
-                              </div>
+                                <div class="-e-v1">
+                                    <img src="Imagenes/Producto1.png" alt="">
+                                </div>
+                                <div class="-e-v1">
+                                    <p><strong>{{ $producto->nombre }}</strong></p>
+                                </div>
                             </div>
+
                             <div class="-c-v4">
-                              <div class="-e-v2">
-                                <p><strong>{{ $producto->precio }}</strong></p>
-                              </div>
-                              <div class="-e-v2">
-                                <a href="Cliente_Producto.html">Más Información</a>
-                              </div>
-                            </div><hr>
-                            <div class="-c-v4">
-                              <div class="-b-v6 -e-v2">
-                                <button onclick="updateCount(-1)">−</button>
-                                <input type="number" id="productCount" value="1" min="0">
-                                <button onclick="updateCount(1)">+</button>
-                              </div>
-                              <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
+                                <div class="-e-v2">
+                                    <p><strong>${{ $producto->precio }}</strong></p>
+                                </div>
+                                <div class="-e-v2">
+                                    detalle
+                                </div>
                             </div>
-                          </div>
+
+                            <hr>
+
+                            <div class="-c-v4">
+                                <div class="-b-v6 -e-v2">
+                                    <button type="button" onclick="updateCount(-1, {{ $producto->id }})">−</button>
+                                    <input type="number" id="productCount_{{ $producto->id }}" name="cantidad" value="1" min="1">
+                                    <button type="button" onclick="updateCount(1, {{ $producto->id }})">+</button>
+                                </div>
+
+                                <!-- Formulario para añadir al carrito -->
+                                <form action="{{ route('carrito.index', $producto->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="cantidad" id="cantidadInput_{{ $producto->id }}" value="1">
+                                    <button type="submit" class="-b-v5 -e-v2">Añadir +</button>
+                                </form>
+                            </div>
                         </div>
+                        </div>
+                        <!-- Aquí finaliza el contenedor de presentación de productos -->
                       @endforeach
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">

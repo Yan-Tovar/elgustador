@@ -3,47 +3,53 @@
     @section('content')
 
     <div class="container">
-        <h1>Lista de Productos</h1>
+        <div class="-c-v4">
+            <h4 class="-tx-v2">Gestion de Productos</h4>
+        </div>
+        <div class="-c-v4">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearProductoModal">
+                Crear Producto
+            </button>     
+        </div>
 
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearProductoModal">
-            Crear Producto
-        </button>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
         @if(!$productos || $productos->isEmpty())
             <div class="alert alert-warning mt-3">
                 No hay productos.
             </div>
         @else
-            <table class="table mt-3">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Imagen</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($productos as $producto)
-                        <tr>
-                            <td>{{ $producto->nombre }}</td>
-                            <td>{{ $producto->categoria->nombre }}</td>
-                            <td>$ {{ $producto->precio }}</td>
-                            <td>{{ $producto->stock }}</td>
-                            <td>
-                                @if($producto->imagen)
-                                    <img src="{{ asset('storage/productos/' . $producto->imagen) }}" width="100 px">
-                                @else
-                                    <img src="{{ asset('imagenes/perfil_oculto.png') }}" width="100 px">
-                                @endif
-                            </td>
-                            <td>
+
+        <div class="row">
+            @foreach($productos as $producto)
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <!-- Este es el contenedor de presentación para los productos -->
+                        <br>
+                        <div class="-c-v3">
+                            <div class="-c-v4">
+                                <div class="-e-v1">
+                                    @if($producto->imagen)
+                                        <img src="{{ asset('storage/productos/' . $producto->imagen) }}">
+                                    @else
+                                        <img src="{{ asset('imagenes/perfil_oculto.png') }}">
+                                    @endif
+                                </div>
+                                <div class="-e-v1">
+                                    <p><strong>{{ $producto->nombre }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="-c-v4">
+                                <div class="-e-v2">
+                                    <p><strong>$ {{ $producto->precio }}</strong></p>
+                                </div>
+                                <div class="-e-v2">
+                                    <a href="Cliente_Producto.html">Más Información</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="-c-v4">
                                 <a href="{{ route('productos.edit', $producto->id) }}" class="btn btn-primary">
                                     Editar
                                 </a>
@@ -52,11 +58,13 @@
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                 </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            </div>
+                        </div>
+                        <br>
+                    <!-- Aquí finaliza el contenedor de presentación de productos -->
+                </div>
+            @endforeach
+        </div>
         @endif
     </div>
 
