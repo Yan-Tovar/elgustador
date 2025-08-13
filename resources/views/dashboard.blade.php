@@ -35,6 +35,7 @@
                   </div>
                   <hr>
                   <div class="-c-v4 -c-v8">
+<<<<<<< Updated upstream
                     <a href="Administrador_EstadisticasYReportes_General.html"><div class="-c-v5">
                       <div class="-e-v1">
                         <i class="material-icons">equalizer</i>
@@ -61,6 +62,40 @@
                     </div></a>
                 </div>
                 <br>
+=======
+                    <!-- Inicio Boton Productos -->
+                      <a href="{{ route('productos.index') }}">
+                        <div class="-c-v5">
+                          <div class="-e-v2">
+                            <img src="{{ asset('imagenes/GestionProductos.jpeg') }}" class="-im-v2">
+                            <p class="-c-v4">Productos</p>
+                          </div>
+                        </div>
+                      </a>
+                    <!-- Fin Boton -->
+                    <!-- Inicio Boton Categorias -->
+                      <a href="{{ route('categorias.index') }}">
+                        <div class="-c-v5">
+                          <div class="-e-v2">
+                            <img src="{{ asset('imagenes/GestionCategorias.jpeg') }}" class="-im-v2">
+                            <p class="-c-v4">Categorias</p>
+                          </div>
+                        </div>
+                      </a>
+                    <!-- Fin Boton -->
+                       <!-- Inicio Boton apuntes -->
+                      <a href="{{ route('apuntes.index') }}">
+                        <div class="-c-v5">
+                          <div class="-e-v2">
+                            <img src="{{ asset('imagenes/GestionCategorias.jpeg') }}" class="-im-v2">
+                            <p class="-c-v4">Apuntes</p>
+                          </div>
+                        </div>
+                      </a>
+                    <!-- Fin Boton -->
+                  </div>
+                  <br>
+>>>>>>> Stashed changes
                 </div>
               </div>
               <div class="-c-v4">
