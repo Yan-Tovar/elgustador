@@ -26,6 +26,8 @@ class UsuarioCustom extends Model
         'password',
     ];
 
+
+
      public function carrito()
     {
         return $this->hasOne(Carrito::class, 'usuario_id');
@@ -35,4 +37,12 @@ class UsuarioCustom extends Model
     {
         return $this->hasMany(Factura::class, 'usuario_id');
     }
+
+
+    
+    public function apuntes()
+    {
+        return $this->hasMany(Apuntes::class, 'usuario_id');
+    }
+
 }

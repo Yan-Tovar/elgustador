@@ -10,9 +10,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\VerificarRol;
 use App\Http\Controllers\OpcionesUsuarioController;
 use App\Http\Controllers\AjustesUsuarioController;
+
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\CarritoController;
+use App\Http\Controllers\ApuntesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +54,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::get('/opcionesUsuario', [OpcionesUsuarioController::class, 'index'])->name('opcionesUsuario');
 
 // Vista de AjustesUsuario (Para todos los roles)
+
+Route::get('/ajustesUsuario', [AjustesUsuarioController::class, 'index'])->name('ajustesUsuario');
+
 Route::get('/ajustesUsuario', [AjustesUsuarioController::class, 'show'])->name('ajustesUsuario.show');
 Route::put('/ajustesUsuario', [AjustesUsuarioController::class, 'update'])->name('ajustesUsuario.update');
 // Estas son las rutas para las subir y eliminar imagenes
@@ -63,6 +68,10 @@ Route::resource('productos', ProductosController::class);
 Route::resource('categorias', CategoriasController::class);
 // Estas son las rutas para el fujo de compra
 Route::resource('carrito', CarritoController::class);
+
+// Estas Son las rutas para el Crud de Apuntes
+Route::resource('apuntes', ApuntesController::class);
+
 
 
 /*
