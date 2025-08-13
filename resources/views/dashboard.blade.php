@@ -35,7 +35,7 @@
                   </div>
                   <hr>
                   <div class="-c-v4 -c-v8">
-<<<<<<< Updated upstream
+
                     <a href="Administrador_EstadisticasYReportes_General.html"><div class="-c-v5">
                       <div class="-e-v1">
                         <i class="material-icons">equalizer</i>
@@ -62,7 +62,7 @@
                     </div></a>
                 </div>
                 <br>
-=======
+
                     <!-- Inicio Boton Productos -->
                       <a href="{{ route('productos.index') }}">
                         <div class="-c-v5">
@@ -83,6 +83,7 @@
                         </div>
                       </a>
                     <!-- Fin Boton -->
+
                        <!-- Inicio Boton apuntes -->
                       <a href="{{ route('apuntes.index') }}">
                         <div class="-c-v5">
@@ -95,7 +96,8 @@
                     <!-- Fin Boton -->
                   </div>
                   <br>
->>>>>>> Stashed changes
+
+
                 </div>
               </div>
               <div class="-c-v4">
@@ -230,93 +232,48 @@
                   <!-- Carrusel Destacado -->
                   <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                      <div class="carousel-item active" data-bs-interval="10000">
-                        <!-- Contenedor de producto -->
-                        <div class="-c-v3">
-                          <div class="-c-v4">
-                            <div class="-e-v1">
-                              <img src="Imagenes/Producto1.png" alt="">
+                      @foreach($productos as $producto)
+                      <!-- Este es el contenedor de presentación para los productos -->
+                        <div class="carousel-item active" data-bs-interval="10000">
+                          <div class="-c-v3">
+                            <div class="-c-v4">
+                                <div class="-e-v1">
+                                    <img src="Imagenes/Producto1.png" alt="">
+                                </div>
+                                <div class="-e-v1">
+                                    <p><strong>{{ $producto->nombre }}</strong></p>
+                                </div>
                             </div>
-                            <div class="-e-v1">
-                              <p><strong> Cenela molida 10g x 100 unidades</strong></p>
+
+                            <div class="-c-v4">
+                                <div class="-e-v2">
+                                    <p><strong>${{ $producto->precio }}</strong></p>
+                                </div>
+                                <div class="-e-v2">
+                                    detalle
+                                </div>
                             </div>
-                          </div>
-                          <div class="-c-v4">
-                            <div class="-e-v2">
-                              <p><strong>$ 1.000,00</strong></p>
+
+                            <hr>
+
+                            <div class="-c-v4">
+                                <div class="-b-v6 -e-v2">
+                                    <button type="button" onclick="updateCount(-1, {{ $producto->id }})">−</button>
+                                    <input type="number" id="productCount_{{ $producto->id }}" name="cantidad" value="1" min="1">
+                                    <button type="button" onclick="updateCount(1, {{ $producto->id }})">+</button>
+                                </div>
+
+                                <!-- Formulario para añadir al carrito -->
+                                <form action="{{ route('carrito.index', $producto->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="cantidad" id="cantidadInput_{{ $producto->id }}" value="1">
+                                    <button type="submit" class="-b-v5 -e-v2">Añadir +</button>
+                                </form>
                             </div>
-                            <div class="-e-v2">
-                              <a href="Cliente_Producto.html">Más Información</a>
-                            </div>
-                          </div><hr>
-                          <div class="-c-v4">
-                            <div class="-b-v6 -e-v2">
-                              <button onclick="updateCount(-1)">−</button>
-                              <input type="number" id="productCount" value="1" min="0">
-                              <button onclick="updateCount(1)">+</button>
-                            </div>
-                            <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
-                          </div>
                         </div>
-                      </div>
-                      <div class="carousel-item" data-bs-interval="2000">
-                        <!-- Contenedor de producto -->
-                        <div class="-c-v3">
-                          <div class="-c-v4">
-                            <div class="-e-v1">
-                              <img src="Imagenes/Producto1.png" alt="">
-                            </div>
-                            <div class="-e-v1">
-                              <p><strong> Cenela molida 10g x 100 unidades</strong></p>
-                            </div>
-                          </div>
-                          <div class="-c-v4">
-                            <div class="-e-v2">
-                              <p><strong>$ 1.000,00</strong></p>
-                            </div>
-                            <div class="-e-v2">
-                              <a href="Cliente_Producto.html">Más Información</a>
-                            </div>
-                          </div><hr>
-                          <div class="-c-v4">
-                            <div class="-b-v6 -e-v2">
-                              <button onclick="updateCount(-1)">−</button>
-                              <input type="number" id="productCount" value="1" min="0">
-                              <button onclick="updateCount(1)">+</button>
-                            </div>
-                            <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
-                          </div>
                         </div>
-                      </div>
-                      <div class="carousel-item">
-                        <!-- Contenedor de producto -->
-                        <div class="-c-v3">
-                          <div class="-c-v4">
-                            <div class="-e-v1">
-                              <img src="Imagenes/Producto1.png" alt="">
-                            </div>
-                            <div class="-e-v1">
-                              <p><strong> Cenela molida 10g x 100 unidades</strong></p>
-                            </div>
-                          </div>
-                          <div class="-c-v4">
-                            <div class="-e-v2">
-                              <p><strong>$ 1.000,00</strong></p>
-                            </div>
-                            <div class="-e-v2">
-                              <a href="Cliente_Producto.html">Más Información</a>
-                            </div>
-                          </div><hr>
-                          <div class="-c-v4">
-                            <div class="-b-v6 -e-v2">
-                              <button onclick="updateCount(-1)">−</button>
-                              <input type="number" id="productCount" value="1" min="0">
-                              <button onclick="updateCount(1)">+</button>
-                            </div>
-                            <a href="Cliente_Camion.html"><button type="button" class="-b-v5 -e-v2">Añadir +</button></a>
-                          </div>
-                        </div>
-                      </div>
+                        <!-- Aquí finaliza el contenedor de presentación de productos -->
+                      @endforeach
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
                       <span class="carousel-control-prev-icon" aria-hidden="true"></span>

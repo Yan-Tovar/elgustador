@@ -9,20 +9,24 @@ class UsuarioCustom extends Model
 {
     use HasFactory;
 
-    protected $table = 'usuarios_custom';  // Nombre de la tabla de Usuarios
+    protected $table = 'usuarios_custom';
 
     protected $fillable = [
         'nombre',
         'email',
         'password',
         'rol',
+        'telefono',
+        'direccion',
+        'identificacion',
+        'estado',
     ];
 
     protected $hidden = [
         'password',
     ];
-<<<<<<< Updated upstream
-=======
+
+
 
      public function carrito()
     {
@@ -34,10 +38,11 @@ class UsuarioCustom extends Model
         return $this->hasMany(Factura::class, 'usuario_id');
     }
 
+
     
     public function apuntes()
     {
         return $this->hasMany(Apuntes::class, 'usuario_id');
     }
->>>>>>> Stashed changes
+
 }
