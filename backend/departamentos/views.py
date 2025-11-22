@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Departamento
+from .serializers import DepartamentoSerializer
 
-# Create your views here.
+class DepartamentoViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Departamento.objects.all()
+    serializer_class = DepartamentoSerializer
