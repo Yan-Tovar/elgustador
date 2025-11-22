@@ -1,13 +1,17 @@
 // src/pages/AdminDashboard.jsx
 import { Container, Typography, Button, Grid, Card, CardContent } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { logoutBackend } from "../utils/Auth";
+import SideBar from "../components/layout/Sidebar";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
   return (
     <Container sx={{ mt: 4 }}>
+      <SideBar>
+        <h1>Bienvenido Admin</h1>
+      {/* Aquí va el contenido específico del admin */}
+      </SideBar>
       <Typography variant="h4" gutterBottom>Panel de Administrador</Typography>
       <Typography variant="body1" gutterBottom>Bienvenido al panel administrativo. </Typography>
       

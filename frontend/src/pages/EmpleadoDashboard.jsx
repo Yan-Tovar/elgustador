@@ -1,7 +1,7 @@
 // src/pages/EmpleadoDashboard.jsx
 import { Container, Typography, Grid, Card, CardContent, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import LogoutButton from "../components/LogoutButton";
+import LogoutButton from "../components/auth/LogoutButton";
 
 export default function EmpleadoDashboard() {
   const navigate = useNavigate();

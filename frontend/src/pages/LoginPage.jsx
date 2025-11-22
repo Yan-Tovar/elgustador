@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { Container, Button, Typography } from "@mui/material";
 import { loginUser } from "../api/auth";
 import { AuthContext } from "../context/AuthContext";
-import FormInput from "../components/FormInput";
+import FormInput from "../components/auth/FormInput";
 
 export default function LoginPage() {
   const { login } = useContext(AuthContext);

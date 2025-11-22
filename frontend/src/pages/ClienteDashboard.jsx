@@ -2,7 +2,7 @@
 import { Container, Typography, Grid, Card, CardContent, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { logoutBackend } from "../utils/Auth";
-import LogoutButton from "../components/LogoutButton";
+import LogoutButton from "../components/auth/LogoutButton";
 
 export default function ClienteDashboard() {
   const navigate = useNavigate();

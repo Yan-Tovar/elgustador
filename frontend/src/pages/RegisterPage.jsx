@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Container, Button, MenuItem, Typography, TextField } from "@mui/material";
 import { registerUser, getDepartamentos, getMunicipios } from "../api/auth";
 import { AuthContext } from "../context/AuthContext";
-import FormInput from "../components/FormInput";
+import FormInput from "../components/auth/FormInput";
 
 export default function RegisterPage() {
   const { login } = useContext(AuthContext);
