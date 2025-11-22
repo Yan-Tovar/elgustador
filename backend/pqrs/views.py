@@ -1,10 +1,10 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import PQRS
-from .serializers import PQRSSerializer
+from .serializers import PqrsSerializer
 
 class PQRSViewSet(viewsets.ModelViewSet):
-    serializer_class = PQRSSerializer
+    serializer_class = PqrsSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

@@ -1,6 +1,7 @@
 # carrito/serializers.py
 from rest_framework import serializers
-from .models import Carrito, CarritoEventos
+from .models import Carrito
+from carrito_eventos.models import CarritoEvento
 from usuarios.serializers import UsuarioSerializer
 from productos.serializers import ProductoSerializer
 
@@ -14,5 +15,5 @@ class CarritoEventSerializer(serializers.ModelSerializer):
     usuario = UsuarioSerializer(read_only=True)
     producto = ProductoSerializer(read_only=True)
     class Meta:
-        model = CarritoEventos
+        model = CarritoEvento
         fields = '__all__'

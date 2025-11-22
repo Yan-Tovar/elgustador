@@ -1,6 +1,7 @@
 # pedidos/serializers.py
 from rest_framework import serializers
-from .models import Pedido, PedidoDetalle
+from .models import Pedido
+from pedidos_detalles.models import PedidoDetalle
 from usuarios.serializers import UsuarioSerializer
 from municipios.serializers import MunicipioSerializer
 from departamentos.serializers import DepartamentoSerializer

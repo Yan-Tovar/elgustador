@@ -1,8 +1,10 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Carrito, CarritoEventos
-from .serializers import CarritoSerializer, CarritoEventoSerializer
+from .models import Carrito
+from carrito_eventos.models import CarritoEvento
+from .serializers import CarritoSerializer
+from carrito_eventos.serializers import CarritoEventoSerializer
 from productos.models import Producto
 
 class CarritoViewSet(viewsets.ViewSet):
@@ -30,6 +32,6 @@ class CarritoViewSet(viewsets.ViewSet):
         return Response({"mensaje": "Producto eliminado"})
 
 class CarritoEventoViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CarritoEventos.objects.all()
+    queryset = CarritoEvento.objects.all()  
     serializer_class = CarritoEventoSerializer
     permission_classes = [IsAuthenticated]

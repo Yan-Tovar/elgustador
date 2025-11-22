@@ -1,7 +1,8 @@
 from rest_framework import viewsets, filters
-from .models import Producto, Categoria
+from .models import Producto
+from categorias.models import Categoria
 from .serializers import ProductoSerializer
-from categorias.models import CategoriaSerializer
+from categorias.serializers import CategoriaSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 class ProductoViewSet(viewsets.ModelViewSet):

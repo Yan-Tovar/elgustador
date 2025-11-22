@@ -1,8 +1,8 @@
 # errores/serializers.py
 from rest_framework import serializers
-from .models import Errores
+from .models import ErrorRegistro
 
 class ErrorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Errores
+        model = ErrorRegistro
         fields = '__all__'

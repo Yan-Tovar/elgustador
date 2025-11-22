@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Factura
 from .serializers import FacturaSerializer
 
-class InvoiceViewSet(viewsets.ReadOnlyModelViewSet):
+class FacturaViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FacturaSerializer
     permission_classes = [IsAuthenticated]
 

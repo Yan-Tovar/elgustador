@@ -1,6 +1,6 @@
 # productos_vistos/serializers.py
 from rest_framework import serializers
-from .models import ProductosVistos
+from .models import ProductoVisto
 from usuarios.serializers import UsuarioSerializer
 from productos.serializers import ProductoSerializer
 
@@ -9,5 +9,5 @@ class ProductosVistosSerializer(serializers.ModelSerializer):
     producto = ProductoSerializer(read_only=True)
 
     class Meta:
-        model = ProductosVistos
+        model = ProductoVisto
         fields = '__all__'

@@ -4,7 +4,7 @@ from .models import Carrusel
 from .serializers import CarruselSerializer
 
 class CarruselViewSet(viewsets.ModelViewSet):
-    queryset = Carrusel.objects.all().order_by("posicion")
+    queryset = Carrusel.objects.all().order_by("orden")
     serializer_class = CarruselSerializer
 
     def get_permissions(self):
