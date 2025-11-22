@@ -8,6 +8,14 @@ from .serializers import (
     UsuarioRegistroSerializer,
     UsuarioLoginSerializer
 )
+from rest_framework_simplejwt.tokens import RefreshToken
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+    }
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all().select_related("departamento", "municipio")
@@ -31,12 +39,14 @@ class LoginViewSet(viewsets.GenericViewSet):
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         identificacion = serializer.validated_data["identificacion"]
         password = serializer.validated_data["password"]
-
         user = authenticate(request, identificacion=identificacion, password=password)
         if not user:
             return Response({"detail": "Credenciales incorrectas"}, status=400)
 
-        return Response(UsuarioSerializer(user).data)
+        tokens = get_tokens_for_user(user)
+        return Response({
+            "user": UsuarioSerializer(user).data,
+            **tokens
+        })

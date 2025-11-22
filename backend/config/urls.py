@@ -22,6 +22,7 @@ urlpatterns = [
 
     # API agrupada por apps
     path("api/usuarios/", include("usuarios.urls")),
+    path("api/auth/", include("usuarios.auth_urls")),  
     path("api/usuarios-sesiones/", include("usuarios_sesiones.urls")),
     path("api/usuarios-actividades/", include("usuarios_actividades.urls")),
     path("api/usuarios-ingresos/", include("usuarios_ingresos.urls")),

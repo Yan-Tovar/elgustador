@@ -12,6 +12,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 pytest.ini
+.pytest_cache
 
 # ================================================================
 # ENTORNOS VIRTUALES / DEPENDENCIAS
