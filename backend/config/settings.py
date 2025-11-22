@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Apps internas
+    'departamentos',
+    'municipios',
+    'pedidos_detalles',
     'usuarios',
     'usuarios_sesiones',
     'usuarios_actividades',
