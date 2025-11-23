@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { clearAuthStorage, logoutBackend } from "../utils/Auth";
 
 export const AuthContext = createContext();
 
@@ -17,12 +18,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("refresh", tokens.refresh);
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    await logoutBackend();
+
+    clearAuthStorage(); 
+    setUser(null);     
     setAccessToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+
+    window.location.href = "/login"; 
   };
 
   return (

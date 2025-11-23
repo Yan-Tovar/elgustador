@@ -1,15 +1,14 @@
-// src/utils/auth.js
+// src/utils/Auth.js
 import axios from "axios";
 
-// Función para borrar tokens en frontend y redirigir al login
-export function logout() {
+// Borra tokens y redirige al login
+export function clearAuthStorage() {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
   localStorage.removeItem("user");
-  window.location.href = "/login"; // redirige al login
 }
 
-// Función para llamar al backend y cerrar sesión invalidando refresh token
+// Cierra sesión en el backend invalidando refresh token
 export async function logoutBackend() {
   const refresh = localStorage.getItem("refresh");
   const token = localStorage.getItem("access");
@@ -25,8 +24,9 @@ export async function logoutBackend() {
       }
     );
   } catch (err) {
-    console.log("Error al cerrar sesión en backend:", err);
+    console.error("Error al cerrar sesión en backend:", err);
+  } finally {
+    clearAuthStorage();
+    window.location.href = "/login";
   }
-
-  logout();
 }

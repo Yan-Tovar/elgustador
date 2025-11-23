@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { Container, Button, Typography } from "@mui/material";
-import { loginUser } from "../api/auth";
+import { loginUser } from "../services/auth";
 import { AuthContext } from "../context/AuthContext";
 import FormInput from "../components/auth/FormInput";
 

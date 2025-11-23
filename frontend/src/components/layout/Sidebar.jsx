@@ -15,7 +15,15 @@ import {
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import { ShoppingCart, People, Settings } from "@mui/icons-material";
+import { 
+  ShoppingCart,
+  People, 
+  Settings, 
+  Category, 
+  Inventory2, 
+  LocalOffer,
+  NotesOutlined,
+} from "@mui/icons-material";
 
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
@@ -43,15 +51,21 @@ export default function SideBar() {
           { text: "Mis pedidos", icon: <People />, path: "/mis-pedidos" },
         ]
       : []),
+
     ...(user?.rol === "empleado"
       ? [
           { text: "Gestión Pedidos", icon: <Settings />, path: "/gestion-pedidos" },
           { text: "Clientes", icon: <People />, path: "/clientes" },
         ]
       : []),
+
     ...(user?.rol === "admin"
       ? [
           { text: "Departamentos", icon: <Settings />, path: "/admin/departamentos" },
+          { text: "Categorías", icon: <Category />, path: "/admin/categorias" },
+          { text: "Productos", icon: <Inventory2 />, path: "/admin/productos" },
+          { text: "Ofertas", icon: <LocalOffer />, path: "/admin/ofertas" },
+          { text: "Notas", icon: <NotesOutlined />, path: "/notas" }
         ]
       : []),
   ];
@@ -97,7 +111,7 @@ export default function SideBar() {
 
   return (
     <>
-      {/* Botón hamburguesa (solo en móvil) */}
+      {/* Botón hamburguesa móvil */}
       {isMobile && (
         <IconButton
           onClick={toggleDrawer}

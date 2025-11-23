@@ -1,4 +1,3 @@
-# ofertas/serializers.py
 from rest_framework import serializers
 from .models import Oferta
 from productos.serializers import ProductoSerializer
@@ -12,7 +11,14 @@ class OfertaSerializer(serializers.ModelSerializer):
         model = Oferta
         fields = '__all__'
 
+
 class OfertaListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oferta
         fields = ['id', 'nombre', 'descuento_porcentaje', 'fecha_inicio', 'fecha_fin', 'estado']
+
+
+class OfertaCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Oferta
+        fields = '__all__'

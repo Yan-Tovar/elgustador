@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { Container, Button, MenuItem, Typography, TextField } from "@mui/material";
-import { registerUser, getDepartamentos, getMunicipios } from "../api/auth";
+import { registerUser, getDepartamentos, getMunicipios } from "../services/auth";
 import { AuthContext } from "../context/AuthContext";
 import FormInput from "../components/auth/FormInput";
 
