@@ -1,23 +1,16 @@
 // services/DepartamentoService.js
-import axios from "axios";
+import api from "./api"; // Usa la instancia global con baseURL + token automático
 
-const API_URL = "http://127.0.0.1:8000/api/departamentos/";
+// Obtener todos los departamentos
+export const getDepartamentos = () => api.get("departamentos/");
 
-const token = localStorage.getItem("access");
+// Crear nuevo departamento
+export const createDepartamento = (data) => api.post("departamentos/", data);
 
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  },
-};
-
-export const getDepartamentos = () => axios.get(API_URL, config);
-
-export const createDepartamento = (data) => axios.post(API_URL, data, config);
-
+// Actualizar departamento
 export const updateDepartamento = (id, data) =>
-  axios.put(`${API_URL}${id}/`, data, config);
+  api.put(`departamentos/${id}/`, data);
 
+// Eliminar departamento
 export const deleteDepartamento = (id) =>
-  axios.delete(`${API_URL}${id}/`, config);
+  api.delete(`departamentos/${id}/`);

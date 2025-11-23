@@ -1,37 +1,21 @@
-import axios from "axios";
+// services/notasService.js
+import api from "./api"; // Importa la instancia global
 
-// 1. Crear instancia de axios con baseURL
-const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/notas/",
-});
+// ===============================
+// CRUD Notas
+// ===============================
 
-// 2. Interceptor: agrega automáticamente el token ANTES de cada request
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("access");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// ====================================================
-// 3. Tus funciones, pero usando SOLO "api" y sin config
-// ====================================================
-
-// Obtener todas las notas del usuario autenticado
-export const fetchNotas = () => api.get("/");
+// Obtener todas las notas
+export const fetchNotas = () => api.get("notas/");
 
 // Crear nota
-export const createNota = (data) => api.post("/", data);
+export const createNota = (data) => api.post("notas/", data);
 
 // Obtener nota por ID
-export const fetchNotaById = (id) => api.get(`/${id}/`);
+export const fetchNotaById = (id) => api.get(`notas/${id}/`);
 
 // Actualizar nota
-export const updateNota = (id, data) => api.put(`/${id}/`, data);
+export const updateNota = (id, data) => api.put(`notas/${id}/`, data);
 
-// Desactivar nota (soft delete)
-export const deleteNota = (id) => api.delete(`/${id}/`);
+// Eliminar (desactivar) nota
+export const deleteNota = (id) => api.delete(`notas/${id}/`);

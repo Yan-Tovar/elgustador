@@ -1,10 +1,6 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import CarritoEventoViewSet
-
-router = DefaultRouter()
-router.register(r"", CarritoEventoViewSet, basename="carrito-eventos")
+from django.urls import path
+from .views import CarritoEventosList
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("", CarritoEventosList.as_view(), name="carrito-eventos-list"),
 ]

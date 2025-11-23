@@ -1,6 +1,7 @@
 // pages/DepartamentoPage.jsx
 import { useEffect, useState } from "react";
 import { Box, Button, Typography, Dialog, DialogContent } from "@mui/material";
+import DashboardLayout from "../components/layout/DashboardLayout";
 import DepartamentoList from "../components/departamentos/DepartamentoList";
 import DepartamentoForm from "../components/departamentos/DepartamentoForm";
 import {
@@ -53,29 +54,31 @@ export default function DepartamentoPage() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        Gestión de Departamentos
-      </Typography>
+    <DashboardLayout>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          Gestión de Departamentos
+        </Typography>
 
-      <Button variant="contained" onClick={handleCreate}>
-        + Crear Departamento
-      </Button>
+        <Button variant="contained" onClick={handleCreate}>
+          + Crear Departamento
+        </Button>
 
-      <DepartamentoList
-        departamentos={departamentos}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+        <DepartamentoList
+          departamentos={departamentos}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogContent>
-          <DepartamentoForm
-            onSubmit={handleSubmit}
-            initialData={editing}
-          />
-        </DialogContent>
-      </Dialog>
-    </Box>
+        <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+          <DialogContent>
+            <DepartamentoForm
+              onSubmit={handleSubmit}
+              initialData={editing}
+            />
+          </DialogContent>
+        </Dialog>
+      </Box>
+    </DashboardLayout>
   );
 }

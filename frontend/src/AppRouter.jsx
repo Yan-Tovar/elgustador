@@ -8,6 +8,7 @@ import DepartamentoPage from "./pages/DepartamentoPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmpleadoDashboard from "./pages/EmpleadoDashboard";
 import ClienteDashboard from "./pages/ClienteDashboard";
+import ProductosPage from "./pages/ProductosPage";
 
 // CRUD Admin
 import CategoriasList from "./views/admin/categorias/CategoriasList";
@@ -26,6 +27,10 @@ import OfertaEdit from "./views/admin/ofertas/OfertaEdit";
 import NotasList from "./views/notas/NotasList";
 import NotaCreate from "./views/notas/NotaCreate";
 import NotaEdit from "./views/notas/NotaEdit";
+
+// Carrito y sus acciones
+import CarritoPage from "./pages/CarritoPage";
+import CarritoEventosPage from "./pages/CarritoEventosPage";
 
 import PrivateRoute from "./components/PrivateRoute";
 
@@ -88,6 +93,16 @@ export default function AppRouter() {
               roles={['empleado', 'admin']} 
             />
           } 
+        />
+
+        <Route
+          path="/productos"
+          element={
+            <PrivateRoute
+              component={ProductosPage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
         />
 
         <Route 
@@ -196,6 +211,32 @@ export default function AppRouter() {
             <PrivateRoute 
               component={NotaEdit} 
               roles={['admin', 'empleado', 'cliente']} 
+            />
+          }
+        />
+                
+        {/* ============================================================
+                CARRITO — ACCESO: cliente, empleado, admin
+        ============================================================ */}
+        <Route
+          path="/carrito"
+          element={
+            <PrivateRoute
+              component={CarritoPage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
+        />
+
+        {/* ============================================================
+                EVENTOS DE CARRITO — ACCESO: solo admin
+        ============================================================ */}
+        <Route
+          path="/carrito-eventos"
+          element={
+            <PrivateRoute
+              component={CarritoEventosPage}
+              roles={["admin"]}
             />
           }
         />

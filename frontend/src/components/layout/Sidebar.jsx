@@ -64,8 +64,11 @@ export default function SideBar() {
           { text: "Departamentos", icon: <Settings />, path: "/admin/departamentos" },
           { text: "Categorías", icon: <Category />, path: "/admin/categorias" },
           { text: "Productos", icon: <Inventory2 />, path: "/admin/productos" },
+          { text: "Comprar Productos", icon: <Inventory2 />, path: "/productos" },
           { text: "Ofertas", icon: <LocalOffer />, path: "/admin/ofertas" },
-          { text: "Notas", icon: <NotesOutlined />, path: "/notas" }
+          { text: "Notas", icon: <NotesOutlined />, path: "/notas" },
+          { text: "Carrito", icon: <NotesOutlined />, path: "/carrito" },
+          { text: "Carrito Eventos", icon: <NotesOutlined />, path: "/carrito-eventos" }
         ]
       : []),
   ];

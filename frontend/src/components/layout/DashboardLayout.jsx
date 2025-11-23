@@ -1,6 +1,6 @@
 // src/components/layout/DashboardLayout.jsx
 import { Box, CssBaseline } from "@mui/material";
-import Sidebar from "./SideBar";
+import SideBar from "./SideBar";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }) {
       <CssBaseline />
 
       {/* SIDEBAR */}
-      <Sidebar />
+      <SideBar />
 
       {/* CONTENIDO PRINCIPAL */}
       <Box

@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import Carrito
+from .models import Carrito, CarritoItem
 
-@admin.register(Carrito)
-class CarritoAdmin(admin.ModelAdmin):
-    list_display = ("id", "usuario", "actualizado_en")
-    search_fields = ("usuario__email",)
-    ordering = ("-actualizado_en",)
+admin.site.register(Carrito)
+admin.site.register(CarritoItem)
