@@ -1,10 +1,9 @@
 # facturas/serializers.py
 from rest_framework import serializers
 from .models import Factura
-from pedidos.serializers import PedidoSerializer
 
 class FacturaSerializer(serializers.ModelSerializer):
-    pedido = PedidoSerializer(read_only=True)
     class Meta:
         model = Factura
-        fields = '__all__'
+        fields = ["id", "pedido", "numero_factura", "subtotal", "impuestos", "total", "url_pdf", "fecha"]
+        read_only_fields = ["id", "numero_factura", "url_pdf", "fecha"]

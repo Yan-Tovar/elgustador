@@ -194,3 +194,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# -----------------------------------
+# PAYPAL 
+# -----------------------------------
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+PAYPAL_SECRET = os.getenv("PAYPAL_SECRET") 
+PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")  
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") 
+PAYPAL_API_BASE = os.getenv("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com")
+

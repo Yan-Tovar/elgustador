@@ -32,7 +32,14 @@ import NotaEdit from "./views/notas/NotaEdit";
 import CarritoPage from "./pages/CarritoPage";
 import CarritoEventosPage from "./pages/CarritoEventosPage";
 
+import PedidosPage from "./pages/PedidosPage";
+
+import CheckoutFlow from "./pages/CheckoutFlow"
+
+import FacturaPage from "./pages/FacturaPage";
+
 import PrivateRoute from "./components/PrivateRoute";
+import { Check } from "@mui/icons-material";
 
 export default function AppRouter() {
   const { user } = useContext(AuthContext);
@@ -106,6 +113,16 @@ export default function AppRouter() {
         />
 
         <Route 
+          path="/pedidos" 
+          element={
+            <PrivateRoute 
+              component={PedidosPage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          } 
+        />
+
+        <Route 
           path="/dashboard" 
           element={
             <PrivateRoute 
@@ -113,6 +130,33 @@ export default function AppRouter() {
               roles={['cliente', 'empleado', 'admin']} 
             />
           } 
+        />
+
+        <Route 
+          path="/checkout" 
+          element={
+            <PrivateRoute 
+              component={CheckoutFlow} 
+              roles={['cliente', 'empleado', 'admin']} 
+            />}
+        />
+
+        <Route 
+          path="/checkout/:pedidoId" 
+          element={
+            <PrivateRoute 
+              component={CheckoutFlow} 
+              roles={['cliente', 'empleado', 'admin']} 
+            />}
+        />
+
+        <Route 
+          path="/factura/:facturaId" 
+          element={
+            <PrivateRoute 
+              component={FacturaPage} 
+              roles={['cliente', 'empleado', 'admin']} 
+            />} 
         />
 
         {/* =====================================

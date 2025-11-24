@@ -1,12 +1,40 @@
+// =======================
+//  CarritoPage.jsx
+// =======================
+
 import { useEffect, useState } from "react";
-import { fetchCarrito, updateCarrito, deleteCarrito } from "../services/carritoService";
-import { Box, Typography, Button, TextField, Card, CardContent, Grid, Snackbar, Alert } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
+import {
+  fetchCarrito,
+  updateCarrito,
+  deleteCarrito
+} from "../services/carritoService";
+
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Card,
+  CardContent,
+  Grid,
+  Snackbar,
+  Alert
+} from "@mui/material";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
 
 export default function CarritoPage() {
+  const navigate = useNavigate();
   const [carrito, setCarrito] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info"
+  });
 
+  // Obtener carrito
   const loadCarrito = async () => {
     try {
       const res = await fetchCarrito();
@@ -20,10 +48,9 @@ export default function CarritoPage() {
     loadCarrito();
   }, []);
 
+  // Actualizar cantidad
   const handleCantidad = async (item, qty) => {
     const cantidad = Number(qty);
-    const stock = item.producto.stock;
-
     if (cantidad < 1) return;
 
     try {
@@ -33,7 +60,7 @@ export default function CarritoPage() {
         setSnackbar({
           open: true,
           message: res.data.message,
-          severity: "warning",
+          severity: "warning"
         });
       }
 
@@ -43,9 +70,19 @@ export default function CarritoPage() {
     }
   };
 
+  // Eliminar item
   const handleDelete = async (itemId) => {
-    await deleteCarrito(itemId);
-    loadCarrito();
+    try {
+      await deleteCarrito(itemId);
+      loadCarrito();
+    } catch (error) {
+      console.error("Error eliminando item:", error);
+    }
+  };
+
+  // SOLO REDIRIGE AL CHECKOUT — NO CREA EL PEDIDO
+  const irACheckout = () => {
+    navigate("/checkout");
   };
 
   if (!carrito) return <Typography>Cargando...</Typography>;
@@ -59,7 +96,7 @@ export default function CarritoPage() {
           <Typography>No tienes productos en el carrito</Typography>
         ) : (
           <Grid container spacing={2}>
-            {carrito.items.map(item => (
+            {carrito.items.map((item) => (
               <Grid item xs={12} md={6} key={item.id}>
                 <Card>
                   <CardContent>
@@ -79,7 +116,7 @@ export default function CarritoPage() {
                         sx={{ width: 100 }}
                         inputProps={{
                           min: 1,
-                          max: item.producto.stock,
+                          max: item.producto.stock
                         }}
                       />
 
@@ -95,6 +132,18 @@ export default function CarritoPage() {
                 </Card>
               </Grid>
             ))}
+
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{ mt: 3 }}
+                onClick={irACheckout}
+              >
+                Continuar al pago
+              </Button>
+            </Grid>
           </Grid>
         )}
 

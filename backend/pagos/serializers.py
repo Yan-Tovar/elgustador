@@ -1,10 +1,12 @@
 # pagos/serializers.py
 from rest_framework import serializers
 from .models import Pago
+from pedidos.models import Pedido
 from pedidos.serializers import PedidoSerializer
 
 class PagoSerializer(serializers.ModelSerializer):
-    pedido = PedidoSerializer(read_only=True)
+    pedido = serializers.PrimaryKeyRelatedField(queryset=Pedido.objects.all())
     class Meta:
         model = Pago
-        fields = '__all__'
+        fields = ["id", "pedido", "pasarela", "monto", "estado", "transaccion_id", "fecha"]
+        read_only_fields = ["id", "fecha"]

@@ -24,7 +24,6 @@ export default function DashboardLayout({ children }) {
       >
         <Navbar />
 
-        {/* 👇 AQUÍ DEBE IR TU DASHBOARD */}
         <Box sx={{ flexGrow: 1, p: 3 }}>
           {children}
         </Box>
