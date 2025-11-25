@@ -10,7 +10,7 @@ from datetime import timedelta
 from carrito.models import Carrito
 from pedidos.models import Pedido
 from pedidos_detalles.models import PedidoDetalle
-from .serializers import PedidoSerializer, PedidoListSerializer, PedidoDetalleSerializer
+from .serializers import PedidoSerializer, PedidoListSerializer, PedidoDetalleSerializer, PedidoEstadoSerializer
 from config.permissions import IsCliente, IsEmpleado, IsAdministrador
 
 # -------------------------
@@ -94,3 +94,57 @@ class PedidoViewSet(viewsets.ModelViewSet):
 class PedidoDetalleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PedidoDetalle.objects.all().select_related("producto", "pedido")
     serializer_class = PedidoDetalleSerializer
+
+# -------------------------
+# Vistas separadas por tipo de pedidos
+# -------------------------
+class PedidosUsuarioView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        pedidos = (
+            Pedido.objects
+            .filter(usuario=request.user)
+            .exclude(estado="pendiente")           
+            .prefetch_related('detalles__producto')
+        )
+
+        serializer = PedidoSerializer(pedidos, many=True)
+        return Response(serializer.data)
+
+class PedidosEmpleadoView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsEmpleado]
+
+    def get(self, request):
+        pedidos = Pedido.objects.exclude(estado="pendiente").prefetch_related('detalles__producto')
+        serializer = PedidoSerializer(pedidos, many=True)
+        return Response(serializer.data)
+
+
+class PedidosAdminView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsAdministrador]
+
+    def get(self, request):
+        pedidos = Pedido.objects.all().prefetch_related('detalles__producto')
+        serializer = PedidoSerializer(pedidos, many=True)
+        return Response(serializer.data)
+
+class ActualizarEstadoPedidoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            pedido = Pedido.objects.get(pk=pk, usuario=request.user)
+        except Pedido.DoesNotExist:
+            return Response(
+                {"detail": "Pedido no encontrado o no pertenece al usuario."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = PedidoEstadoSerializer(pedido, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

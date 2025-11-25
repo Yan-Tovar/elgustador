@@ -24,8 +24,30 @@ class PedidoSerializer(serializers.ModelSerializer):
         model = Pedido
         fields = '__all__'
 
+        # Campos que NO deben actualizarse
+        read_only_fields = [
+            'id',
+            'usuario',
+            'municipio',
+            'departamento',
+            'subtotal',
+            'costo_envio',
+            'total',
+            'metodo_pago',
+            'fecha_creacion',
+        ]
+
+        # Permitir actualizar solo el estado
+        extra_kwargs = {
+            'estado': {'required': False},
+        }
 
 class PedidoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedido
         fields = ['id', 'usuario', 'total', 'estado', 'fecha_creacion']
+
+class PedidoEstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pedido
+        fields = ['id', 'estado']

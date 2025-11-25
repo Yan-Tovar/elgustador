@@ -68,7 +68,8 @@ export default function SideBar() {
           { text: "Ofertas", icon: <LocalOffer />, path: "/admin/ofertas" },
           { text: "Notas", icon: <NotesOutlined />, path: "/notas" },
           { text: "Carrito", icon: <NotesOutlined />, path: "/carrito" },
-          { text: "Carrito Eventos", icon: <NotesOutlined />, path: "/carrito-eventos" }
+          { text: "Carrito Eventos", icon: <NotesOutlined />, path: "/carrito-eventos" },
+          { text: "admin pedidos", icon: <NotesOutlined />, path: "/admin/pedidos" }
         ]
       : []),
   ];

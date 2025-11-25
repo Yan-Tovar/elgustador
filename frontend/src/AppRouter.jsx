@@ -23,6 +23,8 @@ import OfertasList from "./views/admin/ofertas/OfertasList";
 import OfertaCreate from "./views/admin/ofertas/OfertaCreate";
 import OfertaEdit from "./views/admin/ofertas/OfertaEdit";
 
+import AdminPedidos from "./views/admin/pedidos/AdminPedidos";
+
 // CRUD Notas (cualquier usuario logueado)
 import NotasList from "./views/notas/NotasList";
 import NotaCreate from "./views/notas/NotaCreate";
@@ -188,6 +190,15 @@ export default function AppRouter() {
         <Route
           path="/admin/categorias/:id/editar"
           element={<PrivateRoute component={CategoriaEdit} roles={['admin']} />}
+        />
+
+        {/* ============================================================
+                CRUD PRODUCTOS — SOLO ADMIN
+        ============================================================ */}
+
+        <Route
+          path="/admin/pedidos"
+          element={<PrivateRoute component={AdminPedidos} roles={['admin']} />}
         />
 
         {/* ============================================================
