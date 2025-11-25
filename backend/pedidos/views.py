@@ -92,8 +92,17 @@ class PedidoViewSet(viewsets.ModelViewSet):
 # ViewSet de detalle de pedidos (solo lectura)
 # -------------------------
 class PedidoDetalleViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = PedidoDetalle.objects.all().select_related("producto", "pedido")
     serializer_class = PedidoDetalleSerializer
+
+    def get_queryset(self):
+        queryset = PedidoDetalle.objects.all().select_related("producto", "pedido")
+
+        pedido_id = self.request.query_params.get("pedido")
+
+        if pedido_id:
+            queryset = queryset.filter(pedido_id=pedido_id)
+
+        return queryset
 
 # -------------------------
 # Vistas separadas por tipo de pedidos

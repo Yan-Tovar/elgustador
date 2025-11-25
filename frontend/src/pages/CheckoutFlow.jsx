@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { crearPedidoDesdeCarrito, getPedido } from "../services/pedidosService";
 import { registrarPago, simulatePago } from "../services/pagosService";
-import { crearFactura } from "../services/facturasService";
 
 import { Box, Button, Typography, Stepper, Step, StepLabel } from "@mui/material";
 import { PayPalButtons } from "@paypal/react-paypal-js";
@@ -36,21 +35,19 @@ export default function CheckoutFlow() {
   };
 
   // ========================================================
-  // PASO 2 — CARGAR PEDIDO CON RETRASO PARA CONSISTENCIA
+  // PASO 2 — CARGAR PEDIDO CON RETRASO
   // ========================================================
   const cargarPedidoDespues = async (id) => {
     setLoadingPedido(true);
-
-    // esperar para que el backend termine de procesar
     await new Promise((res) => setTimeout(res, 1200));
 
     try {
       const res = await getPedido(id);
       setPedido(res.data);
-      setActiveStep(2); // Ir a pagar
+      setActiveStep(2);
     } catch (err) {
-      console.error("No se pudo cargar el pedido:", err);
-      alert("Error cargando pedido, intenta nuevamente.");
+      console.error("Error cargando pedido:", err);
+      alert("Error cargando pedido.");
     }
 
     setLoadingPedido(false);
@@ -66,12 +63,11 @@ export default function CheckoutFlow() {
       const res = await registrarPago({
         pedido: pedidoId,
         monto: pedido.total,
-        estado: capture.status,   // <-- ESTA ES LA CORRECTA
+        estado: capture.status,
         transaccion_id: capture.id,
         pasarela: "paypal",
       });
 
-      setActiveStep(3);
       navigate(`/factura/${res.data.factura_id}`);
     } catch (err) {
       console.error("Error registrando pago:", err);
@@ -80,7 +76,7 @@ export default function CheckoutFlow() {
   };
 
   // ========================================================
-  // PASO 3B — PROCESAR PAGO SIMULADO (Botón alterno)
+  // PASO 3B — PROCESAR PAGO SIMULADO
   // ========================================================
   const procesarPagoSimulado = async () => {
     if (!pedido) return alert("No hay pedido cargado.");
@@ -91,11 +87,9 @@ export default function CheckoutFlow() {
         monto: pedido.total,
       });
 
-      setActiveStep(3);
-
       navigate(`/factura/${res.data.factura_id}`);
     } catch (err) {
-      console.error("Error en pago simulado:", err);
+      console.error("Error simulando pago:", err);
       alert("No se pudo simular el pago.");
     }
   };
@@ -106,12 +100,11 @@ export default function CheckoutFlow() {
         Checkout
       </Typography>
 
-      {/* STEPPER */}
+      {/* STEPPER REDUCIDO A 3 PASOS */}
       <Stepper activeStep={activeStep} sx={{ my: 3 }}>
         <Step><StepLabel>Crear Pedido</StepLabel></Step>
         <Step><StepLabel>Cargando Pedido</StepLabel></Step>
         <Step><StepLabel>Pagar</StepLabel></Step>
-        <Step><StepLabel>Factura</StepLabel></Step>
       </Stepper>
 
       {/* PASO 1 — CREAR PEDIDO */}
@@ -121,7 +114,7 @@ export default function CheckoutFlow() {
         </Button>
       )}
 
-      {/* PASO 2 — CARGANDO PEDIDO */}
+      {/* PASO 2 — CARGANDO */}
       {activeStep === 1 && (
         <Typography>Cargando información del pedido...</Typography>
       )}
@@ -133,7 +126,6 @@ export default function CheckoutFlow() {
             Total a pagar: <strong>${pedido.total}</strong>
           </Typography>
 
-          {/* Pago con PayPal */}
           <Box mt={3}>
             <PayPalButtons
               style={{ layout: "vertical" }}
@@ -161,11 +153,6 @@ export default function CheckoutFlow() {
             Pagar Simulado
           </Button>
         </Box>
-      )}
-
-      {/* PASO 4 — FACTURA */}
-      {activeStep === 3 && (
-        <Typography>Generando factura...</Typography>
       )}
     </Box>
   );

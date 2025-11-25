@@ -4,7 +4,7 @@ from .views import CrearPedidoDesdeCarritoView, PedidoViewSet, PedidoDetalleView
 
 router = DefaultRouter()
 router.register(r"pedidos", PedidoViewSet, basename="pedidos")
-router.register(r"pedidos/detalles", PedidoDetalleViewSet, basename="pedidos_detalles")
+router.register(r"detalles", PedidoDetalleViewSet, basename="pedidos_detalles")
 
 
 urlpatterns = [

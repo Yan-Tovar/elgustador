@@ -28,8 +28,8 @@ export const fetchPedidosUsuario = async () => {
 };
 
 // Detalles de un pedido específico
-export const fetchPedidoDetalle = async (pedidoId) => {
-  const response = await api.get(`pedidos/detalles/?pedido=${pedidoId}`);
+export const fetchPedidoDetalle = async (id) => {
+  const response = await api.get(`/pedidos/detalles/?pedido=${id}`);
   return Array.isArray(response.data) ? response.data : [];
 };
 
