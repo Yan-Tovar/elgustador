@@ -23,6 +23,10 @@ import OfertasList from "./views/admin/ofertas/OfertasList";
 import OfertaCreate from "./views/admin/ofertas/OfertaCreate";
 import OfertaEdit from "./views/admin/ofertas/OfertaEdit";
 
+import AdminPedidos from "./views/admin/pedidos/AdminPedidos";
+
+import AdminFacturas from "./views/admin/facturas/AdminFacturas";
+
 // CRUD Notas (cualquier usuario logueado)
 import NotasList from "./views/notas/NotasList";
 import NotaCreate from "./views/notas/NotaCreate";
@@ -33,10 +37,12 @@ import CarritoPage from "./pages/CarritoPage";
 import CarritoEventosPage from "./pages/CarritoEventosPage";
 
 import PedidosPage from "./pages/PedidosPage";
+import PedidoDetallePage from "./pages/PedidoDetallePage";
 
 import CheckoutFlow from "./pages/CheckoutFlow"
 
 import FacturaPage from "./pages/FacturaPage";
+import FacturasPage from "./pages/FacturasPage";
 
 import PrivateRoute from "./components/PrivateRoute";
 import { Check } from "@mui/icons-material";
@@ -123,6 +129,16 @@ export default function AppRouter() {
         />
 
         <Route 
+          path="/pedidos/:id" 
+          element={
+            <PrivateRoute 
+              component={PedidoDetallePage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          } 
+        />
+
+        <Route 
           path="/dashboard" 
           element={
             <PrivateRoute 
@@ -159,6 +175,15 @@ export default function AppRouter() {
             />} 
         />
 
+        <Route 
+          path="/facturas" 
+          element={
+            <PrivateRoute 
+              component={FacturasPage} 
+              roles={['cliente', 'empleado', 'admin']} 
+            />} 
+        />
+
         {/* =====================================
               CRUD DEPARTAMENTOS — SOLO ADMIN
         ===================================== */}
@@ -188,6 +213,20 @@ export default function AppRouter() {
         <Route
           path="/admin/categorias/:id/editar"
           element={<PrivateRoute component={CategoriaEdit} roles={['admin']} />}
+        />
+
+        {/* ============================================================
+                PEDIDOS - FACTURAS — SOLO ADMIN
+        ============================================================ */}
+
+        <Route
+          path="/admin/pedidos"
+          element={<PrivateRoute component={AdminPedidos} roles={['admin']} />}
+        />
+
+        <Route
+          path="/admin/facturas"
+          element={<PrivateRoute component={AdminFacturas} roles={['admin']} />}
         />
 
         {/* ============================================================
