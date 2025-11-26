@@ -72,7 +72,9 @@ export default function SideBar() {
           { text: "Pedidos", icon: <NotesOutlined />, path: "/pedidos" },
           { text: "Carrito Eventos", icon: <NotesOutlined />, path: "/carrito-eventos" },
           { text: "admin pedidos", icon: <NotesOutlined />, path: "/admin/pedidos" },
+          { text: "admin password reset", icon: <NotesOutlined />, path: "/passwordreset" },
           { text: "admin facturas", icon: <NotesOutlined />, path: "/admin/facturas" }
+          
         ]
       : []),
   ];
