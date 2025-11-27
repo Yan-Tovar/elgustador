@@ -4,6 +4,8 @@ import { AuthContext } from "./context/AuthContext";
 
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import PasswordResetRequest from "./pages/PasswordResetRequest";
+import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 import DepartamentoPage from "./pages/DepartamentoPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmpleadoDashboard from "./pages/EmpleadoDashboard";
@@ -65,6 +67,16 @@ export default function AppRouter() {
         <Route 
           path="/register" 
           element={!user ? <RegisterPage /> : <Navigate to="/" />} 
+        />
+
+        <Route 
+          path="/passwordreset" 
+          element={!user ? <PasswordResetRequest /> : <Navigate to="/" />} 
+        />
+
+        <Route 
+          path="/auth/reset-password/:uid/:token" 
+          element={!user ? <PasswordResetConfirm /> : <Navigate to="/" />} 
         />
 
         {/* =====================================

@@ -19,3 +19,23 @@ export const getDepartamentos = async () => {
 export const getMunicipios = async () => {
   return api.get("municipios/");
 };
+
+// NUEVO: Solicitar reset de contraseña
+export const requestPasswordReset = async (email) => {
+  return api.post("auth/password-reset/", { email });
+};
+
+// NUEVO: Confirmar nuevo password
+export const confirmPasswordReset = async (data) => {
+  return api.post("auth/password-reset-confirm/", data);
+};
+
+// Enviar código al email
+export const sendEmailCode = async (email) => {
+  return api.post("auth/email/send-code/", { email });
+};
+
+// Verificar código
+export const verifyEmailCode = async (email, code) => {
+  return api.post("auth/email/verify-code/", { email, code });
+};
