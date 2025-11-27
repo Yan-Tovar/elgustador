@@ -29,3 +29,13 @@ export const requestPasswordReset = async (email) => {
 export const confirmPasswordReset = async (data) => {
   return api.post("auth/password-reset-confirm/", data);
 };
+
+// Enviar código al email
+export const sendEmailCode = async (email) => {
+  return api.post("auth/email/send-code/", { email });
+};
+
+// Verificar código
+export const verifyEmailCode = async (email, code) => {
+  return api.post("auth/email/verify-code/", { email, code });
+};

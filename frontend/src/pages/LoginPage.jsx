@@ -1,56 +1,64 @@
 import { useState, useContext } from "react";
-import { Container, Button, Typography, Box } from "@mui/material";
+import { Alert, Button, Box, Typography, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/auth";
 import { AuthContext } from "../context/AuthContext";
-import FormInput from "../components/auth/FormInput";
+import AuthLayout from "../components/layout/AuthLayout";
+
+// Componentes comunes
+import TitleMain from "../components/common/TitleMain";
+import InputField from "../components/common/InputField";
+import PrimaryButton from "../components/common/PrimaryButton";
+import RegisterButton from "../components/common/RegisterButton"
+import IdentificacionInput from "../components/common/IdentificacionInput";
+
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import TwitterIcon from "@mui/icons-material/Twitter";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const [form, setForm] = useState({
-    identificacion: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ identificacion: "", password: "" });
+  const [error, setError] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
     if (!form.identificacion || !form.password) {
-      alert("Todos los campos requeridos deben ser llenados");
+      setError("Todos los campos requeridos deben ser llenados");
       return;
     }
 
     try {
       const res = await loginUser(form);
       login(res.data.user, { access: res.data.access, refresh: res.data.refresh });
-      alert("Login exitoso");
+      setSnackbar({ open: true, message: "Login exitoso", severity: "success" });
     } catch (err) {
       console.error(err);
-      alert("Credenciales incorrectas");
+      setError("Credenciales incorrectas");
     }
   };
 
-  return (
-    <Container maxWidth="sm">
-      <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>
-        Iniciar Sesión
-      </Typography>
+  /** Contenido del bloque izquierdo: el formulario */
+  const left = (
+    <>
+      <TitleMain>Iniciar Sesión</TitleMain>
+
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <form onSubmit={handleSubmit}>
-        <FormInput
-          label="Identificación"
-          name="identificacion"
-          value={form.identificacion}
-          onChange={handleChange}
-          required
-        />
 
-        <FormInput
+        <IdentificacionInput value={form.identificacion} onChange={handleChange} />
+
+        <InputField
           label="Contraseña"
           name="password"
           type="password"
@@ -59,27 +67,61 @@ export default function LoginPage() {
           required
         />
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mt: 2 }}
-        >
-          Ingresar
-        </Button>
+        <PrimaryButton type="submit">Continuar</PrimaryButton>
       </form>
 
-      {/* BOTÓN DE RESTABLECER CONTRASEÑA */}
-      <Box textAlign="center" sx={{ mt: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", mt: 1 }}>
         <Button
           variant="text"
-          color="secondary"
-          onClick={() => navigate("/passwordreset")}
+          onClick={() => navigate("/passwordreset")} 
+          sx={{ color: "#0e37eeff", fontWeight: 500 }}
         >
-          Cambiar contraseña
+          ¿Olvidaste la contraseña?
         </Button>
       </Box>
-    </Container>
+    </>
+  );
+
+  /** Contenido del bloque derecho: información */
+  const right = (
+    <>
+      <Typography
+        variant="body2"
+        textAlign="center"
+        sx={{ color: "gray", mb: 2 }}
+      >
+        ¿ Aún no te has registrdo ?
+      </Typography>
+      <RegisterButton/>
+      <Typography
+        variant="body2"
+        textAlign="center"
+        sx={{ color: "gray", mb: 2 }}
+      >
+        Conocenos en nuestras redes sociales
+      </Typography>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{
+          mt: 2,
+          justifyContent: { xs: "center", sm: "flex-start" },
+        }}
+      >
+        <FacebookIcon sx={{ cursor: "pointer" }} />
+        <InstagramIcon sx={{ cursor: "pointer" }} />
+        <TwitterIcon sx={{ cursor: "pointer" }} />
+      </Stack>
+    </>
+  );
+
+  return (
+    <AuthLayout
+      showContent={true}
+      snackbar={snackbar}
+      setSnackbar={setSnackbar}
+      left={left}
+      right={right}
+    />
   );
 }

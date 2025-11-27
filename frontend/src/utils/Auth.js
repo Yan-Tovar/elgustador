@@ -15,7 +15,7 @@ export async function logoutBackend() {
 
   try {
     await axios.post(
-      "http://127.0.0.1:8000/api/users/logout/",
+      "http://127.0.0.1:8000/api/usuarios/usuarios/logout/",
       { refresh },
       {
         headers: {

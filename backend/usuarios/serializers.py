@@ -45,3 +45,7 @@ class UsuarioRegistroSerializer(serializers.ModelSerializer):
 class UsuarioLoginSerializer(serializers.Serializer):
     identificacion = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
+class EmailVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(required=False, max_length=6)
