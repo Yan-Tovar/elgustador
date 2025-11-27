@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 # Importar las funciones correctas
 from .tokens import generate_reset_token, validate_reset_token
 
-Usuario = get_user_model()
+from .models import Usuario
 
 
 # ====================================================================================
@@ -27,34 +27,32 @@ class RequestPasswordResetView(APIView):
             return Response({"detail": "Debes enviar un correo"}, status=400)
 
         try:
+            # Buscar si existe un usuario con este correo
             user = Usuario.objects.get(email=email)
         except Usuario.DoesNotExist:
-            # Por seguridad enviamos la misma respuesta
-            return Response({"detail": "Se ha enviado un enlace."}, status=200)
+            # Por seguridad devolvemos el mismo mensaje aunque no exista el correo
+            return Response({"detail": "Se ha enviado un enlace al correo."}, status=200)
 
         # UID del usuario
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        # TOKEN firmado
+        # Token firmado
         token = generate_reset_token(user)
 
-        # URL que recibe el frontend
+        # URL que recibirá el frontend
         reset_url = f"{settings.FRONTEND_URL}/auth/reset-password/{uid}/{token}"
 
+        # Configuración del email
         subject = "Restablecimiento de contraseña - El Gustador"
         from_email = settings.DEFAULT_FROM_EMAIL
         to = [user.email]
 
-        # =========== EMAIL HTML PROFESIONAL ===========
+        # Email HTML profesional
         html_content = f"""
         <div style="font-family: Arial; color:#1F2B5B;">
-            
             <h2 style="color:#1EBE4E;">Solicitud de cambio de contraseña</h2>
-
             <p>Hola <b>{user.nombre}</b>,</p>
-
             <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta.</p>
-
             <p style="margin:25px 0;">
                 <a href="{reset_url}"
                    style="background:#FF6A00; padding:14px 20px;
@@ -63,11 +61,8 @@ class RequestPasswordResetView(APIView):
                     Cambiar mi contraseña
                 </a>
             </p>
-
             <p>Si tú no realizaste esta solicitud, puedes ignorar este correo.</p>
-
             <br>
-
             <hr style="border:0; height:2px; background:#1EBE4E;">
             <p style="font-size:12px; color:#555; text-align:center;">
                 © {timezone.now().year} El Gustador · Ibagué - Tolima<br>
@@ -76,9 +71,9 @@ class RequestPasswordResetView(APIView):
         </div>
         """
 
-        email = EmailMultiAlternatives(subject, "", from_email, to)
-        email.attach_alternative(html_content, "text/html")
-        email.send()
+        email_message = EmailMultiAlternatives(subject, "", from_email, to)
+        email_message.attach_alternative(html_content, "text/html")
+        email_message.send()
 
         return Response({"detail": "Se ha enviado un enlace al correo."}, status=200)
 

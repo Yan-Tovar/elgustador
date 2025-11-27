@@ -201,6 +201,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 PAYPAL_SECRET = os.getenv("PAYPAL_SECRET") 
 PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")  
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3001") 
 PAYPAL_API_BASE = os.getenv("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com")
 
