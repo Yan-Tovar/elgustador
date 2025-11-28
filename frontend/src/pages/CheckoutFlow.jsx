@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { crearPedidoDesdeCarrito, getPedido } from "../services/pedidosService";
 import { registrarPago, simulatePago } from "../services/pagosService";
+import DashboardLayout from "../components/layout/DashboardLayout";
 
 import { Box, Button, Typography, Stepper, Step, StepLabel } from "@mui/material";
 import { PayPalButtons } from "@paypal/react-paypal-js";
@@ -95,65 +96,67 @@ export default function CheckoutFlow() {
   };
 
   return (
-    <Box p={4}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Checkout
-      </Typography>
+    <DashboardLayout>
+      <Box p={4}>
+        <Typography variant="h4" sx={{ mb: 3 }}>
+          Checkout
+        </Typography>
 
-      {/* STEPPER REDUCIDO A 3 PASOS */}
-      <Stepper activeStep={activeStep} sx={{ my: 3 }}>
-        <Step><StepLabel>Crear Pedido</StepLabel></Step>
-        <Step><StepLabel>Cargando Pedido</StepLabel></Step>
-        <Step><StepLabel>Pagar</StepLabel></Step>
-      </Stepper>
+        {/* STEPPER REDUCIDO A 3 PASOS */}
+        <Stepper activeStep={activeStep} sx={{ my: 3 }}>
+          <Step><StepLabel>Crear Pedido</StepLabel></Step>
+          <Step><StepLabel>Cargando Pedido</StepLabel></Step>
+          <Step><StepLabel>Pagar</StepLabel></Step>
+        </Stepper>
 
-      {/* PASO 1 — CREAR PEDIDO */}
-      {activeStep === 0 && (
-        <Button variant="contained" onClick={crearPedido}>
-          Crear Pedido
-        </Button>
-      )}
-
-      {/* PASO 2 — CARGANDO */}
-      {activeStep === 1 && (
-        <Typography>Cargando información del pedido...</Typography>
-      )}
-
-      {/* PASO 3 — PAGO */}
-      {activeStep === 2 && pedido && (
-        <Box>
-          <Typography variant="h6">
-            Total a pagar: <strong>${pedido.total}</strong>
-          </Typography>
-
-          <Box mt={3}>
-            <PayPalButtons
-              style={{ layout: "vertical" }}
-              createOrder={(data, actions) =>
-                actions.order.create({
-                  purchase_units: [
-                    { amount: { value: pedido.total.toString() } },
-                  ],
-                })
-              }
-              onApprove={async (data, actions) => {
-                const details = await actions.order.capture();
-                procesarPagoPaypal(details);
-              }}
-            />
-          </Box>
-
-          {/* Pago simulado */}
-          <Button
-            sx={{ mt: 3 }}
-            variant="outlined"
-            color="secondary"
-            onClick={procesarPagoSimulado}
-          >
-            Pagar Simulado
+        {/* PASO 1 — CREAR PEDIDO */}
+        {activeStep === 0 && (
+          <Button variant="contained" onClick={crearPedido}>
+            Crear Pedido
           </Button>
-        </Box>
-      )}
-    </Box>
+        )}
+
+        {/* PASO 2 — CARGANDO */}
+        {activeStep === 1 && (
+          <Typography>Cargando información del pedido...</Typography>
+        )}
+
+        {/* PASO 3 — PAGO */}
+        {activeStep === 2 && pedido && (
+          <Box>
+            <Typography variant="h6">
+              Total a pagar: <strong>${pedido.total}</strong>
+            </Typography>
+
+            <Box mt={3}>
+              <PayPalButtons
+                style={{ layout: "vertical" }}
+                createOrder={(data, actions) =>
+                  actions.order.create({
+                    purchase_units: [
+                      { amount: { value: pedido.total.toString() } },
+                    ],
+                  })
+                }
+                onApprove={async (data, actions) => {
+                  const details = await actions.order.capture();
+                  procesarPagoPaypal(details);
+                }}
+              />
+            </Box>
+
+            {/* Pago simulado */}
+            <Button
+              sx={{ mt: 3 }}
+              variant="outlined"
+              color="secondary"
+              onClick={procesarPagoSimulado}
+            >
+              Pagar Simulado
+            </Button>
+          </Box>
+        )}
+      </Box>
+    </DashboardLayout>
   );
 }

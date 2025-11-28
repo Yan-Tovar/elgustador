@@ -11,6 +11,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EmpleadoDashboard from "./pages/EmpleadoDashboard";
 import ClienteDashboard from "./pages/ClienteDashboard";
 import ProductosPage from "./pages/ProductosPage";
+import CategoriasPage from "./pages/CategoriasPage";
+import DetalleCategoria from "./pages/DetalleCategoria";
 
 // CRUD Admin
 import CategoriasList from "./views/admin/categorias/CategoriasList";
@@ -118,6 +120,26 @@ export default function AppRouter() {
               roles={['empleado', 'admin']} 
             />
           } 
+        />
+
+        <Route
+          path="/categorias"
+          element={
+            <PrivateRoute
+              component={CategoriasPage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
+        />
+
+        <Route
+          path="/categorias/:id"
+          element={
+            <PrivateRoute
+              component={DetalleCategoria}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
         />
 
         <Route

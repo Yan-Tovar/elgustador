@@ -17,3 +17,6 @@ export const updateProducto = (productoId, data) => api.put(`productos/${product
 
 // Desactivar producto (solo admin)
 export const deleteProducto = (productoId) => api.delete(`productos/${productoId}/`);
+
+// Buscar productos por categoria
+export const fetchProductosPorCategoria = async (categoriaId) => { return await api.get(`/productos/por-categoria/${categoriaId}/`); };

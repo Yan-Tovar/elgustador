@@ -47,7 +47,8 @@ export default function SideBar() {
   const menuItems = [
     ...(user?.rol === "cliente"
       ? [
-          { text: "Comprar Productos", icon: <Inventory2 />, path: "/productos" },
+          { text: "Productos", icon: <Inventory2 />, path: "/productos" },
+          { text: "Categorias", icon: <Inventory2 />, path: "/categorias" },
           { text: "Carrito", icon: <NotesOutlined />, path: "/carrito" },
           { text: "Pedidos", icon: <NotesOutlined />, path: "/pedidos" },
           { text: "Facturas", icon: <NotesOutlined />, path: "/facturas" },

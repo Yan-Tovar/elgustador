@@ -1,151 +1,89 @@
-// =======================
-//  CarritoPage.jsx
-// =======================
-
+// src/pages/CarritoPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import {
-  fetchCarrito,
-  updateCarrito,
-  deleteCarrito
-} from "../services/carritoService";
-
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  Card,
-  CardContent,
-  Grid,
-  Snackbar,
-  Alert
-} from "@mui/material";
+import { Box, Typography, Grid, Snackbar, Alert } from "@mui/material";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
+
+import { fetchCarrito, updateCarrito, deleteCarrito } from "../services/carritoService";
+import { fetchUsuario } from "../services/usuariosService";
+
+import CarritoListado from "../components/common/CarritoListado";
+import CarritoResumen from "../components/common/CarritoResumen";
+import { WidthFull } from "@mui/icons-material";
 
 export default function CarritoPage() {
   const navigate = useNavigate();
   const [carrito, setCarrito] = useState(null);
+  const [usuario, setUsuario] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "info"
+    severity: "info",
   });
 
-  // Obtener carrito
   const loadCarrito = async () => {
-    try {
-      const res = await fetchCarrito();
-      setCarrito(res.data);
-    } catch (error) {
-      console.error("Error cargando carrito:", error);
-    }
+    const res = await fetchCarrito();
+    setCarrito(res.data);
+  };
+
+  const loadUsuario = async () => {
+    const res = await fetchUsuario();
+    setUsuario(res.data);
   };
 
   useEffect(() => {
     loadCarrito();
+    loadUsuario();
   }, []);
 
-  // Actualizar cantidad
   const handleCantidad = async (item, qty) => {
-    const cantidad = Number(qty);
-    if (cantidad < 1) return;
-
     try {
-      const res = await updateCarrito(item.id, { cantidad });
+      const res = await updateCarrito(item.id, { cantidad: qty });
 
       if (res.data.warning) {
         setSnackbar({
           open: true,
           message: res.data.message,
-          severity: "warning"
+          severity: "warning",
         });
       }
 
       loadCarrito();
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    } catch (error) {}
   };
 
-  // Eliminar item
   const handleDelete = async (itemId) => {
-    try {
-      await deleteCarrito(itemId);
-      loadCarrito();
-    } catch (error) {
-      console.error("Error eliminando item:", error);
-    }
+    await deleteCarrito(itemId);
+    loadCarrito();
   };
 
-  // SOLO REDIRIGE AL CHECKOUT — NO CREA EL PEDIDO
-  const irACheckout = () => {
-    navigate("/checkout");
-  };
+  const irACheckout = () => navigate("/checkout");
 
   if (!carrito) return <Typography>Cargando...</Typography>;
 
   return (
     <DashboardLayout>
-      <Box p={3}>
-        <Typography variant="h4" mb={3}>Mi Carrito</Typography>
-
-        {carrito.items.length === 0 ? (
-          <Typography>No tienes productos en el carrito</Typography>
-        ) : (
-          <Grid container spacing={2}>
-            {carrito.items.map((item) => (
-              <Grid item xs={12} md={6} key={item.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6">{item.producto.nombre}</Typography>
-                    <Typography>Precio: ${item.producto.precio}</Typography>
-                    <Typography color="text.secondary">
-                      Stock: {item.producto.stock}
-                    </Typography>
-
-                    <Box display="flex" alignItems="center" mt={2} gap={2}>
-                      <TextField
-                        type="number"
-                        size="small"
-                        label="Cantidad"
-                        value={item.cantidad}
-                        onChange={(e) => handleCantidad(item, e.target.value)}
-                        sx={{ width: 100 }}
-                        inputProps={{
-                          min: 1,
-                          max: item.producto.stock
-                        }}
-                      />
-
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                sx={{ mt: 3 }}
-                onClick={irACheckout}
-              >
-                Continuar al pago
-              </Button>
-            </Grid>
+      <Box p={1}>
+        <Grid container spacing={3}>
+          {/* IZQUIERDA → listado */}
+          <Grid item xs={12} md={8}>
+            <CarritoListado
+              carrito={carrito}
+              onCantidad={handleCantidad}
+              onDelete={handleDelete}
+            />
           </Grid>
-        )}
+
+          {/* DERECHA → resumen */}
+          <Grid item xs={12} md={4}>
+            <CarritoResumen
+              usuario={usuario}
+              carrito={carrito}
+              irACheckout={irACheckout}
+            />
+          </Grid>
+        </Grid>
 
         <Snackbar
           open={snackbar.open}

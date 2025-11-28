@@ -15,7 +15,7 @@ class CarritoView(APIView):
 
     def get(self, request):
         carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-        serializer = CarritoSerializer(carrito)
+        serializer = CarritoSerializer(carrito, context={"request": request})
         return Response(serializer.data)
 
 

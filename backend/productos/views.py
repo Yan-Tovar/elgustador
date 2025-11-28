@@ -1,6 +1,6 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.filters import SearchFilter
 
 from config.permissions import IsAdministrador
@@ -55,3 +55,14 @@ class ProductoViewSet(viewsets.ModelViewSet):
         producto.save()
 
         return Response({"message": "Producto desactivado correctamente."})
+
+class ProductosPorCategoriaView(generics.ListAPIView):
+    serializer_class = ProductoListSerializer
+    permission_classes = [AllowAny]  # O IsAuthenticatedOrReadOnly
+
+    def get_queryset(self):
+        categoria_id = self.kwargs["categoria_id"]
+        return Producto.objects.filter(
+            categoria_id=categoria_id,
+            estado=True
+        ).order_by("nombre")

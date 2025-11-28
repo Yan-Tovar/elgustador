@@ -50,3 +50,20 @@ class LoginViewSet(viewsets.GenericViewSet):
             "user": UsuarioSerializer(user).data,
             **tokens
         })
+
+class UsuarioSelfViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    # GET /usuarios/me/
+    def list(self, request):
+        usuario = request.user
+        serializer = UsuarioSerializer(usuario)
+        return Response(serializer.data)
+
+    # PUT /usuarios/me/
+    def update(self, request):
+        usuario = request.user
+        serializer = UsuarioSerializer(usuario, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
