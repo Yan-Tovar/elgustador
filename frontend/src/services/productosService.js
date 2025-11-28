@@ -3,6 +3,9 @@ import api from "./api";
 // Listar todos los productos (catálogo público)
 export const fetchProductos = () => api.get("productos/");
 
+// Buscar productos
+export const searchProductos = (query) => api.get(`productos/?search=${query}`);
+
 // Obtener detalle de un producto
 export const fetchProducto = (productoId) => api.get(`productos/${productoId}/`);
 
