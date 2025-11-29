@@ -1,7 +1,7 @@
 // src/pages/CarritoPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Grid, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, Snackbar, Alert } from "@mui/material";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 
@@ -10,7 +10,8 @@ import { fetchUsuario } from "../services/usuariosService";
 
 import CarritoListado from "../components/common/CarritoListado";
 import CarritoResumen from "../components/common/CarritoResumen";
-import { WidthFull } from "@mui/icons-material";
+
+import TwoColumnInnerLayout from "../components/layout/TwoColumnInnerLayout";
 
 export default function CarritoPage() {
   const navigate = useNavigate();
@@ -60,31 +61,31 @@ export default function CarritoPage() {
 
   const irACheckout = () => navigate("/checkout");
 
-  if (!carrito) return <Typography>Cargando...</Typography>;
+  if (!carrito) return <DashboardLayout><Typography>Cargando...</Typography></DashboardLayout>;
 
   return (
     <DashboardLayout>
       <Box p={1}>
-        <Grid container spacing={3}>
-          {/* IZQUIERDA → listado */}
-          <Grid item xs={12} md={8}>
+
+        {/*  Layout reutilizable de dos columnas */}
+        <TwoColumnInnerLayout
+          left={
             <CarritoListado
               carrito={carrito}
               onCantidad={handleCantidad}
               onDelete={handleDelete}
             />
-          </Grid>
-
-          {/* DERECHA → resumen */}
-          <Grid item xs={12} md={4}>
+          }
+          right={
             <CarritoResumen
               usuario={usuario}
               carrito={carrito}
               irACheckout={irACheckout}
             />
-          </Grid>
-        </Grid>
+          }
+        />
 
+        {/* Snackbar para alertas */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={2500}
@@ -92,6 +93,7 @@ export default function CarritoPage() {
         >
           <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
         </Snackbar>
+
       </Box>
     </DashboardLayout>
   );

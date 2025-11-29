@@ -1,22 +1,28 @@
-// pages/pedidos/PedidoDetallePage.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Card,
-  CardContent,
   CircularProgress,
-  Grid,
   Button,
-  Divider,
+  useTheme,
+  Divider
 } from "@mui/material";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
+
 import { fetchPedidoDetalle, getPedido } from "../services/pedidosService";
+
+import PedidoProductosListado from "../components/common/pedidos/PedidoProductosListado";
+import PedidoResumen from "../components/common/pedidos/PedidoResumen";
+import PedidoEstadoFlujo from "../components/common/pedidos/PedidoEstadoFlujo";
+
+import TwoColumnInnerLayout from "../components/layout/TwoColumnInnerLayout";
 
 export default function PedidoDetallePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [pedido, setPedido] = useState(null);
   const [detalles, setDetalles] = useState([]);
@@ -44,7 +50,7 @@ export default function PedidoDetallePage() {
     return (
       <DashboardLayout>
         <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-            <CircularProgress />
+          <CircularProgress />
         </Box>
       </DashboardLayout>
     );
@@ -54,7 +60,7 @@ export default function PedidoDetallePage() {
     return (
       <DashboardLayout>
         <Box sx={{ textAlign: "center", mt: 5 }}>
-            <Typography variant="h5">Pedido no encontrado</Typography>
+          <Typography variant="h5">Pedido no encontrado</Typography>
         </Box>
       </DashboardLayout>
     );
@@ -62,48 +68,52 @@ export default function PedidoDetallePage() {
 
   return (
     <DashboardLayout>
-        <Box sx={{ p: 4 }}>
-        <Button variant="contained" onClick={() => navigate(-1)} sx={{ mb: 3 }}>
-            Volver
-        </Button>
 
-        <Typography variant="h4" sx={{ mb: 2 }}>
-            Detalle del Pedido #{pedido.id}
-        </Typography>
+      {/* BARRA SUPERIOR DEL PEDIDO */}
+      <Box
+        sx={{
+          width: "100%",
+          p: 2,
+          mb: 3,
+          borderRadius: 2,
+          boxShadow: 3,
+          background: theme.palette.background.paper,
+        }}
+      >
+        <Divider sx={{ mb: 2 }}>Estado del Pedido</Divider>
 
-        <Card sx={{ mb: 3, p: 2 }}>
-            <CardContent>
-            <Typography variant="h6">Información del Pedido</Typography>
-            <Divider sx={{ my: 1 }} />
-            <Typography><strong>Estado:</strong> {pedido.estado}</Typography>
-            <Typography><strong>Fecha:</strong> {new Date(pedido.fecha_creacion).toLocaleString()}</Typography>
-            <Typography><strong>Total:</strong> ${pedido.total}</Typography>
-            </CardContent>
-        </Card>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "center",
+            alignItems: "center",
+            gap: { xs: 2, md: 4 },
+          }}
+        >
+          <PedidoEstadoFlujo estado={pedido.estado} />
 
-        <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>
-            Productos del Pedido
-        </Typography>
-
-        <Grid container spacing={2}>
-            {detalles.map((item) => (
-            <Grid item xs={12} md={6} lg={4} key={item.id}>
-                <Card>
-                <CardContent>
-                    <Typography variant="h6">{item.producto.nombre}</Typography>
-                    <Typography><strong>Cantidad:</strong> {item.cantidad}</Typography>
-                    <Typography><strong>Precio unitario:</strong> ${item.precio_unitario}</Typography>
-                    <Typography><strong>Subtotal:</strong> ${(item.cantidad * item.precio_unitario).toFixed(2)}</Typography>
-                </CardContent>
-                </Card>
-            </Grid>
-            ))}
-        </Grid>
-
-        {detalles.length === 0 && (
-            <Typography sx={{ mt: 3 }}>Este pedido no tiene productos registrados.</Typography>
-        )}
+          <Button
+            variant="contained"
+            onClick={() => navigate(-1)}
+            sx={{
+              bgcolor: "green",
+              color: "black",
+              height: 40,
+              width: { xs: "100%", md: "auto" },
+              mt: { xs: 1, md: 0 },
+            }}
+          >
+            Pedidos
+          </Button>
         </Box>
+      </Box>
+
+      {/* LAYOUT REUTILIZABLE */}
+      <TwoColumnInnerLayout
+        left={<PedidoProductosListado detalles={detalles} />}
+        right={<PedidoResumen pedido={pedido} />}
+      />
     </DashboardLayout>
   );
 }
