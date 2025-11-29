@@ -1,155 +1,170 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-} from "@mui/material";
+// src/pages/FacturasPage.jsx
+import { useEffect, useState, useRef, useCallback } from "react";
+import { Box, Typography, CircularProgress, TextField } from "@mui/material";
+
+import FacturaCard from "../components/common/facturas/FacturaCard";
 
 import {
   getFacturasUsuario,
   descargarFacturaPDF,
   enviarFacturaEmail,
 } from "../services/facturasService";
-import DashboardLayout from "../components/layout/DashboardLayout"
 
+import DashboardLayout from "../components/layout/DashboardLayout";
 import { saveAs } from "file-saver";
 
 export default function FacturasPage() {
-  const navigate = useNavigate();
   const [facturas, setFacturas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [enviandoId, setEnviandoId] = useState(null);
 
-  const cargarFacturas = async () => {
+  const [search, setSearch] = useState(""); // 🔎 Texto del buscador
+  const [page, setPage] = useState(1); // 📄 Page para paginación
+  const [hasMore, setHasMore] = useState(true);
+
+  const observer = useRef();
+
+  // ======================================================
+  // Cargar facturas con paginación y búsqueda
+  // ======================================================
+  const cargarFacturas = async (reset = false) => {
     try {
-      const res = await getFacturasUsuario();
-      setFacturas(res.data);
+      const res = await getFacturasUsuario({
+        q: search,
+        page: page,
+      });
+
+      const nuevas = res.data.results || [];
+
+      if (reset) {
+        setFacturas(nuevas);
+      } else {
+        setFacturas((prev) => [...prev, ...nuevas]);
+      }
+
+      setHasMore(res.data.has_more);
+      setLoading(false);
     } catch (err) {
       console.error("Error cargando facturas:", err);
-      alert("No se pudieron cargar las facturas.");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  useEffect(() => {
-    cargarFacturas();
-  }, []);
+  // ======================================================
+  // Scroll infinito → detectar último card
+  // ======================================================
+  const lastFacturaRef = useCallback(
+    (node) => {
+      if (loading) return;
 
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prev) => prev + 1); // siguiente página
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  // ======================================================
+  // Cargar primera página o recargar tras búsqueda
+  // ======================================================
+  useEffect(() => {
+    setLoading(true);
+    setPage(1);
+    cargarFacturas(true); // reset
+  }, [search]);
+
+  // ======================================================
+  // Scroll infinito: cargar más páginas
+  // ======================================================
+  useEffect(() => {
+    if (page > 1) cargarFacturas();
+  }, [page]);
+
+  // ======================================================
+  // Acciones PDF / Email
+  // ======================================================
   const handleDescargar = async (id) => {
     try {
       const response = await descargarFacturaPDF(id);
       const blob = new Blob([response.data], { type: "application/pdf" });
       saveAs(blob, `factura_${id}.pdf`);
-    } catch (error) {
-      console.error("Error descargando factura:", error);
+    } catch {
       alert("Hubo un error al descargar la factura.");
     }
   };
 
   const handleEnviarCorreo = async (id) => {
     try {
-      setEnviandoId(id); // ➤ Deshabilita solo el botón de esta factura
-
+      setEnviandoId(id);
       await enviarFacturaEmail(id);
-
       alert("Factura enviada al correo.");
-    } catch (error) {
-      console.error("Error enviando factura:", error);
-      alert("No se pudo enviar la factura por correo.");
+    } catch {
+      alert("No se pudo enviar la factura.");
     } finally {
-      setEnviandoId(null); // ➤ Reactiva el botón
+      setEnviandoId(null);
     }
   };
 
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <Box p={4} textAlign="center">
-          <CircularProgress />
-          <Typography sx={{ mt: 2 }}>Cargando facturas...</Typography>
-        </Box>
-      </DashboardLayout>
-    );
-  }
-
   return (
     <DashboardLayout>
-      <Box p={4}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
+      <Box p={{ xs: 2, md: 4 }}>
+        <Typography variant="h4" sx={{ mb: 2, fontWeight: 700 }}>
           Mis Facturas
         </Typography>
 
-        {facturas.length === 0 ? (
-          <Typography>No tienes facturas aún.</Typography>
-        ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Número de Factura</TableCell>
-                  <TableCell>Total</TableCell>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Acciones</TableCell>
-                </TableRow>
-              </TableHead>
+        {/* Buscador integrado dentro de la vista */}
+        <TextField
+          fullWidth
+          placeholder="Buscar por número, fecha, total..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{ mb: 3 }}
+        />
 
-              <TableBody>
-                {facturas.map((factura) => (
-                  <TableRow key={factura.id}>
-                    <TableCell>{factura.id}</TableCell>
-                    <TableCell>{factura.numero_factura}</TableCell>
-                    <TableCell>${factura.total}</TableCell>
-                    <TableCell>
-                      {new Date(factura.fecha).toLocaleString()}
-                    </TableCell>
+        {/* LISTADO */}
+        <Box
+          mt={2}
+          display="grid"
+          gap={2}
+          gridTemplateColumns={{
+            xs: "1fr",
+            sm: "1fr 1fr",
+            md: "1fr 1fr 1fr",
+          }}
+        >
+          {facturas.map((f, i) => {
+            const isLast = i === facturas.length - 1;
 
-                    <TableCell>
-                      <Box display="flex" gap={1}>
-                        {/* Ver factura */}
-                        <Button
-                          variant="contained"
-                          size="small"
-                          onClick={() => navigate(`/factura/${factura.id}`)}
-                        >
-                          Ver
-                        </Button>
+            return (
+              <div key={f.id} ref={isLast ? lastFacturaRef : null}>
+                <FacturaCard
+                  factura={f}
+                  enviandoId={enviandoId}
+                  onDescargar={() => handleDescargar(f.id)}
+                  onEnviar={() => handleEnviarCorreo(f.id)}
+                />
+              </div>
+            );
+          })}
+        </Box>
 
-                        {/* Descargar PDF */}
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => handleDescargar(factura.id)}
-                        >
-                          Descargar
-                        </Button>
+        {/* Loader inferior */}
+        {loading && (
+          <Box textAlign="center" py={3}>
+            <CircularProgress />
+          </Box>
+        )}
 
-                        {/* Enviar por correo */}
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          size="small"
-                          disabled={enviandoId === factura.id} 
-                          onClick={() => handleEnviarCorreo(factura.id)}
-                        >
-                          {enviandoId === factura.id ? "Enviando..." : "Enviar Email"}
-                        </Button>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        {!hasMore && !loading && (
+          <Typography textAlign="center" py={2} color="gray">
+            No hay más facturas
+          </Typography>
         )}
       </Box>
     </DashboardLayout>

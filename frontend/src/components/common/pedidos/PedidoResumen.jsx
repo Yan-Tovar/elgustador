@@ -71,7 +71,7 @@ export default function PedidoResumen({ pedido }) {
       <Divider sx={{ my: 2 }} />
 
       <Typography>
-        <strong>ID del pedido:</strong> #{pedido.id}
+        <strong>ID del pedido:</strong> {pedido.id}
       </Typography>
     </Box>
   );
