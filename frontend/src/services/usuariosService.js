@@ -5,4 +5,4 @@ import api from "./api";
 export const fetchUsuario = () => api.get("usuarios/usuarios/me/");
 
 // Editar datos del usuario autenticado
-export const updateUsuario = (data) => api.put("usuarios/me/", data);
+export const updateUsuario = (data) => api.put("usuarios/usuarios/me/", data);

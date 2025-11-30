@@ -13,6 +13,7 @@ import ClienteDashboard from "./pages/ClienteDashboard";
 import ProductosPage from "./pages/ProductosPage";
 import CategoriasPage from "./pages/CategoriasPage";
 import DetalleCategoria from "./pages/DetalleCategoria";
+import PerfilUsuarioPage from "./pages/PerfilUsuarioPage";
 
 // CRUD Admin
 import CategoriasList from "./views/admin/categorias/CategoriasList";
@@ -177,6 +178,16 @@ export default function AppRouter() {
           element={
             <PrivateRoute 
               component={ClienteDashboard} 
+              roles={['cliente', 'empleado', 'admin']} 
+            />
+          } 
+        />
+
+        <Route 
+          path="/perfil" 
+          element={
+            <PrivateRoute 
+              component={PerfilUsuarioPage} 
               roles={['cliente', 'empleado', 'admin']} 
             />
           } 

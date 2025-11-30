@@ -49,3 +49,22 @@ class UsuarioLoginSerializer(serializers.Serializer):
 class EmailVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(required=False, max_length=6)
+
+class UsuarioUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Usuario
+        fields = [
+            "nombre",
+            "apellido",
+            "telefono",
+            "direccion_detallada",
+            "municipio",
+            "departamento",
+            "email"
+        ]
+        extra_kwargs = {
+            "email": {"required": False},
+            "municipio": {"required": False},
+            "departamento": {"required": False},
+        }

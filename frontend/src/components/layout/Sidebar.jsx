@@ -52,6 +52,7 @@ export default function SideBar() {
           { text: "Carrito", icon: <NotesOutlined />, path: "/carrito" },
           { text: "Pedidos", icon: <NotesOutlined />, path: "/pedidos" },
           { text: "Facturas", icon: <NotesOutlined />, path: "/facturas" },
+          { text: "Perfil", icon: <NotesOutlined />, path: "/perfil" },
         ]
       : []),
 
@@ -73,6 +74,7 @@ export default function SideBar() {
           { text: "Carrito", icon: <NotesOutlined />, path: "/carrito" },
           { text: "Facturas", icon: <NotesOutlined />, path: "/facturas" },
           { text: "Pedidos", icon: <NotesOutlined />, path: "/pedidos" },
+          { text: "Perfil", icon: <NotesOutlined />, path: "/perfil" },
           { text: "Carrito Eventos", icon: <NotesOutlined />, path: "/carrito-eventos" },
           { text: "admin pedidos", icon: <NotesOutlined />, path: "/admin/pedidos" },
           { text: "admin facturas", icon: <NotesOutlined />, path: "/admin/facturas" }
