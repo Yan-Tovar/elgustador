@@ -18,8 +18,8 @@ export default function FacturasPage() {
   const [loading, setLoading] = useState(true);
   const [enviandoId, setEnviandoId] = useState(null);
 
-  const [search, setSearch] = useState(""); // 🔎 Texto del buscador
-  const [page, setPage] = useState(1); // 📄 Page para paginación
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
   const observer = useRef();
@@ -31,7 +31,7 @@ export default function FacturasPage() {
     try {
       const res = await getFacturasUsuario({
         q: search,
-        page: page,
+        page,
       });
 
       const nuevas = res.data.results || [];
@@ -61,7 +61,7 @@ export default function FacturasPage() {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => prev + 1); // siguiente página
+          setPage((prev) => prev + 1);
         }
       });
 
@@ -76,7 +76,7 @@ export default function FacturasPage() {
   useEffect(() => {
     setLoading(true);
     setPage(1);
-    cargarFacturas(true); // reset
+    cargarFacturas(true);
   }, [search]);
 
   // ======================================================
@@ -111,6 +111,10 @@ export default function FacturasPage() {
     }
   };
 
+  // ======================================================
+  // UI
+  // ======================================================
+
   return (
     <DashboardLayout>
       <Box p={{ xs: 2, md: 4 }}>
@@ -118,7 +122,7 @@ export default function FacturasPage() {
           Mis Facturas
         </Typography>
 
-        {/* Buscador integrado dentro de la vista */}
+        {/* Buscador */}
         <TextField
           fullWidth
           placeholder="Buscar por número, fecha, total..."
@@ -126,6 +130,59 @@ export default function FacturasPage() {
           onChange={(e) => setSearch(e.target.value)}
           sx={{ mb: 3 }}
         />
+
+        {/* ===================== */}
+        {/* ESTADO: SIN FACTURAS */}
+        {/* ===================== */}
+        {!loading && facturas.length === 0 && (
+          <Box
+            sx={{
+              width: "100%",
+              minHeight: "60vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              px: 2,
+            }}
+          >
+            <Box
+              component="img"
+              src="/NoFacturas.png"
+              alt="Sin facturas"
+              sx={{
+                width: { xs: "60%", sm: "40%", md: "250px" },
+                maxWidth: "280px",
+                mb: 2,
+                objectFit: "contain",
+              }}
+            />
+
+            <Typography
+              variant="h6"
+              sx={{
+                color: "text.primary",
+                fontWeight: 600,
+                fontSize: { xs: "1.1rem", sm: "1.3rem", md: "1.5rem" },
+                mb: 1,
+              }}
+            >
+              Aún no tienes facturas
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+                maxWidth: "350px",
+              }}
+            >
+              Cuando realices pagos aparecerán aquí para que puedas revisarlos.
+            </Typography>
+          </Box>
+        )}
 
         {/* LISTADO */}
         <Box
@@ -161,7 +218,7 @@ export default function FacturasPage() {
           </Box>
         )}
 
-        {!hasMore && !loading && (
+        {!hasMore && !loading && facturas.length > 0 && (
           <Typography textAlign="center" py={2} color="gray">
             No hay más facturas
           </Typography>

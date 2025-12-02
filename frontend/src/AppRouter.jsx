@@ -53,7 +53,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import { Check } from "@mui/icons-material";
 
 export default function AppRouter() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+  
+  if (loading) return <div>Cargando...</div>;
 
   return (
     <Router>
@@ -88,15 +90,10 @@ export default function AppRouter() {
         <Route 
           path="/" 
           element={
-            user?.rol === "admin" ? (
-              <Navigate to="/admin/dashboard" />
-            ) : user?.rol === "empleado" ? (
-              <Navigate to="/employee/dashboard" />
-            ) : user?.rol === "cliente" ? (
-              <Navigate to="/dashboard" />
-            ) : (
-              <Navigate to="/login" />
-            )
+            !user ? <Navigate to="/login" replace  /> :
+            user.rol === "admin" ? <AdminDashboard /> :
+            user.rol === "empleado" ? <EmpleadoDashboard /> :
+            <ClienteDashboard />
           }
         />
 

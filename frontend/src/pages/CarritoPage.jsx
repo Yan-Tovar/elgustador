@@ -1,12 +1,14 @@
 // src/pages/CarritoPage.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Snackbar, Alert } from "@mui/material";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 
-import { fetchCarrito, updateCarrito, deleteCarrito } from "../services/carritoService";
+import { updateCarrito, deleteCarrito } from "../services/carritoService";
 import { fetchUsuario } from "../services/usuariosService";
+
+import { CarritoContext } from "../context/CarritoContext";
 
 import CarritoListado from "../components/common/CarritoListado";
 import CarritoResumen from "../components/common/CarritoResumen";
@@ -15,7 +17,10 @@ import TwoColumnInnerLayout from "../components/layout/TwoColumnInnerLayout";
 
 export default function CarritoPage() {
   const navigate = useNavigate();
-  const [carrito, setCarrito] = useState(null);
+
+  //  Traer carrito y loadCarrito del CarritoContext
+  const { carrito, loadCarrito } = useContext(CarritoContext);
+
   const [usuario, setUsuario] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -23,20 +28,20 @@ export default function CarritoPage() {
     severity: "info",
   });
 
-  const loadCarrito = async () => {
-    const res = await fetchCarrito();
-    setCarrito(res.data);
-  };
-
-  const loadUsuario = async () => {
-    const res = await fetchUsuario();
-    setUsuario(res.data);
-  };
-
+  // Cargar usuario y carrito al montar
   useEffect(() => {
     loadCarrito();
     loadUsuario();
   }, []);
+
+  const loadUsuario = async () => {
+    try {
+      const res = await fetchUsuario();
+      setUsuario(res.data);
+    } catch (err) {
+      console.error("Error cargando usuario:", err);
+    }
+  };
 
   const handleCantidad = async (item, qty) => {
     try {
@@ -50,24 +55,36 @@ export default function CarritoPage() {
         });
       }
 
-      loadCarrito();
-    } catch (error) {}
+      // Actualiza carrito global
+      await loadCarrito();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDelete = async (itemId) => {
-    await deleteCarrito(itemId);
-    loadCarrito();
+    try {
+      await deleteCarrito(itemId);
+
+      // Actualiza carrito global
+      await loadCarrito();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const irACheckout = () => navigate("/checkout");
 
-  if (!carrito) return <DashboardLayout><Typography>Cargando...</Typography></DashboardLayout>;
+  if (!carrito)
+    return (
+      <DashboardLayout>
+        <Typography>Cargando...</Typography>
+      </DashboardLayout>
+    );
 
   return (
     <DashboardLayout>
       <Box p={1}>
-
-        {/*  Layout reutilizable de dos columnas */}
         <TwoColumnInnerLayout
           left={
             <CarritoListado
@@ -85,15 +102,13 @@ export default function CarritoPage() {
           }
         />
 
-        {/* Snackbar para alertas */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={2500}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
         >
           <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
         </Snackbar>
-
       </Box>
     </DashboardLayout>
   );

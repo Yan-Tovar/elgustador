@@ -15,44 +15,60 @@ import {
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
-import { 
+import {
   ShoppingCart,
-  People, 
-  Settings, 
-  Category, 
-  Inventory2, 
+  People,
+  Settings,
+  Category,
+  Inventory2,
   LocalOffer,
   NotesOutlined,
+  AutoAwesomeMosaic,
+  ScatterPlot,
+  ViewStream,
+  Receipt,
+  PersonPin,
 } from "@mui/icons-material";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState, useRef  } from "react";
+
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import LogoutButton from "../auth/LogoutButton";
 import DarkModeToggle from "../common/DarkModeToggle";
 
+
 const drawerWidth = 260;
+const NAVBAR_HEIGHT = 70;
 
 export default function SideBar() {
   const { user } = useContext(AuthContext);
   const theme = useTheme();
   const navigate = useNavigate();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [open, setOpen] = useState(false);
 
+  const [open, setOpen] = useState(false);
   const toggleDrawer = () => setOpen(!open);
 
-  // Items por rol
+  // --------------------------------------------
+  // OBTENER PRIMER NOMBRE DEL USUARIO
+  // --------------------------------------------
+  const primerNombre = user?.nombre
+    ? user.nombre.trim().split(" ")[0]
+    : "Usuario";
+
+  // --------------------------------------------
+  // MENÚ POR ROLES
+  // --------------------------------------------
   const menuItems = [
     ...(user?.rol === "cliente"
       ? [
-          { text: "Productos", icon: <Inventory2 />, path: "/productos" },
-          { text: "Categorias", icon: <Inventory2 />, path: "/categorias" },
-          { text: "Carrito", icon: <NotesOutlined />, path: "/carrito" },
-          { text: "Pedidos", icon: <NotesOutlined />, path: "/pedidos" },
-          { text: "Facturas", icon: <NotesOutlined />, path: "/facturas" },
-          { text: "Perfil", icon: <NotesOutlined />, path: "/perfil" },
+          { text: "Productos", icon: <AutoAwesomeMosaic />, path: "/productos" },
+          { text: "Categorias", icon: <ScatterPlot />, path: "/categorias" },
+          { text: "Carrito", icon: <ShoppingCart />, path: "/carrito" },
+          { text: "Pedidos", icon: <ViewStream />, path: "/pedidos" },
+          { text: "Facturas", icon: <Receipt />, path: "/facturas" },
+          { text: "Perfil", icon: <PersonPin />, path: "/perfil" },
         ]
       : []),
 
@@ -76,45 +92,66 @@ export default function SideBar() {
           { text: "Pedidos", icon: <NotesOutlined />, path: "/pedidos" },
           { text: "Perfil", icon: <NotesOutlined />, path: "/perfil" },
           { text: "Carrito Eventos", icon: <NotesOutlined />, path: "/carrito-eventos" },
-          { text: "admin pedidos", icon: <NotesOutlined />, path: "/admin/pedidos" },
-          { text: "admin facturas", icon: <NotesOutlined />, path: "/admin/facturas" }
-          
+          { text: "Admin Pedidos", icon: <NotesOutlined />, path: "/admin/pedidos" },
+          { text: "Admin Facturas", icon: <NotesOutlined />, path: "/admin/facturas" },
         ]
       : []),
   ];
 
+  // --------------------------------------------
+  // CONTENIDO DEL DRAWER
+  // --------------------------------------------
   const drawerContent = (
-    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Toolbar>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* HEADER FIJO */}
+      <Toolbar
+        sx={{
+          position: "relative",
+          top: 0,
+          zIndex: 10,
+          bgcolor: theme.palette.background.paper,
+        }}
+      >
         <Typography variant="h6" fontWeight="bold">
-          Mi App
+          Hola {primerNombre}
         </Typography>
       </Toolbar>
 
       <Divider />
 
-      <List>
-        {menuItems.map((item) => (
-          <ListItem
-            button
-            key={item.text}
-            onClick={() => {
-              navigate(item.path);
-              if (isMobile) toggleDrawer();
-            }}
-          >
-            <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
-        ))}
-      </List>
-
-      <Box sx={{ flexGrow: 1 }} />
+      {/* ZONA SCROLLEABLE */}
+      <Box sx={{ overflowY: "auto", flexGrow: 1 }}>
+        <List>
+          {menuItems.map((item) => (
+            <ListItem
+              button
+              key={item.text}
+              onClick={() => {
+                navigate(item.path);
+                if (isMobile) toggleDrawer();
+              }}
+              sx={{
+                cursor:"pointer"
+              }}
+            >
+              <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
 
       <Divider />
 
+      {/* FOOTER FIJO */}
       <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
         <DarkModeToggle />
         <LogoutButton />
@@ -122,13 +159,36 @@ export default function SideBar() {
     </Box>
   );
 
+  const [stickToTop, setStickToTop] = useState(true);
+
+  useEffect(() => {
+    const sentinel = document.getElementById("footer-sentinel");
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Cuando el footer aparece → el sidebar debe subir con el contenido
+        setStickToTop(!entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
-      {/* Botón hamburguesa móvil */}
+      {/* Menu mobile */}
       {isMobile && (
         <IconButton
           onClick={toggleDrawer}
-          sx={{ position: "fixed", top: 10, left: 10, zIndex: theme.zIndex.drawer + 2 }}
+          sx={{
+            position: "fixed",
+            top: 10,
+            left: 10,
+            zIndex: theme.zIndex.drawer + 3,
+          }}
         >
           <MenuIcon />
         </IconButton>
@@ -143,6 +203,15 @@ export default function SideBar() {
             [`& .MuiDrawer-paper`]: {
               width: drawerWidth,
               backgroundColor: theme.palette.background.paper,
+              height: stickToTop
+                ? `calc(100vh - ${NAVBAR_HEIGHT}px)`  // Comportamiento normal fijo
+                : "calc(100vh - ${NAVBAR_HEIGHT}px)",                            // Cuando llega al footer
+              top: stickToTop ? `${NAVBAR_HEIGHT}px` : "auto",
+              position: stickToTop ? "fixed" : "absolute",
+              bottom: stickToTop ? "auto" : "10px",
+              overflow: "hidden",
+              borderTopRightRadius: "15px",
+              borderBottomRightRadius: "15px"
             },
           }}
         >
@@ -150,7 +219,7 @@ export default function SideBar() {
         </Drawer>
       )}
 
-      {/* Drawer Móvil */}
+      {/* Drawer Mobile */}
       {isMobile && (
         <Drawer
           variant="temporary"
@@ -160,6 +229,10 @@ export default function SideBar() {
             [`& .MuiDrawer-paper`]: {
               width: drawerWidth,
               backgroundColor: theme.palette.background.paper,
+              height: `calc(100vh - ${NAVBAR_HEIGHT}px)`,
+              top: `${NAVBAR_HEIGHT}px`,
+              overflow: "hidden",
+              borderTopRightRadius:"15px",
             },
           }}
         >

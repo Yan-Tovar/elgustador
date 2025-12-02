@@ -5,64 +5,58 @@ import CarritoItem from "./CarritoItem";
 export default function CarritoListado({ carrito, onCantidad, onDelete }) {
   const items = carrito?.items || [];
 
-  // ❌ Carrito vacío
+  //  Carrito vacío 
   if (!Array.isArray(items) || items.length === 0) {
     return (
-      <Box width="100%">
-        {/* 🔵 Barra superior con imagen y mensaje */}
+      <Box
+        sx={{
+          width: "100%",
+          minHeight: "60vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          px: 2,
+        }}
+      >
+        {/* Imagen centrada */}
         <Box
+          component="img"
+          src="/NoCarrito.png"
+          alt="Carrito vacío"
           sx={{
-            width: "100%",
-            backgroundColor: "background.paper",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: { xs: 2, md: 4 },
-            py: 2,
-            boxShadow: 2,
-            borderRadius: 2,
-            mb: 3,
+            width: { xs: "60%", sm: "40%", md: "250px" },
+            maxWidth: "280px",
+            mb: 2,
+            objectFit: "contain",
+          }}
+        />
+
+        {/* Mensaje principal */}
+        <Typography
+          variant="h6"
+          sx={{
+            color: "text.primary",
+            fontWeight: 600,
+            fontSize: { xs: "1.1rem", sm: "1.3rem", md: "1.5rem" },
+            mb: 1,
           }}
         >
-          {/* Imagen izquierda */}
-          <Box
-            component="img"
-            src="/carritoVacio.png"
-            alt="Carrito vacío"
-            sx={{
-              height: { xs: 40, sm: 50, md: 60 },
-              width: "auto",
-              objectFit: "contain",
-            }}
-          />
+          Tu carrito está vacío
+        </Typography>
 
-          {/* Texto centrado */}
-          <Typography
-            variant="h6"
-            fontWeight={700}
-            textAlign="center"
-            sx={{
-              flexGrow: 1,
-              color: "text.secondary",
-              fontSize: { xs: "1rem", sm: "1.2rem", md: "1.3rem" },
-            }}
-          >
-            El carrito está vacío
-          </Typography>
-
-          {/* Imagen duplicada a la derecha para balance — opcional */}
-          <Box
-            component="img"
-            src="/carritoVacio.png"
-            alt="Carrito vacío"
-            sx={{
-              height: { xs: 40, sm: 50, md: 60 },
-              width: "auto",
-              objectFit: "contain",
-              opacity: 0, // si lo quieres visible cámbialo a 1
-            }}
-          />
-        </Box>
+        {/* Submensaje opcional */}
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            fontSize: { xs: "0.9rem", sm: "1rem" },
+            maxWidth: "350px",
+          }}
+        >
+          Explora nuestros productos y agrega tus favoritos para continuar con la compra.
+        </Typography>
       </Box>
     );
   }

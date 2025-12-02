@@ -71,7 +71,7 @@ export default function CarritoResumen({ usuario, carrito, irACheckout }) {
           width: "100%",
           marginTop: 20,
           padding: 12,
-          background: "#1976d2",
+          background: "orangered",
           color: "white",
           border: 0,
           borderRadius: 8,

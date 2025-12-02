@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// src/pages/ProductosPage.jsx
+import { useEffect, useState, useContext } from "react";
 import {
   Box,
   Grid,
@@ -7,12 +8,15 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
+
 import SearchIcon from "@mui/icons-material/Search";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 
 import { fetchProductos, searchProductos } from "../services/productosService";
 import { addToCarrito } from "../services/carritoService";
+
+import { CarritoContext } from "../context/CarritoContext";
 
 import ProductosCard from "../components/common/ProductosCard";
 
@@ -26,11 +30,15 @@ export default function ProductosPage() {
     severity: "info",
   });
 
+  // Traer loadCarrito desde el context
+  const { loadCarrito } = useContext(CarritoContext);
+
+  // Cargar productos al montar página
   useEffect(() => {
     loadProductos();
   }, []);
 
-  //  Efecto para buscar productos con debounce
+  // Debounce búsqueda
   useEffect(() => {
     const delay = setTimeout(() => {
       if (search.trim() === "") {
@@ -81,6 +89,9 @@ export default function ProductosPage() {
         cantidad,
       });
 
+      // 🚀 Actualiza el carrito global
+      await loadCarrito();
+
       setSnackbar({
         open: true,
         message: res.data.warning
@@ -107,9 +118,15 @@ export default function ProductosPage() {
   return (
     <DashboardLayout>
       <Box sx={{ padding: 1 }}>
-        
         {/* BARRA DE BÚSQUEDA */}
-        <Box sx={{ mb: 2, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <TextField
             fullWidth
             placeholder="Buscar productos..."

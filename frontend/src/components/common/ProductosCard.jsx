@@ -231,7 +231,7 @@ export default function ProductosCard({
           {producto.precio_anterior && (
             <Typography
               variant="body2"
-              sx={{ color: "text.secondary", textDecoration: "line-through" }}
+              sx={{ color: "gray", textDecoration: "line-through" }}
             >
               ${producto.precio_anterior}
             </Typography>

@@ -105,8 +105,8 @@ export default function CheckoutFlow() {
         {/* STEPPER REDUCIDO A 3 PASOS */}
         <Stepper activeStep={activeStep} sx={{ my: 3 }}>
           <Step><StepLabel>Crear Pedido</StepLabel></Step>
-          <Step><StepLabel>Cargando Pedido</StepLabel></Step>
           <Step><StepLabel>Pagar</StepLabel></Step>
+          <Step><StepLabel>Factura</StepLabel></Step>
         </Stepper>
 
         {/* PASO 1 — CREAR PEDIDO */}

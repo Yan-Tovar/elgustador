@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { updateUsuario } from "../../../../services/usuariosService";
+import TelefonoInput from "../../TelefonoInput";
 
 export default function ModalTelefono({ open, onClose, usuario, setUsuario }) {
   const [telefono, setTelefono] = useState(usuario.telefono || "");
@@ -31,7 +32,7 @@ export default function ModalTelefono({ open, onClose, usuario, setUsuario }) {
       <DialogTitle>Editar teléfono</DialogTitle>
 
       <DialogContent dividers>
-        <TextField
+        <TelefonoInput
           fullWidth
           label="Teléfono"
           value={telefono}

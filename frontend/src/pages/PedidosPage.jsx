@@ -39,9 +39,7 @@ export default function PedidosPage() {
   return (
     <DashboarLayout>
       <Box p={4}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Mis Pedidos
-        </Typography>
+        
 
         <PedidosListado pedidos={pedidos} />
       </Box>
