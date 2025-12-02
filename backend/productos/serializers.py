@@ -13,7 +13,7 @@ class ProductoSerializer(serializers.ModelSerializer):
 class ProductoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
-        fields = ['id', 'codigo', 'nombre', 'precio', 'stock', 'imagen1']
+        fields = ['id', 'codigo', 'nombre', 'precio', 'precio_anterior', 'stock', 'imagen1']
 
 
 class ProductoCreateUpdateSerializer(serializers.ModelSerializer):

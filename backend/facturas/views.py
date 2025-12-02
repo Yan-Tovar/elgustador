@@ -3,10 +3,12 @@ from rest_framework import viewsets, status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from django.http import FileResponse
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 
 from config.permissions import IsAdministrador
 from .models import Factura
@@ -15,17 +17,28 @@ from pedidos_detalles.models import PedidoDetalle
 from .serializers import FacturaSerializer
 
 import io
-import os  
+import os
 
-# ReportLab
+# ReportLab (mantengo tu generador existente)
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 
+# ---------------------------
+# PAGINACIÓN (10 por página)
+# ---------------------------
+class TenResultsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"   # opcionalmente permitir cambiar
+    max_page_size = 100
 
+# ---------------------------
+# GENERADOR PDF (tu función existente)
+# ---------------------------
 def generar_pdf_factura(factura):
+    # (copié exactamente tu implementación original para mantener detalles)
     buffer = io.BytesIO()
 
     pdf = SimpleDocTemplate(
@@ -123,7 +136,7 @@ def generar_pdf_factura(factura):
                 Paragraph(encabezado_texto, encabezado_style),
             ]
         ],
-        colWidths=[160, 360],   # 💡 Más balanceado
+        colWidths=[160, 360],
     )
 
     encabezado_tabla.setStyle(
@@ -238,7 +251,7 @@ def generar_pdf_factura(factura):
     elements.append(Spacer(1, 25))
 
     # =================================================================
-    #                           PIE DE PÁGINA (MEJORADO)
+    #                           PIE DE PÁGINA 
     # =================================================================
 
     footer_line = Table(
@@ -265,19 +278,92 @@ def generar_pdf_factura(factura):
     return buffer
 
 # =================================================================
-#                      VIEWSET PRINCIPAL
+#                      VIEWSET PRINCIPAL (con filtros y paginación)
 # =================================================================
 class FacturaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = FacturaSerializer
+    pagination_class = TenResultsPagination  # <-- paginación por 10
 
     def get_queryset(self):
-        # admin → todas
-        if self.request.user.rol == "administrador":
-            return Factura.objects.all()
+        """
+        Devuelve queryset según rol y query params:
+          - admin: todas las facturas
+          - usuario: solo sus facturas
+        Aplica filtros por query params (id, numero_factura, fecha_from, fecha_to,
+        total_min, total_max, q)
+        """
+        user = self.request.user
+        qs = Factura.objects.all() if user.rol == "administrador" else Factura.objects.filter(pedido__usuario=user)
 
-        # otros → solo sus facturas
-        return Factura.objects.filter(pedido__usuario=self.request.user)
+        params = self.request.query_params
+
+        # filtro por id exacto
+        factura_id = params.get("id")
+        if factura_id:
+            qs = qs.filter(id=factura_id)
+
+        # numero_factura exacto o parcial
+        numero = params.get("numero_factura")
+        if numero:
+            qs = qs.filter(numero_factura__icontains=numero)
+
+        # búsqueda general (q) en numero_factura y pedido.usuario.nombre
+        q = params.get("q")
+        if q:
+            qs = qs.filter(
+                # busqueda simple; puedes mejorar con Q si quieres múltiples campos
+                numero_factura__icontains=q
+            ) | qs.filter(pedido__usuario__nombre__icontains=q)
+
+        # fecha range (fecha_from, fecha_to) - formato ISO YYYY-MM-DD
+        fecha_from = params.get("fecha_from")
+        fecha_to = params.get("fecha_to")
+        if fecha_from:
+            d = parse_date(fecha_from)
+            if d:
+                qs = qs.filter(fecha__date__gte=d)
+        if fecha_to:
+            d2 = parse_date(fecha_to)
+            if d2:
+                qs = qs.filter(fecha__date__lte=d2)
+
+        # total min / max
+        total_min = params.get("total_min")
+        total_max = params.get("total_max")
+        if total_min:
+            try:
+                total_min_f = float(total_min)
+                qs = qs.filter(total__gte=total_min_f)
+            except ValueError:
+                pass
+        if total_max:
+            try:
+                total_max_f = float(total_max)
+                qs = qs.filter(total__lte=total_max_f)
+            except ValueError:
+                pass
+
+        # ordenar por fecha desc por defecto
+        qs = qs.order_by("-fecha")
+
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        """
+        `list` usa paginación automática (PageNumberPagination) y devuelve
+        página de 10 resultados por defecto. Los params de filtro se pasan
+        como query params.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={"request": request})
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True, context={"request": request})
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -287,22 +373,101 @@ class FacturaViewSet(viewsets.ModelViewSet):
 
 
 # =================================================================
-#                      LISTADOS
+#                      LISTADOS (compatibles con filtros y paginación)
 # =================================================================
 class FacturasUsuarioView(generics.ListAPIView):
     serializer_class = FacturaSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = TenResultsPagination
 
     def get_queryset(self):
-        return Factura.objects.filter(pedido__usuario=self.request.user)
+        user = self.request.user
+        qs = Factura.objects.filter(pedido__usuario=user)
+
+        # Permito filtros igual que en el viewset (id, fecha range, total range, q)
+        params = self.request.query_params
+
+        factura_id = params.get("id")
+        if factura_id:
+            qs = qs.filter(id=factura_id)
+
+        q = params.get("q")
+        if q:
+            qs = qs.filter(numero_factura__icontains=q) | qs.filter(pedido__usuario__nombre__icontains=q)
+
+        fecha_from = params.get("fecha_from")
+        fecha_to = params.get("fecha_to")
+        if fecha_from:
+            d = parse_date(fecha_from)
+            if d:
+                qs = qs.filter(fecha__date__gte=d)
+        if fecha_to:
+            d2 = parse_date(fecha_to)
+            if d2:
+                qs = qs.filter(fecha__date__lte=d2)
+
+        total_min = params.get("total_min")
+        total_max = params.get("total_max")
+        if total_min:
+            try:
+                total_min_f = float(total_min)
+                qs = qs.filter(total__gte=total_min_f)
+            except ValueError:
+                pass
+        if total_max:
+            try:
+                total_max_f = float(total_max)
+                qs = qs.filter(total__lte=total_max_f)
+            except ValueError:
+                pass
+
+        return qs.order_by("-fecha")
 
 
 class FacturasAdminView(generics.ListAPIView):
     serializer_class = FacturaSerializer
     permission_classes = [IsAuthenticated, IsAdministrador]
+    pagination_class = TenResultsPagination
 
     def get_queryset(self):
-        return Factura.objects.all()
+        qs = Factura.objects.all()
+        params = self.request.query_params
+
+        factura_id = params.get("id")
+        if factura_id:
+            qs = qs.filter(id=factura_id)
+
+        q = params.get("q")
+        if q:
+            qs = qs.filter(numero_factura__icontains=q) | qs.filter(pedido__usuario__nombre__icontains=q)
+
+        fecha_from = params.get("fecha_from")
+        fecha_to = params.get("fecha_to")
+        if fecha_from:
+            d = parse_date(fecha_from)
+            if d:
+                qs = qs.filter(fecha__date__gte=d)
+        if fecha_to:
+            d2 = parse_date(fecha_to)
+            if d2:
+                qs = qs.filter(fecha__date__lte=d2)
+
+        total_min = params.get("total_min")
+        total_max = params.get("total_max")
+        if total_min:
+            try:
+                total_min_f = float(total_min)
+                qs = qs.filter(total__gte=total_min_f)
+            except ValueError:
+                pass
+        if total_max:
+            try:
+                total_max_f = float(total_max)
+                qs = qs.filter(total__lte=total_max_f)
+            except ValueError:
+                pass
+
+        return qs.order_by("-fecha")
 
 
 # =================================================================

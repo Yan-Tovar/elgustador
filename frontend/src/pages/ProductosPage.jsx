@@ -1,39 +1,71 @@
-import { useEffect, useState } from "react";
+// src/pages/ProductosPage.jsx
+import { useEffect, useState, useContext } from "react";
 import {
   Box,
   Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Button,
-  TextField,
   Snackbar,
   Alert,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
-import api from "../services/api";
-import { addToCarrito } from "../services/carritoService";
+
+import SearchIcon from "@mui/icons-material/Search";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
+
+import { fetchProductos, searchProductos } from "../services/productosService";
+import { addToCarrito } from "../services/carritoService";
+
+import { CarritoContext } from "../context/CarritoContext";
+
+import ProductosCard from "../components/common/ProductosCard";
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState([]);
   const [cantidades, setCantidades] = useState({});
+  const [search, setSearch] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "info",
   });
 
+  // Traer loadCarrito desde el context
+  const { loadCarrito } = useContext(CarritoContext);
+
+  // Cargar productos al montar página
   useEffect(() => {
     loadProductos();
   }, []);
 
+  // Debounce búsqueda
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (search.trim() === "") {
+        loadProductos();
+      } else {
+        handleSearch(search);
+      }
+    }, 400);
+
+    return () => clearTimeout(delay);
+  }, [search]);
+
   const loadProductos = async () => {
     try {
-      const res = await api.get("productos/");
+      const res = await fetchProductos();
       setProductos(res.data);
     } catch (err) {
       console.error("Error cargando productos:", err);
+    }
+  };
+
+  const handleSearch = async (texto) => {
+    try {
+      const res = await searchProductos(texto);
+      setProductos(res.data);
+    } catch (err) {
+      console.error("Error buscando productos:", err);
     }
   };
 
@@ -57,22 +89,18 @@ export default function ProductosPage() {
         cantidad,
       });
 
-      if (res.data.warning) {
-        setSnackbar({
-          open: true,
-          message: res.data.message,
-          severity: "warning",
-        });
-      } else {
-        setSnackbar({
-          open: true,
-          message: "Producto agregado al carrito",
-          severity: "success",
-        });
-      }
+      // 🚀 Actualiza el carrito global
+      await loadCarrito();
+
+      setSnackbar({
+        open: true,
+        message: res.data.warning
+          ? res.data.message
+          : "Producto agregado al carrito",
+        severity: res.data.warning ? "warning" : "success",
+      });
 
       setCantidades((prev) => ({ ...prev, [producto.id]: 1 }));
-
     } catch (err) {
       console.error("Error al agregar:", err);
       setSnackbar({
@@ -83,61 +111,70 @@ export default function ProductosPage() {
     }
   };
 
+  const handleDetalle = (producto) => {
+    console.log("Ver detalle:", producto);
+  };
+
   return (
     <DashboardLayout>
-      <Box p={3}>
-        <Typography variant="h4" mb={3}>
-          Productos disponibles
-        </Typography>
+      <Box sx={{ padding: 1 }}>
+        {/* BARRA DE BÚSQUEDA */}
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TextField
+            fullWidth
+            placeholder="Buscar productos..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: 2,
+              maxWidth: 400,
+            }}
+          />
+        </Box>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={2} justifyContent="center">
           {productos.map((prod) => (
-            <Grid item xs={12} sm={6} md={4} key={prod.id}>
-              <Card>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={prod.imagen1 || "https://via.placeholder.com/300"}
-                />
-                <CardContent>
-                  <Typography variant="h6">{prod.nombre}</Typography>
-                  <Typography color="text.secondary">${prod.precio}</Typography>
-                  <Typography sx={{ mt: 1 }} color="text.secondary">
-                    Stock: {prod.stock}
-                  </Typography>
-
-                  {/* Input Cantidad */}
-                  <TextField
-                    type="number"
-                    label="Cantidad"
-                    size="small"
-                    sx={{ mt: 2 }}
-                    value={cantidades[prod.id] || 1}
-                    onChange={(e) =>
-                      handleCantidadChange(prod.id, e.target.value, prod.stock)
-                    }
-                    inputProps={{ min: 1, max: prod.stock }}
-                  />
-
-                  {/* Botón agregar */}
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 2 }}
-                    onClick={() => handleAddToCarrito(prod)}
-                  >
-                    Añadir al Carrito
-                  </Button>
-                </CardContent>
-              </Card>
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={2}
+              key={prod.id}
+              display="flex"
+              justifyContent="center"
+            >
+              <ProductosCard
+                producto={prod}
+                cantidad={cantidades[prod.id] || 1}
+                onCantidadChange={handleCantidadChange}
+                onAdd={handleAddToCarrito}
+                onDetalle={handleDetalle}
+              />
             </Grid>
           ))}
         </Grid>
 
+        {/* Snackbar */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={2500}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
         >
           <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
         </Snackbar>

@@ -275,7 +275,7 @@ export default function Footer() {
           {/* Footer legal */}
           <Box sx={{ ml: 4 }}>
             <Typography variant="body2" align="center" sx={{ color: "#cfcfcf" }}>
-              © 2025 Appelgustador. Todos los derechos reservados.
+              © {new Date().getFullYear()} Appelgustador. Todos los derechos reservados.
             </Typography>
             <Typography variant="body2" align="center" sx={{ mt: 1, color: "#ff3c00ff" }}>
               Dirección: Ibagué Tolima | Tel: +57 300 123 4567

@@ -11,6 +11,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EmpleadoDashboard from "./pages/EmpleadoDashboard";
 import ClienteDashboard from "./pages/ClienteDashboard";
 import ProductosPage from "./pages/ProductosPage";
+import CategoriasPage from "./pages/CategoriasPage";
+import DetalleCategoria from "./pages/DetalleCategoria";
+import PerfilUsuarioPage from "./pages/PerfilUsuarioPage";
 
 // CRUD Admin
 import CategoriasList from "./views/admin/categorias/CategoriasList";
@@ -50,7 +53,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import { Check } from "@mui/icons-material";
 
 export default function AppRouter() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+  
+  if (loading) return <div>Cargando...</div>;
 
   return (
     <Router>
@@ -85,15 +90,10 @@ export default function AppRouter() {
         <Route 
           path="/" 
           element={
-            user?.rol === "admin" ? (
-              <Navigate to="/admin/dashboard" />
-            ) : user?.rol === "empleado" ? (
-              <Navigate to="/employee/dashboard" />
-            ) : user?.rol === "cliente" ? (
-              <Navigate to="/dashboard" />
-            ) : (
-              <Navigate to="/login" />
-            )
+            !user ? <Navigate to="/login" replace  /> :
+            user.rol === "admin" ? <AdminDashboard /> :
+            user.rol === "empleado" ? <EmpleadoDashboard /> :
+            <ClienteDashboard />
           }
         />
 
@@ -118,6 +118,26 @@ export default function AppRouter() {
               roles={['empleado', 'admin']} 
             />
           } 
+        />
+
+        <Route
+          path="/categorias"
+          element={
+            <PrivateRoute
+              component={CategoriasPage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
+        />
+
+        <Route
+          path="/categorias/:id"
+          element={
+            <PrivateRoute
+              component={DetalleCategoria}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
         />
 
         <Route
@@ -155,6 +175,16 @@ export default function AppRouter() {
           element={
             <PrivateRoute 
               component={ClienteDashboard} 
+              roles={['cliente', 'empleado', 'admin']} 
+            />
+          } 
+        />
+
+        <Route 
+          path="/perfil" 
+          element={
+            <PrivateRoute 
+              component={PerfilUsuarioPage} 
               roles={['cliente', 'empleado', 'admin']} 
             />
           } 

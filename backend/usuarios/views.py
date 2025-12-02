@@ -6,7 +6,8 @@ from .models import Usuario
 from .serializers import (
     UsuarioSerializer,
     UsuarioRegistroSerializer,
-    UsuarioLoginSerializer
+    UsuarioLoginSerializer,
+    UsuarioUpdateSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -50,3 +51,24 @@ class LoginViewSet(viewsets.GenericViewSet):
             "user": UsuarioSerializer(user).data,
             **tokens
         })
+
+class UsuarioSelfViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    # GET /usuarios/usuarios/me/
+    def list(self, request):
+        usuario = request.user
+        serializer = UsuarioSerializer(usuario)
+        return Response(serializer.data)
+
+    # PUT /usuarios/usuarios/me/
+    def update(self, request):
+        usuario = request.user
+        serializer = UsuarioUpdateSerializer(
+            usuario, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # Devolver datos completos con relaciones anidadas
+        return Response(UsuarioSerializer(usuario).data, status=status.HTTP_200_OK)

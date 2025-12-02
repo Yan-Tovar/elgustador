@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';;
+import App from './App';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { CarritoProvider } from './context/CarritoContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -9,9 +10,11 @@ const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
 
 root.render(
   <React.StrictMode>
-    <PayPalScriptProvider options={{ "client-id": paypalClientId }}>
-      <App />
-    </PayPalScriptProvider>
+    <CarritoProvider>
+      <PayPalScriptProvider options={{ "client-id": paypalClientId }}>
+        <App />
+      </PayPalScriptProvider>
+    </CarritoProvider>
   </React.StrictMode>
 );
 
