@@ -55,3 +55,9 @@ class CategoriaViewSet(viewsets.ModelViewSet):
         categoria.save()
 
         return Response({"message": "Categoría desactivada correctamente."})
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault('context', {})
+        kwargs['context']['request'] = self.request
+        return super().get_serializer(*args, **kwargs)
+

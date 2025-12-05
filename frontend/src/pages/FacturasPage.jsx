@@ -13,6 +13,12 @@ import {
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { saveAs } from "file-saver";
 
+import {
+  showAlert,
+  showToast,
+  showConfirm,
+} from "../components/feedback/SweetAlert";
+
 export default function FacturasPage() {
   const [facturas, setFacturas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +52,7 @@ export default function FacturasPage() {
       setLoading(false);
     } catch (err) {
       console.error("Error cargando facturas:", err);
+      showAlert("Error", "No se pudieron cargar las facturas.", "error");
       setLoading(false);
     }
   };
@@ -89,23 +96,36 @@ export default function FacturasPage() {
   // ======================================================
   // Acciones PDF / Email
   // ======================================================
+
   const handleDescargar = async (id) => {
     try {
-      const response = await descargarFacturaPDF(id);
-      const blob = new Blob([response.data], { type: "application/pdf" });
+      const res = await descargarFacturaPDF(id);
+      const blob = new Blob([res.data], { type: "application/pdf" });
       saveAs(blob, `factura_${id}.pdf`);
-    } catch {
-      alert("Hubo un error al descargar la factura.");
+
+      showToast("Factura descargada correctamente", "success");
+    } catch (err) {
+      console.error(err);
+      showAlert("Error", "No se pudo descargar la factura.", "error");
     }
   };
 
   const handleEnviarCorreo = async (id) => {
     try {
+      const confirmar = await showConfirm(
+        "Enviar factura",
+        "¿Deseas enviar esta factura a tu correo electrónico?"
+      );
+
+      if (!confirmar) return;
+
       setEnviandoId(id);
       await enviarFacturaEmail(id);
-      alert("Factura enviada al correo.");
-    } catch {
-      alert("No se pudo enviar la factura.");
+
+      showToast("Factura enviada al correo.", "success");
+    } catch (err) {
+      console.error(err);
+      showAlert("Error", "No se pudo enviar la factura.", "error");
     } finally {
       setEnviandoId(null);
     }

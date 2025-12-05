@@ -60,9 +60,6 @@ export default function PedidosListado({ pedidos }) {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ mb: 3, fontFamily: "fangsong" }}>
-        Mis Pedidos
-      </Typography>
       <Grid container spacing={3}>
         {pedidos.map((pedido) => (
           <Grid item xs={12} sm={6} md={4} key={pedido.id}>

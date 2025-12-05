@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchNotas, deleteNota } from "../../services/notasService";
 import { Box, Typography, Button, Grid, Snackbar, Alert } from "@mui/material";
 import DashboardLayout from "../../components/layout/DashboardLayout";
-import NotaCard from "../../components/notas/NotaCard";
+import NotaCard from "./NotaCard";
 
 export default function NotasList() {
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ export default function NotasList() {
           Crear Nota
         </Button>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           {notas.map((nota) => (
             <Grid item xs={12} sm={6} md={4} key={nota.id}>
               <NotaCard

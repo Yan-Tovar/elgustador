@@ -16,7 +16,7 @@ export default function InputField({
       type={type}
       fullWidth
       margin="normal"  
-      // margin={margin}
+      color="secondary"
       value={value}
       onChange={onChange}
       required={required}

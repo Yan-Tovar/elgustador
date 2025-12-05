@@ -57,6 +57,7 @@ export default function IdentificacionInput({
       margin="normal"
       error={Boolean(error)}
       helperText={error}
+      color="secondary"
       inputProps={{
         maxLength: maxLength,
         inputMode: "numeric",

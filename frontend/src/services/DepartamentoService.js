@@ -14,3 +14,8 @@ export const updateDepartamento = (id, data) =>
 // Eliminar departamento
 export const deleteDepartamento = (id) =>
   api.delete(`departamentos/${id}/`);
+
+export const buscarDepartamentos = async (filters = {}) => {
+  const res = await api.get("/departamentos/departamentos/buscar/", { params: filters });
+  return res.data;
+};

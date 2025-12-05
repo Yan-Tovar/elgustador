@@ -1,5 +1,6 @@
 // pages/admin/AdminPedidos.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -10,6 +11,7 @@ import {
   MenuItem,
   CircularProgress,
   Button,
+  useTheme,
 } from "@mui/material";
 import Swal from "sweetalert2";
 
@@ -32,10 +34,12 @@ const ESTADOS = [
 ];
 
 export default function AdminPedidos() {
+  const navigate = useNavigate();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [vista, setVista] = useState("usuario"); // usuario | empleado | admin
+  const theme = useTheme();
 
   // Función para cargar pedidos según la vista
   const loadPedidos = async (tipo) => {
@@ -91,7 +95,7 @@ export default function AdminPedidos() {
   if (loading)
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-        <CircularProgress />
+        <CircularProgress sx={{color: "orangered"}} />
       </Box>
     );
 
@@ -105,18 +109,21 @@ export default function AdminPedidos() {
         {/* Botones para cambiar de vista */}
         <Box sx={{ mb: 3, display: "flex", gap: 2 }}>
           <Button
+            color="text"
             variant={vista === "usuario" ? "contained" : "outlined"}
             onClick={() => setVista("usuario")}
           >
             Mis pedidos
           </Button>
           <Button
+            color="text"
             variant={vista === "empleado" ? "contained" : "outlined"}
             onClick={() => setVista("empleado")}
           >
             Pedidos empleados
           </Button>
           <Button
+            color="text"
             variant={vista === "admin" ? "contained" : "outlined"}
             onClick={() => setVista("admin")}
           >
@@ -127,52 +134,99 @@ export default function AdminPedidos() {
         {pedidos.length === 0 ? (
           <Typography>No hay pedidos disponibles.</Typography>
         ) : (
-          <Grid container spacing={3}>
-            {pedidos.map((pedido) => (
-              <Grid item xs={12} md={6} lg={4} key={pedido.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6">Pedido #{pedido.id}</Typography>
-                    <Typography variant="body2">
-                      Usuario: {pedido.usuario?.email || "Desconocido"}
-                    </Typography>
-                    <Typography variant="body2">Total: ${pedido.total || 0}</Typography>
-                    <Typography variant="body2" mt={1}>
-                      Estado:
-                    </Typography>
-                    <Select
-                      value={pedido.estado || "pendiente"}
-                      onChange={(e) => handleChangeEstado(pedido.id, e.target.value)}
-                      fullWidth
-                      size="small"
-                    >
-                      {ESTADOS.map((estado) => (
-                        <MenuItem value={estado} key={estado}>
-                          {estado}
-                        </MenuItem>
-                      ))}
-                    </Select>
+          <Box sx={{ width: "100%", overflowX: "auto" }}>
+            <Box
+              component="table"
+              sx={{
+                width: "100%",
+                minWidth: "900px", // Fuerza scroll en móviles
+                borderCollapse: "collapse",
+                backgroundColor: "",
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
+            >
+              {/* ENCABEZADOS */}
+              <Box component="thead" sx={{ bgcolor: theme.palette.background.paper, }}>
+                <Box component="tr">
+                  <Box component="th" sx={{ p: 2, textAlign: "left", fontWeight: 700 }}>
+                    Pedido
+                  </Box>
+                  <Box component="th" sx={{ p: 2, textAlign: "left", fontWeight: 700 }}>
+                    Usuario
+                  </Box>
+                  <Box component="th" sx={{ p: 2, textAlign: "left", fontWeight: 700 }}>
+                    Total
+                  </Box>
+                  <Box component="th" sx={{ p: 2, textAlign: "left", fontWeight: 700 }}>
+                    Estado
+                  </Box>
+                  <Box component="th" sx={{ p: 2, textAlign: "left", fontWeight: 700 }}>
+                    Detalles
+                  </Box>
+                </Box>
+              </Box>
 
-                    <Box mt={2}>
-                      <Typography variant="subtitle2">Detalles:</Typography>
-                      <ul>
-                        {Array.isArray(pedido.detalles) && pedido.detalles.length > 0 ? (
-                          pedido.detalles.map((item) => (
-                            <li key={item.id}>
-                              {item.producto?.nombre || "Producto"} x {item.cantidad || 0} - $
-                              {item.precio_total || 0}
-                            </li>
-                          ))
-                        ) : (
-                          <li>No hay detalles</li>
-                        )}
-                      </ul>
+              {/* FILAS */}
+              <Box component="tbody" sx={{ bgcolor: theme.palette.background.paper, }}>
+                {pedidos.map((pedido) => (
+                  <Box
+                    component="tr"
+                    key={pedido.id}
+                    sx={{
+                      borderBottom: "1px solid #ddd",
+                      "&:hover": { bgcolor: "#ca4d2e73" },
+                    }}
+                  >
+                    {/* ID */}
+                    <Box component="td" sx={{ p: 2 }}>
+                      <Typography fontWeight={600}>#{pedido.id}</Typography>
                     </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+
+                    {/* Usuario */}
+                    <Box component="td" sx={{ p: 2 }}>
+                      {pedido.usuario?.email || "Desconocido"}
+                    </Box>
+
+                    {/* Total */}
+                    <Box component="td" sx={{ p: 2 }}>
+                      ${pedido.total}
+                    </Box>
+
+                    {/* Estado con Select */}
+                    <Box component="td" sx={{ p: 2, minWidth: 160 }}>
+                      <Select
+                        value={pedido.estado || "pendiente"}
+                        size="small"
+                        fullWidth
+                        onChange={(e) =>
+                          handleChangeEstado(pedido.id, e.target.value)
+                        }
+                      >
+                        {ESTADOS.map((estado) => (
+                          <MenuItem key={estado} value={estado}>
+                            {estado}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Box>
+
+                    {/* Detalles */}
+                    <Box component="td" sx={{ p: 2 }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => navigate(`/pedidos/${pedido.id}`)}
+                        sx={{ borderRadius: 2, px: 3 }}
+                      >
+                        Ver Detalle
+                      </Button>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          </Box>
         )}
       </Box>
 

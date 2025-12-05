@@ -1,4 +1,3 @@
-# carrusel/serializers.py
 from rest_framework import serializers
 from .models import Carrusel
 
@@ -6,3 +5,6 @@ class CarruselSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carrusel
         fields = '__all__'
+        extra_kwargs = {
+            "imagen": {"required": False}
+        }

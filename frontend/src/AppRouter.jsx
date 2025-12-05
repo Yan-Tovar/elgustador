@@ -6,7 +6,6 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
-import DepartamentoPage from "./pages/DepartamentoPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmpleadoDashboard from "./pages/EmpleadoDashboard";
 import ClienteDashboard from "./pages/ClienteDashboard";
@@ -16,9 +15,7 @@ import DetalleCategoria from "./pages/DetalleCategoria";
 import PerfilUsuarioPage from "./pages/PerfilUsuarioPage";
 
 // CRUD Admin
-import CategoriasList from "./views/admin/categorias/CategoriasList";
-import CategoriaCreate from "./views/admin/categorias/CategoriaCreate";
-import CategoriaEdit from "./views/admin/categorias/CategoriaEdit";
+import { CategoriasAdminPage } from "./views/admin/categorias";
 
 import ProductosList from "./views/admin/productos/ProductosList";
 import ProductoCreate from "./views/admin/productos/ProductoCreate";
@@ -31,6 +28,11 @@ import OfertaEdit from "./views/admin/ofertas/OfertaEdit";
 import AdminPedidos from "./views/admin/pedidos/AdminPedidos";
 
 import AdminFacturas from "./views/admin/facturas/AdminFacturas";
+
+import CarruselAdminPage from "./views/admin/carrusel/CarruselAdminPage"; 
+
+import DepartamentoPage from "./views/admin/Departamentos/DepartamentoPage";
+import MunicipioPage from "./views/admin/municipios/MunicipioPage";
 
 // CRUD Notas (cualquier usuario logueado)
 import NotasList from "./views/notas/NotasList";
@@ -239,22 +241,22 @@ export default function AppRouter() {
           } 
         />
 
+        <Route 
+          path="/admin/municipios" 
+          element={
+            <PrivateRoute 
+              component={MunicipioPage} 
+              roles={['admin']} 
+            />
+          } 
+        />
+
         {/* ============================================================
                 CRUD CATEGORÍAS — SOLO ADMIN
         ============================================================ */}
         <Route
           path="/admin/categorias"
-          element={<PrivateRoute component={CategoriasList} roles={['admin']} />}
-        />
-
-        <Route
-          path="/admin/categorias/nuevo"
-          element={<PrivateRoute component={CategoriaCreate} roles={['admin']} />}
-        />
-
-        <Route
-          path="/admin/categorias/:id/editar"
-          element={<PrivateRoute component={CategoriaEdit} roles={['admin']} />}
+          element={<PrivateRoute component={CategoriasAdminPage} roles={['admin']} />}
         />
 
         {/* ============================================================
@@ -269,6 +271,11 @@ export default function AppRouter() {
         <Route
           path="/admin/facturas"
           element={<PrivateRoute component={AdminFacturas} roles={['admin']} />}
+        />
+
+        <Route
+          path="/admin/carrusel"
+          element={<PrivateRoute component={CarruselAdminPage} roles={['admin']} />}
         />
 
         {/* ============================================================

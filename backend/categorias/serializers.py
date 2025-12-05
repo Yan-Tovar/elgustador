@@ -24,7 +24,7 @@ class CategoriaListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categoria
-        fields = ['id', 'nombre', 'imagen_url']
+        fields = '__all__'
 
     def get_imagen_url(self, obj):
         request = self.context.get("request")

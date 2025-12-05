@@ -18,6 +18,13 @@ import FacturaInfo from "../components/common/facturas/FacturaInfo";
 import PedidoInfo from "../components/common/facturas/PedidoInfo";
 import DetallePedidoTabla from "../components/common/facturas/DetallePedidoTabla";
 
+// ⬅ IMPORT SWEETALERT CORRECTO
+import {
+  showAlert,
+  showToast,
+  showConfirm,
+} from "../components/feedback/SweetAlert";
+
 export default function FacturaPage() {
   const { facturaId } = useParams();
 
@@ -25,9 +32,11 @@ export default function FacturaPage() {
   const [pedido, setPedido] = useState(null);
   const [detallePedido, setDetallePedido] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [enviandoId, setEnviandoId] = useState(null);
 
+  // -------------------------
+  // CARGA INICIAL
+  // -------------------------
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -43,6 +52,11 @@ export default function FacturaPage() {
         setDetallePedido(resDetalle);
       } catch (err) {
         console.error("Error cargando información:", err);
+        showAlert(
+          "Error",
+          "No se pudo cargar la información de la factura.",
+          "error"
+        );
       } finally {
         setLoading(false);
       }
@@ -63,20 +77,39 @@ export default function FacturaPage() {
       link.href = URL.createObjectURL(blob);
       link.download = `factura_${id}.pdf`;
       link.click();
+
+      showToast("Descarga iniciada", "success");
     } catch (error) {
       console.error("Error descargando factura:", error);
-      alert("Hubo un error al descargar la factura.");
+      showAlert(
+        "Error al descargar",
+        "Hubo un error al descargar la factura.",
+        "error"
+      );
     }
   };
 
   const handleEnviarCorreo = async (id) => {
     try {
+      // Confirmación antes de enviar
+      const confirmado = await showConfirm(
+        "Enviar factura",
+        "¿Deseas enviar la factura al correo del cliente?"
+      );
+
+      if (!confirmado) return;
+
       setEnviandoId(id);
       await enviarFacturaEmail(id);
-      alert("Factura enviada al correo.");
+
+      showToast("Factura enviada correctamente", "success");
     } catch (error) {
       console.error("Error enviando factura:", error);
-      alert("No se pudo enviar la factura por correo.");
+      showAlert(
+        "Error al enviar",
+        "No se pudo enviar la factura por correo.",
+        "error"
+      );
     } finally {
       setEnviandoId(null);
     }
@@ -110,24 +143,32 @@ export default function FacturaPage() {
   return (
     <DashboardLayout>
       <Box p={4}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%"
+          }}
+        >
+          <Typography variant="h5"  fontWeight="bold">
+            Detalle de tu Factura
+          </Typography>
+        </Box>
         <TwoColumnInnerLayout
           left={
             <Box>
-              {/* FACTURA */}
               <FacturaInfo
                 factura={factura}
                 enviandoId={enviandoId}
                 onDescargar={handleDescargar}
                 onEnviarCorreo={handleEnviarCorreo}
               />
+
               <DetallePedidoTabla detalle={detallePedido} />
             </Box>
           }
           right={
-            <Box>
-              {/* PEDIDO */}
-              {pedido && <PedidoInfo pedido={pedido} />}
-            </Box>
+            <Box>{pedido && <PedidoInfo pedido={pedido} />}</Box>
           }
         />
       </Box>

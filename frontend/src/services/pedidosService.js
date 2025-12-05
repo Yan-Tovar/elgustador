@@ -39,3 +39,15 @@ export const actualizarEstadoPedido = async (id, nuevoEstado) => {
   return response;
 };
 
+// Estadisticas
+export const fetchPedidosStats = async (startDate, endDate) => {
+  // startDate/endDate en formato YYYY-MM-DD o null
+  const params = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+
+  const response = await api.get("pedidos/stats/", { params });
+  // devolver array de {date, estado, count}
+  return response.data?.data ?? [];
+};
+
