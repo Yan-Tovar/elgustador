@@ -15,7 +15,7 @@ import DetalleCategoria from "./pages/DetalleCategoria";
 import PerfilUsuarioPage from "./pages/PerfilUsuarioPage";
 
 // CRUD Admin
-import { CategoriasAdminPage } from "./views/admin/categorias";
+import CategoriasAdminPage  from "./views/admin/categorias/CategoriasAdminPage";
 
 import ProductosList from "./views/admin/productos/ProductosList";
 import ProductoCreate from "./views/admin/productos/ProductoCreate";
