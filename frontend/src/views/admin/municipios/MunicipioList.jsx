@@ -87,7 +87,7 @@ export default function MunicipioList({ municipios, onEdit, onDelete }) {
                 </TableCell>
 
                 <TableCell align="right">
-                  <IconButton onClick={() => onEdit(m)} color="primary">
+                  <IconButton onClick={() => onEdit(m)} color="text">
                     <Edit />
                   </IconButton>
 

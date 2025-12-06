@@ -147,14 +147,6 @@ export default function CategoriaTable({
 
                 <td style={tdCenter}>
                   <Stack direction="row" spacing={1} justifyContent="center">
-                    {/* Desactivada */}
-                    {cat.estado === false && (
-                      <Tooltip title="Desactivada">
-                        <Button size="small" color="warning" variant="outlined">
-                          <DoDisturbOn />
-                        </Button>
-                      </Tooltip>
-                    )}
 
                     {/* Editar */}
                     <Button

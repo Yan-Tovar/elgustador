@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EmpleadoDashboard from "./pages/EmpleadoDashboard";
 import ClienteDashboard from "./pages/ClienteDashboard";
 import ProductosPage from "./pages/ProductosPage";
+import ProductoDetallePage from "./pages/ProductoDetallePage";
 import CategoriasPage from "./pages/CategoriasPage";
 import DetalleCategoria from "./pages/DetalleCategoria";
 import PerfilUsuarioPage from "./pages/PerfilUsuarioPage";
@@ -26,6 +27,7 @@ import OfertaCreate from "./views/admin/ofertas/OfertaCreate";
 import OfertaEdit from "./views/admin/ofertas/OfertaEdit";
 
 import AdminPedidos from "./views/admin/pedidos/AdminPedidos";
+import EmpleadoPedidos from "./pages/EmpleadoPedidos";
 
 import AdminFacturas from "./views/admin/facturas/AdminFacturas";
 
@@ -123,6 +125,11 @@ export default function AppRouter() {
         />
 
         <Route
+          path="/empleado/pedidos"
+          element={<PrivateRoute component={EmpleadoPedidos} roles={['empleado', 'admin']} />}
+        />
+
+        <Route
           path="/categorias"
           element={
             <PrivateRoute
@@ -147,6 +154,16 @@ export default function AppRouter() {
           element={
             <PrivateRoute
               component={ProductosPage}
+              roles={["cliente", "empleado", "admin"]}
+            />
+          }
+        />
+
+        <Route
+          path="/producto/:id"
+          element={
+            <PrivateRoute
+              component={ProductoDetallePage}
               roles={["cliente", "empleado", "admin"]}
             />
           }

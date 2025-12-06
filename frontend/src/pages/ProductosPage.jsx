@@ -8,6 +8,7 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom"; 
 
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -24,6 +25,7 @@ export default function ProductosPage() {
   const [productos, setProductos] = useState([]);
   const [cantidades, setCantidades] = useState({});
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -89,7 +91,7 @@ export default function ProductosPage() {
         cantidad,
       });
 
-      // 🚀 Actualiza el carrito global
+      //  Actualiza el carrito global
       await loadCarrito();
 
       setSnackbar({
@@ -112,7 +114,7 @@ export default function ProductosPage() {
   };
 
   const handleDetalle = (producto) => {
-    console.log("Ver detalle:", producto);
+    navigate(`/producto/${producto.id}`);
   };
 
   return (

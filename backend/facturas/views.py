@@ -16,6 +16,11 @@ from pedidos.models import Pedido
 from pedidos_detalles.models import PedidoDetalle
 from .serializers import FacturaSerializer
 
+from django.db.models import Q
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
+
 import io
 import os
 
@@ -283,71 +288,63 @@ def generar_pdf_factura(factura):
 class FacturaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = FacturaSerializer
-    pagination_class = TenResultsPagination  # <-- paginación por 10
+    pagination_class = TenResultsPagination
 
     def get_queryset(self):
-        """
-        Devuelve queryset según rol y query params:
-          - admin: todas las facturas
-          - usuario: solo sus facturas
-        Aplica filtros por query params (id, numero_factura, fecha_from, fecha_to,
-        total_min, total_max, q)
-        """
         user = self.request.user
-        qs = Factura.objects.all() if user.rol == "administrador" else Factura.objects.filter(pedido__usuario=user)
+        qs = Factura.objects.all() if user.rol == "admin" else Factura.objects.filter(pedido__usuario=user)
 
         params = self.request.query_params
 
-        # filtro por id exacto
+        # ID exacto (entero)
         factura_id = params.get("id")
         if factura_id:
             qs = qs.filter(id=factura_id)
 
-        # numero_factura exacto o parcial
+        # Número factura parcial
         numero = params.get("numero_factura")
         if numero:
             qs = qs.filter(numero_factura__icontains=numero)
 
-        # búsqueda general (q) en numero_factura y pedido.usuario.nombre
+        # Buscador general
         q = params.get("q")
         if q:
             qs = qs.filter(
-                # busqueda simple; puedes mejorar con Q si quieres múltiples campos
-                numero_factura__icontains=q
-            ) | qs.filter(pedido__usuario__nombre__icontains=q)
+                Q(numero_factura__icontains=q) |
+                Q(pedido__usuario__nombre__icontains=q)
+            )
 
-        # fecha range (fecha_from, fecha_to) - formato ISO YYYY-MM-DD
+        # Filtros de fecha
         fecha_from = params.get("fecha_from")
         fecha_to = params.get("fecha_to")
+
         if fecha_from:
             d = parse_date(fecha_from)
             if d:
                 qs = qs.filter(fecha__date__gte=d)
+
         if fecha_to:
             d2 = parse_date(fecha_to)
             if d2:
                 qs = qs.filter(fecha__date__lte=d2)
 
-        # total min / max
+        # Total mínimo/máximo
         total_min = params.get("total_min")
         total_max = params.get("total_max")
+
         if total_min:
             try:
-                total_min_f = float(total_min)
-                qs = qs.filter(total__gte=total_min_f)
-            except ValueError:
+                qs = qs.filter(total__gte=float(total_min))
+            except:
                 pass
+
         if total_max:
             try:
-                total_max_f = float(total_max)
-                qs = qs.filter(total__lte=total_max_f)
-            except ValueError:
+                qs = qs.filter(total__lte=float(total_max))
+            except:
                 pass
 
-        # ordenar por fecha desc por defecto
-        qs = qs.order_by("-fecha")
-
-        return qs
+        return qs.order_by("-fecha")
 
     def list(self, request, *args, **kwargs):
         """
@@ -384,7 +381,6 @@ class FacturasUsuarioView(generics.ListAPIView):
         user = self.request.user
         qs = Factura.objects.filter(pedido__usuario=user)
 
-        # Permito filtros igual que en el viewset (id, fecha range, total range, q)
         params = self.request.query_params
 
         factura_id = params.get("id")
@@ -393,14 +389,19 @@ class FacturasUsuarioView(generics.ListAPIView):
 
         q = params.get("q")
         if q:
-            qs = qs.filter(numero_factura__icontains=q) | qs.filter(pedido__usuario__nombre__icontains=q)
+            qs = qs.filter(
+                Q(numero_factura__icontains=q) |
+                Q(pedido__usuario__nombre__icontains=q)
+            )
 
         fecha_from = params.get("fecha_from")
         fecha_to = params.get("fecha_to")
+
         if fecha_from:
             d = parse_date(fecha_from)
             if d:
                 qs = qs.filter(fecha__date__gte=d)
+
         if fecha_to:
             d2 = parse_date(fecha_to)
             if d2:
@@ -408,17 +409,17 @@ class FacturasUsuarioView(generics.ListAPIView):
 
         total_min = params.get("total_min")
         total_max = params.get("total_max")
+
         if total_min:
             try:
-                total_min_f = float(total_min)
-                qs = qs.filter(total__gte=total_min_f)
-            except ValueError:
+                qs = qs.filter(total__gte=float(total_min))
+            except:
                 pass
+
         if total_max:
             try:
-                total_max_f = float(total_max)
-                qs = qs.filter(total__lte=total_max_f)
-            except ValueError:
+                qs = qs.filter(total__lte=float(total_max))
+            except:
                 pass
 
         return qs.order_by("-fecha")
@@ -433,38 +434,47 @@ class FacturasAdminView(generics.ListAPIView):
         qs = Factura.objects.all()
         params = self.request.query_params
 
+        # ID exacto
         factura_id = params.get("id")
         if factura_id:
             qs = qs.filter(id=factura_id)
 
+        # Buscador general
         q = params.get("q")
         if q:
-            qs = qs.filter(numero_factura__icontains=q) | qs.filter(pedido__usuario__nombre__icontains=q)
+            qs = qs.filter(
+                Q(numero_factura__icontains=q) |
+                Q(pedido__usuario__nombre__icontains=q)
+            )
 
+        # Fechas
         fecha_from = params.get("fecha_from")
         fecha_to = params.get("fecha_to")
+
         if fecha_from:
             d = parse_date(fecha_from)
             if d:
                 qs = qs.filter(fecha__date__gte=d)
+
         if fecha_to:
             d2 = parse_date(fecha_to)
             if d2:
                 qs = qs.filter(fecha__date__lte=d2)
 
+        # Totales
         total_min = params.get("total_min")
         total_max = params.get("total_max")
+
         if total_min:
             try:
-                total_min_f = float(total_min)
-                qs = qs.filter(total__gte=total_min_f)
-            except ValueError:
+                qs = qs.filter(total__gte=float(total_min))
+            except:
                 pass
+
         if total_max:
             try:
-                total_max_f = float(total_max)
-                qs = qs.filter(total__lte=total_max_f)
-            except ValueError:
+                qs = qs.filter(total__lte=float(total_max))
+            except:
                 pass
 
         return qs.order_by("-fecha")
@@ -483,7 +493,7 @@ class DescargarFacturaPDF(APIView):
             return Response({"detail": "Factura no encontrada"}, status=404)
 
         # Seguridad
-        if factura.pedido.usuario != request.user and request.user.rol != "administrador":
+        if factura.pedido.usuario != request.user and request.user.rol != "admin":
             return Response({"detail": "No tienes permiso"}, status=403)
 
         pdf_buffer = generar_pdf_factura(factura)
@@ -504,7 +514,7 @@ class EnviarFacturaEmail(APIView):
             return Response({"detail": "Factura no encontrada"}, status=404)
 
         # Seguridad
-        if factura.pedido.usuario != request.user and request.user.rol != "administrador":
+        if factura.pedido.usuario != request.user and request.user.rol != "admin":
             return Response({"detail": "No tienes permiso"}, status=403)
 
         # Generar PDF
@@ -573,3 +583,111 @@ class EnviarFacturaEmail(APIView):
         email.send()
 
         return Response({"detail": "Factura enviada correctamente al correo"}, status=200)
+
+class FacturasAdminSearchView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdministrador]
+    serializer_class = FacturaSerializer
+    pagination_class = TenResultsPagination
+
+    def get_queryset(self):
+        qs = Factura.objects.select_related(
+            "pedido", "pedido__usuario"
+        ).all()
+
+        q = self.request.query_params.get("q")
+
+        if q:
+            qs = qs.filter(
+                Q(id__icontains=q) |
+                Q(numero_factura__icontains=q) |
+                Q(pedido__id__icontains=q) |
+                Q(pedido__usuario__nombre__icontains=q) |
+                Q(pedido__usuario__identificacion__icontains=q)
+            )
+
+        return qs.order_by("-fecha")
+
+class FacturasAdminExportExcel(APIView):
+    permission_classes = [IsAuthenticated, IsAdministrador]
+
+    def get(self, request):
+        fecha_from = request.query_params.get("fecha_from")
+        fecha_to = request.query_params.get("fecha_to")
+
+        qs = Factura.objects.select_related(
+            "pedido", "pedido__usuario"
+        ).all()
+
+        if fecha_from:
+            qs = qs.filter(fecha__date__gte=parse_date(fecha_from))
+        if fecha_to:
+            qs = qs.filter(fecha__date__lte=parse_date(fecha_to))
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Facturas"
+
+        # Encabezados
+        headers = [
+            "Factura ID", "Número Factura", "Fecha",
+            "Total", "Estado Pedido",
+            "Pedido ID",
+            "Usuario Nombre", "Usuario Identificación", "Usuario Email",
+            "Producto", "Cantidad", "Precio Unitario", "Subtotal"
+        ]
+        ws.append(headers)
+
+        for factura in qs:
+            pedido = factura.pedido
+            detalles = PedidoDetalle.objects.filter(pedido=pedido)
+
+            # Si no hay detalles, al menos colocar información de factura
+            if not detalles.exists():
+                ws.append([
+                    factura.id,
+                    factura.numero_factura,
+                    factura.fecha.strftime("%Y-%m-%d %H:%M"),
+                    factura.total,
+                    pedido.estado,
+                    pedido.id,
+                    pedido.usuario.nombre,
+                    pedido.usuario.identificacion,
+                    pedido.usuario.email,
+                    "", "", "", ""
+                ])
+            else:
+                for d in detalles:
+                    ws.append([
+                        factura.id,
+                        factura.numero_factura,
+                        factura.fecha.strftime("%Y-%m-%d %H:%M"),
+                        factura.total,
+                        pedido.estado,
+                        pedido.id,
+                        pedido.usuario.nombre,
+                        pedido.usuario.identificacion,
+                        pedido.usuario.email,
+                        d.producto.nombre,
+                        d.cantidad,
+                        d.precio_unitario,
+                        d.precio_total,
+                    ])
+
+        # Ajustar ancho automático
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                try:
+                    max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+        # Generar respuesta
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = f'attachment; filename="facturas.xlsx"'
+        wb.save(response)
+        return response

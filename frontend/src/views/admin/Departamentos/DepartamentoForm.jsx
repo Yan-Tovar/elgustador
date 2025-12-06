@@ -34,6 +34,7 @@ export default function DepartamentoForm({ initialData, onSubmit }) {
         label="Nombre del Departamento"
         value={nombre}
         required
+        color="secondary"
         onChange={(e) => setNombre(e.target.value)}
       />
 

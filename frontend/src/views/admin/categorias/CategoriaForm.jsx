@@ -76,7 +76,7 @@ export default function CategoriaForm({
   };
 
   // ─────────────────────────────────────────────
-  // ❗ LÓGICA NUEVA DEL ESTADO
+  //  LÓGICA NUEVA DEL ESTADO
   // Crear: initial == null → siempre mostrar switch
   // Editar:
   //   estado true  → NO mostrar switch
@@ -104,6 +104,7 @@ export default function CategoriaForm({
       <TextField
         name="nombre"
         label="Nombre de la categoría"
+        color="secondary"
         value={nombre}
         onChange={(e) => setNombre(e.target.value)}
         required
@@ -113,6 +114,7 @@ export default function CategoriaForm({
       <TextField
         name="descripcion"
         label="Descripción"
+        color="secondary"
         multiline
         minRows={3}
         value={descripcion}

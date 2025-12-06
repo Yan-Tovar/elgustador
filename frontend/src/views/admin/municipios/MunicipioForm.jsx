@@ -59,6 +59,7 @@ export default function MunicipioForm({ initialData, onSubmit }) {
       <TextField
         label="Nombre del Municipio"
         value={nombre}
+        color="secondary"
         required
         onChange={(e) => setNombre(e.target.value)}
       />
@@ -67,6 +68,7 @@ export default function MunicipioForm({ initialData, onSubmit }) {
         select
         label="Departamento"
         value={departamento_id}
+        color="secondary"
         required
         onChange={(e) => setDepartamentoId(e.target.value)}
         fullWidth
@@ -81,14 +83,16 @@ export default function MunicipioForm({ initialData, onSubmit }) {
       <TextField
         label="Costo de envío"
         type="number"
+        color="secondary"
         required
         value={costo_envio}
         onChange={(e) => setCostoEnvio(e.target.value)}
       />
 
       <FormControlLabel
-        control={<Switch checked={estado} onChange={(e) => setEstado(e.target.checked)} />}
+        control={<Switch color="secondary" checked={estado} onChange={(e) => setEstado(e.target.checked)} />}
         label="Activo"
+        
       />
 
       <Button type="submit" variant="contained" sx={{ bgcolor: "#FF3C00" }}>

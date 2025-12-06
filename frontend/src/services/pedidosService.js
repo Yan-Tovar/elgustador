@@ -1,53 +1,64 @@
 import api from "./api";
 
-export const fetchPedidos = async () => {
-  return await api.get("pedidos/");
+// ------------------------------------------
+// PEDIDOS DEL USUARIO (paginado + filtros)
+// ------------------------------------------
+export const fetchPedidosUsuario = async (params = {}) => {
+  // params puede incluir: estado, search, page, page_size
+  const response = await api.get("pedidos/usuario/", { params });
+  return response.data;  // incluye paginación: count, next, previous, results
 };
 
-export const crearPedidoDesdeCarrito = () => api.post("pedidos/crear-desde-carrito/");
+// ------------------------------------------
+// TODOS LOS PEDIDOS (ADMIN) PAGINADOS
+// ------------------------------------------
+export const fetchPedidosTodos = async (params = {}) => {
+  const response = await api.get("pedidos/admin/", { params });
+  return response.data;
+};
 
+// ------------------------------------------
+// PEDIDOS EMPLEADOS PAGINADOS
+// ------------------------------------------
+export const fetchPedidosEmpleados = async (params = {}) => {
+  const response = await api.get("pedidos/empleado/", { params });
+  return response.data;
+};
+
+// ------------------------------------------
+// CREAR PEDIDO DESDE CARRITO
+// ------------------------------------------
+export const crearPedidoDesdeCarrito = () =>
+  api.post("pedidos/crear-desde-carrito/");
+
+// ------------------------------------------
+// OBTENER PEDIDO ESPECÍFICO
+// ------------------------------------------
 export const getPedido = (id) => api.get(`pedidos/pedidos/${id}/`);
 
-// Todos los pedidos (para administrador)
-export const fetchPedidosTodos = async () => {
-  const response = await api.get("pedidos/admin/");
-  // Aseguramos que devuelva array
-  return Array.isArray(response.data) ? response.data : [];
-};
-
-// Pedidos de empleados (todos excepto pendientes)
-export const fetchPedidosEmpleados = async () => {
-  const response = await api.get("pedidos/empleado/");
-  return Array.isArray(response.data) ? response.data : [];
-};
-
-// Pedidos del usuario actual (cliente)
-export const fetchPedidosUsuario = async () => {
-  const response = await api.get("pedidos/usuario/");
-  return Array.isArray(response.data) ? response.data : [];
-};
-
-// Detalles de un pedido específico
+// ------------------------------------------
+// DETALLES DEL PEDIDO
+// ------------------------------------------
 export const fetchPedidoDetalle = async (id) => {
-  const response = await api.get(`/pedidos/detalles/?pedido=${id}`);
-  return Array.isArray(response.data) ? response.data : [];
+  const response = await api.get(`pedidos/detalles/?pedido=${id}`);
+  return response.data;
 };
 
-// Actualizar el estado de un pedido (solo empleados/admins)
+// ------------------------------------------
+// ACTUALIZAR ESTADO DE PEDIDO
+// ------------------------------------------
 export const actualizarEstadoPedido = async (id, nuevoEstado) => {
-  const response = await api.patch(`pedidos/pedido/${id}/actualizar/`, { estado: nuevoEstado });
-  return response;
+  return await api.patch(`pedidos/pedido/${id}/actualizar/`, { estado: nuevoEstado });
 };
 
-// Estadisticas
+// ------------------------------------------
+// ESTADÍSTICAS
+// ------------------------------------------
 export const fetchPedidosStats = async (startDate, endDate) => {
-  // startDate/endDate en formato YYYY-MM-DD o null
   const params = {};
   if (startDate) params.start_date = startDate;
   if (endDate) params.end_date = endDate;
 
   const response = await api.get("pedidos/stats/", { params });
-  // devolver array de {date, estado, count}
   return response.data?.data ?? [];
 };
-

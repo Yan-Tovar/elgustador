@@ -7,12 +7,12 @@ import {
   TextField,
   Stack,
   Button,
-  Pagination,  
+  Pagination,
   Tooltip,
   useMediaQuery,
   Divider,
 } from "@mui/material";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
+
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import PaymentIcon from "@mui/icons-material/Payment";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
@@ -22,6 +22,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 import DashboarLayout from "../components/layout/DashboardLayout";
 import TwoColumnInnerLayout from "../components/layout/TwoColumnInnerLayout";
+
 import { fetchPedidosUsuario } from "../services/pedidosService";
 
 import PedidosListado from "../components/common/pedidos/PedidosListado";
@@ -32,23 +33,38 @@ import { showAlert, showToast } from "../components/feedback/SweetAlert";
 export default function PedidosPage() {
   const [pedidos, setPedidos] = useState([]);
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState(""); 
   const [estadoFiltro, setEstadoFiltro] = useState("todos");
 
   const [page, setPage] = useState(1);
-  const porPagina = 10;
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   const [loading, setLoading] = useState(true);
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
+  // =========================================
+  //   Cargar pedidos desde BACKEND
+  // =========================================
   const cargarPedidos = async () => {
     try {
-      const response = await fetchPedidosUsuario();
-      setPedidos(response || []);
+      setLoading(true);
 
-      if (!response || response.length === 0) {
-        showToast("Aún no tienes pedidos registrados", "info");
+      const response = await fetchPedidosUsuario({
+        page,
+        estado: estadoFiltro,
+        search,
+      });
+
+      // El backend ya debe enviar:
+      // { results: [], total_pages: X, count: Y }
+      setPedidos(response?.results || []);
+      setTotalPaginas(response?.total_pages || 1);
+
+      if (response?.results?.length === 0) {
+        showToast("No se encontraron pedidos", "info");
       }
+
     } catch (err) {
       showAlert(
         "Error",
@@ -56,55 +72,14 @@ export default function PedidosPage() {
         "error"
       );
     }
+
     setLoading(false);
   };
 
+  // cargar datos cada vez que cambie filtro, buscador o página
   useEffect(() => {
     cargarPedidos();
-  }, []);
-
-  // ===========================
-  //   FILTRO POR TEXTO
-  // ===========================
-  const filtrarBusqueda = (pedido) => {
-    if (!search.trim()) return true;
-
-    const query = search.toLowerCase();
-
-    const fecha = new Date(pedido.fecha_creacion)
-      .toLocaleDateString("es-CO")
-      .toLowerCase();
-
-    return (
-      pedido.id?.toString().includes(query) ||
-      fecha.includes(query)
-    );
-  };
-
-  // ===========================
-  //   FILTRO POR ESTADO
-  // ===========================
-  const filtrarEstado = (pedido) => {
-    if (estadoFiltro === "todos") return true;
-    return pedido.estado === estadoFiltro;
-  };
-
-  // ===========================
-  //   COMBINAR FILTROS
-  // ===========================
-  const pedidosFiltrados = useMemo(() => {
-    return pedidos.filter((p) => filtrarBusqueda(p) && filtrarEstado(p));
-  }, [pedidos, search, estadoFiltro]);
-
-  // ===========================
-  //   PAGINACIÓN MANUAL
-  // ===========================
-  const totalPaginas = Math.ceil(pedidosFiltrados.length / porPagina);
-
-  const pedidosPaginados = useMemo(() => {
-    const inicio = (page - 1) * porPagina;
-    return pedidosFiltrados.slice(inicio, inicio + porPagina);
-  }, [page, pedidosFiltrados]);
+  }, [page, estadoFiltro, search]);
 
   if (loading) {
     return (
@@ -125,8 +100,8 @@ export default function PedidosPage() {
 
             <Divider sx={{ mb: 2 }}>Pedidos</Divider>
 
-            {/* Botones de filtro (ahora a la izquierda) */}
-            <Stack direction="row" spacing={1} flexWrap="wrap" sx={{display: "flex", justifyContent: "center"}}>
+            {/* Botones de filtro (izquierda) */}
+            <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ display: "flex", justifyContent: "center" }}>
               {[
                 { label: "Todos", value: "todos", icon: <DoneAllIcon /> },
                 { label: "Pagado", value: "pagado", icon: <PaymentIcon /> },
@@ -175,9 +150,7 @@ export default function PedidosPage() {
                       borderRadius: 3,
                       textTransform: "none",
                       boxShadow:
-                        estadoFiltro === btn.value
-                          ? "0px 2px 6px rgba(0,0,0,0.15)"
-                          : "none",
+                        estadoFiltro === btn.value ? "0px 2px 6px rgba(0,0,0,0.15)" : "none",
                     }}
                   >
                     {buttonContent}
@@ -189,39 +162,49 @@ export default function PedidosPage() {
         }
         right={
           <Box sx={{ mt: { xs: 2, sm: 2, lg: 2 } }}>
-            {/* Buscador (ahora derecha, parte corta) */}
-            <TextField
-              fullWidth
-              color="text"
-              label="Buscar por Número o Fecha"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              variant="outlined"
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 3,
-                },
-              }}
-            />
+            <Stack direction="row" spacing={1}>
+              
+              <TextField
+                fullWidth
+                color="text"
+                label="Buscar por Número o Fecha"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  "& .MuiOutlinedInput-root": { borderRadius: 3 },
+                }}
+              />
+
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ borderRadius: 3 }}
+                onClick={() => {
+                  setSearch(searchInput); // ahora sí ejecuta la búsqueda
+                  setPage(1);             // reiniciar a página 1
+                }}
+              >
+                Buscar
+              </Button>
+
+            </Stack>
           </Box>
         }
       />
 
       {/* LISTADO */}
       <Box p={4}>
-        <PedidosListado pedidos={pedidosPaginados} />
+        <PedidosListado pedidos={pedidos} />
 
-        {/* PAGINACIÓN */}
+        {/* PAGINACIÓN BACKEND */}
         {totalPaginas > 1 && (
           <Box mt={3} display="flex" justifyContent="center">
             <Pagination
               count={totalPaginas}
               page={page}
-              onChange={(e, val) => setPage(val)}
+              onChange={(e, newPage) => setPage(newPage)}
               color="secondary"
               shape="rounded"
             />

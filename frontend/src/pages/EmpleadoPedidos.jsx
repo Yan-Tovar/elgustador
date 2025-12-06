@@ -32,15 +32,14 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import PaymentIcon from "@mui/icons-material/Payment";
-import TimelapseIcon  from "@mui/icons-material/Timelapse";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-import DashboardLayout from "../../../components/layout/DashboardLayout";
-import CustomSnackbar from "../../../components/common/CustomSnackbar";
-import { showAlert,  showConfirm, showToast } from "../../../components/feedback/SweetAlert";
+import DashboardLayout from "../components/layout/DashboardLayout";
+import CustomSnackbar from "../components/common/CustomSnackbar";
+import { showAlert, showConfirm, showToast } from "../components/feedback/SweetAlert";
 
 import {
   fetchPedidosUsuario,
@@ -48,7 +47,7 @@ import {
   fetchPedidosTodos,
   actualizarEstadoPedido,
   fetchPedidoDetalle,
-} from "../../../services/pedidosService";
+} from "../services/pedidosService";
 
 const ESTADOS = [
   "pendiente",
@@ -59,7 +58,7 @@ const ESTADOS = [
   "cancelado",
 ];
 
-export default function AdminPedidos() {
+export default function EmpleadoPedidos() {
   const navigate = useNavigate();
   const [pedidos, setPedidos] = useState([]);
   const [detallesPedido, setDetallesPedido] = useState([]);
@@ -67,6 +66,7 @@ export default function AdminPedidos() {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const theme = useTheme();
 
+  const [vista, setVista] = useState("empleado"); 
   const isMobile = useMediaQuery("(max-width:600px)");
 
   // Buscador / filtro
@@ -83,8 +83,9 @@ export default function AdminPedidos() {
   const [openModalPedido, setOpenModalPedido] = useState(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
 
-  // Estados
+  // Definir jerarquía de estados para empleado
   const JERARQUIA_ESTADOS = ["pagado", "procesando", "enviado", "entregado"];
+  const ESTADOS_EMPLEADO = ["pagado", "procesando", "enviado", "entregado", "cancelado"];
 
   // =========================================
   //   Cargar pedidos desde BACKEND
@@ -92,77 +93,81 @@ export default function AdminPedidos() {
   const cargarPedidos = async () => {
     setLoading(true);
     try {
-      // Usamos SIEMPRE el servicio de administrador
-      const response = await fetchPedidosTodos({
-        page,
-        estado: estadoFiltro,
-        search,
-      });
-
-      // Puede venir array o paginado
-      if (Array.isArray(response)) {
-        setPedidos(response);
-        setTotalPaginas(1);
-      } else {
+      let response;
+      if (vista === "usuario") {
+        // Para vista de usuario simple (sin paginación)
+        response = await fetchPedidosUsuario({ search, estado: estadoFiltro });
+        // Si el servicio devuelve array:
+        const results = Array.isArray(response) ? response : response?.results ?? [];
+        setPedidos(results);
+        setTotalPaginas(response?.total_pages ?? 1);
+      } else if (vista === "empleado") {
+        // Vista empleados: usamos paginación backend
+        response = await fetchPedidosEmpleados({ page, estado: estadoFiltro, search });
+        // Esperamos { results: [], total_pages: X, count: Y }
         setPedidos(response?.results || []);
         setTotalPaginas(response?.total_pages || 1);
+      } else {
+        // admin - todos los pedidos (puede usarse paginación si tu servicio la soporta)
+        response = await fetchPedidosTodos({ page, estado: estadoFiltro, search });
+        if (Array.isArray(response)) {
+          setPedidos(response);
+          setTotalPaginas(1);
+        } else {
+          setPedidos(response?.results || []);
+          setTotalPaginas(response?.total_pages || 1);
+        }
       }
 
-      const cantidad =
-        response?.results?.length ??
-        (Array.isArray(response) ? response.length : 0);
-
-      if (cantidad === 0) {
+      if ((response?.results?.length ?? (Array.isArray(response) ? response.length : 0)) === 0) {
         showToast("No se encontraron pedidos", "info");
       }
     } catch (err) {
       console.error(err);
-      showAlert(
-        "Error",
-        "No se pudieron cargar los pedidos como administrador.",
-        "error"
-      );
+      showAlert("Error", "No se pudieron cargar los pedidos. Intenta de nuevo.", "error");
       setPedidos([]);
       setTotalPaginas(1);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // cargar datos cada vez que cambie filtro, buscador o página o vista
-
+  useEffect(() => {
+    setPage(1);
+  }, [vista, estadoFiltro]);
 
   useEffect(() => {
     cargarPedidos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ page, estadoFiltro, search]);
+  }, [vista, page, estadoFiltro, search]);
 
   // =========================================
   //   Cambiar estado con confirmación
   // =========================================
   const handleChangeEstado = async (pedidoId, nuevoEstado) => {
-    try {
-      // Usar la confirmación de SweetAlert
-      const confirmado = await showConfirm(
-        "Confirmar cambio",
-        `¿Deseas cambiar el estado del pedido a "${nuevoEstado}"?`
-      );
+    const confirm = await window?.Swal?.fire
+      ? window.Swal.fire({
+          title: "Confirmar cambio",
+          text: `¿Deseas cambiar el estado del pedido a "${nuevoEstado}"?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sí, cambiar",
+          cancelButtonText: "Cancelar",
+        })
+      : await Promise.resolve({ isConfirmed: true }); // fallback si Swal no está en window
 
-      if (!confirmado) return; // Si el usuario cancela, abortamos
-
-      // Actualizar estado en backend
-      const { data } = await actualizarEstadoPedido(pedidoId, nuevoEstado);
-
-      // Actualizar estado en frontend
-      setPedidos((prev) =>
-        prev.map((p) =>
-          p.id === pedidoId ? { ...p, estado: data?.estado ?? nuevoEstado } : p
-        )
-      );
-
-      showToast("Estado actualizado correctamente", "success");
-    } catch (error) {
-      console.error(error);
-      showToast("Error al actualizar el estado", "error");
+    if (confirm.isConfirmed) {
+      try {
+        const { data } = await actualizarEstadoPedido(pedidoId, nuevoEstado);
+        setPedidos((prev) =>
+          prev.map((p) => (p.id === pedidoId ? { ...p, estado: data?.estado ?? nuevoEstado } : p))
+        );
+        setSnackbar({ open: true, message: "Estado actualizado", severity: "success" });
+      } catch (error) {
+        console.error(error);
+        setSnackbar({ open: true, message: "Error actualizando estado", severity: "error" });
+      }
     }
   };
 
@@ -179,7 +184,7 @@ export default function AdminPedidos() {
       setPedidoSeleccionado(pedido);
 
       const data = await fetchPedidoDetalle(pedido.id);
-      setDetallesPedido(data); 
+      setDetallesPedido(data); // data debería venir como array de detalles
 
       setOpenModalPedido(true);
     } catch (error) {
@@ -213,7 +218,6 @@ export default function AdminPedidos() {
           <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ alignItems: "center" }}>
             {[
               { label: "Todos", value: "todos", icon: <DoneAllIcon /> },
-              { label: "Pendientes", value: "pendiente", icon: <TimelapseIcon /> },
               { label: "Pagado", value: "pagado", icon: <PaymentIcon /> },
               { label: "Procesando", value: "procesando", icon: <AutorenewIcon /> },
               { label: "Enviado", value: "enviado", icon: <LocalShippingIcon /> },
@@ -385,25 +389,44 @@ export default function AdminPedidos() {
                       {/* Cambiar Estado */}
                       <TableCell sx={{ minWidth: 160 }}>
                         <Select
-                          value={pedido.estado || "pendiente"}
+                          value={pedido.estado}
                           size="small"
                           fullWidth
-                          disabled={pedido.estado === "pendiente"} // pendiente no se puede cambiar
-                          onChange={(e) => handleChangeEstado(pedido.id, e.target.value)}
-                        >
-                          {ESTADOS.map((estado) => {
-                            let disabled = false;
+                          onChange={async (e) => {
+                            const nuevoEstado = e.target.value;
 
-                            // Solo aplicamos jerarquía a los estados de la cadena principal
+                            // Validar jerarquía: no permitir retroceder
+                            if (JERARQUIA_ESTADOS.includes(pedido.estado) && JERARQUIA_ESTADOS.includes(nuevoEstado)) {
+                              const indexActual = JERARQUIA_ESTADOS.indexOf(pedido.estado);
+                              const indexNuevo = JERARQUIA_ESTADOS.indexOf(nuevoEstado);
+                              if (indexNuevo < indexActual) {
+                                showToast(
+                                  `No puedes cambiar el estado a "${nuevoEstado}" porque ya está en "${pedido.estado}"`,
+                                  "warning"
+                                );
+                                return;
+                              }
+                            }
+
+                            // Confirmación con SweetAlert
+                            const confirmado = await showConfirm(
+                              "Confirmar cambio",
+                              `¿Deseas cambiar el estado del pedido a "${nuevoEstado}"?`
+                            );
+                            if (!confirmado) return;
+
+                            // Actualizar estado en backend
+                            handleChangeEstado(pedido.id, nuevoEstado);
+                          }}
+                        >
+                          {ESTADOS_EMPLEADO.map((estado) => {
+                            // Deshabilitar estados anteriores en la jerarquía
+                            let disabled = false;
                             if (pedido.estado && JERARQUIA_ESTADOS.includes(pedido.estado) && JERARQUIA_ESTADOS.includes(estado)) {
                               const indexActual = JERARQUIA_ESTADOS.indexOf(pedido.estado);
                               const indexNuevo = JERARQUIA_ESTADOS.indexOf(estado);
-                              if (indexNuevo < indexActual) disabled = true; // no se puede retroceder
+                              if (indexNuevo < indexActual) disabled = true;
                             }
-
-                            // "pendiente" siempre deshabilitado
-                            if (estado === "pendiente") disabled = true;
-
                             return (
                               <MenuItem key={estado} value={estado} disabled={disabled}>
                                 {estado}
@@ -412,7 +435,6 @@ export default function AdminPedidos() {
                           })}
                         </Select>
                       </TableCell>
-
                     </TableRow>
                   ))}
                 </TableBody>

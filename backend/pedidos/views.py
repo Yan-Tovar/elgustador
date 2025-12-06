@@ -1,13 +1,16 @@
+# pedidos/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import timedelta
+
+from rest_framework.pagination import PageNumberPagination
 
 from carrito.models import Carrito
 from pedidos.models import Pedido
@@ -16,7 +19,7 @@ from .serializers import (
     PedidoSerializer,
     PedidoListSerializer,
     PedidoDetalleSerializer,
-    PedidoEstadoSerializer
+    PedidoEstadoSerializer,
 )
 from config.permissions import IsCliente, IsEmpleado, IsAdministrador
 
@@ -33,7 +36,7 @@ class CrearPedidoDesdeCarritoView(APIView):
         carrito = get_object_or_404(Carrito, usuario=usuario)
 
         if carrito.items.count() == 0:
-            return Response({"detail": "El carrito está vacío."}, status=400)
+            return Response({"detail": "El carrito está vacío."}, status=status.HTTP_400_BAD_REQUEST)
 
         subtotal = sum(item.subtotal for item in carrito.items.all())
         costo_envio = 12000
@@ -48,7 +51,7 @@ class CrearPedidoDesdeCarritoView(APIView):
             costo_envio=costo_envio,
             metodo_pago="pendiente",
             total=total,
-            estado="pendiente"
+            estado="pendiente",
         )
 
         for item in carrito.items.all():
@@ -57,22 +60,36 @@ class CrearPedidoDesdeCarritoView(APIView):
                 producto=item.producto,
                 cantidad=item.cantidad,
                 precio_unitario=item.precio_unitario,
-                precio_total=item.subtotal
+                precio_total=item.subtotal,
             )
 
-        return Response({"pedido_id": pedido.id}, status=201)
+        return Response({"pedido_id": pedido.id}, status=status.HTTP_201_CREATED)
 
 
 # -------------------------
 # ViewSet de pedidos
 # -------------------------
 class PedidoViewSet(viewsets.ModelViewSet):
+    """
+    - Admin / Empleado: pueden ver todos los pedidos (excepto pendientes si así lo requiere).
+    - Cliente: solo sus propios pedidos (excluye 'pendiente').
+    - La eliminación de pedidos NO está permitida por política: devuelve 405.
+    """
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Pedido.objects.filter(usuario=self.request.user)
+        user = self.request.user
+        # Normalize role check: soporta "admin" y "administrador"
+        is_admin = getattr(user, "rol", "") in ("admin", "administrador")
+        is_empleado = getattr(user, "rol", "") == "empleado"
+
+        if is_admin or is_empleado:
+            # Admin y empleado ven todos los pedidos (excluí pendiente si lo deseas)
+            return Pedido.objects.all().exclude(estado="pendiente")
+        # Cliente ve solo los suyos (excluye pendientes)
+        return Pedido.objects.filter(usuario=user).exclude(estado="pendiente")
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -85,32 +102,43 @@ class PedidoViewSet(viewsets.ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        pedido = self.get_object()
-
-        if pedido.estado != "pendiente":
-            return Response({"detail": "Solo se pueden eliminar pedidos pendientes"}, status=400)
-
-        if (timezone.now() - pedido.fecha_creacion) > timedelta(days=30):
-            pedido.delete()
-            return Response({"detail": "Pedido eliminado"}, status=200)
-        else:
-            return Response({"detail": "No han pasado 30 días desde la creación"}, status=400)
+        # Política: nunca eliminar pedidos desde la API
+        return Response(
+            {"detail": "Eliminación de pedidos no permitida."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
 
 # -------------------------
 # Detalles de pedido
 # -------------------------
 class PedidoDetalleViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only viewset para detalles del pedido.
+    - Admin / Empleado: pueden consultar cualquier detalle (si se les permite).
+    - Cliente: solo detalles de sus propios pedidos.
+    Soporta filtro por query param `pedido=<id>`.
+    """
     serializer_class = PedidoDetalleSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        user = self.request.user
         queryset = PedidoDetalle.objects.all().select_related("producto", "pedido")
 
         pedido_id = self.request.query_params.get("pedido")
         if pedido_id:
             queryset = queryset.filter(pedido_id=pedido_id)
 
-        return queryset
+        # Normalización de roles
+        is_admin = getattr(user, "rol", "") in ("admin", "administrador")
+        is_empleado = getattr(user, "rol", "") == "empleado"
+
+        if is_admin or is_empleado:
+            return queryset
+
+        # Cliente: solo sus propios detalles
+        return queryset.filter(pedido__usuario=user)
 
     def get_serializer(self, *args, **kwargs):
         kwargs.setdefault("context", {})
@@ -118,64 +146,127 @@ class PedidoDetalleViewSet(viewsets.ReadOnlyModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
+class PedidosPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response({
+            "results": data,
+            "count": self.page.paginator.count,
+            "total_pages": self.page.paginator.num_pages,
+            "next": self.get_next_link(),
+            "previous": self.get_previous_link(),
+        })
+
+
 # -------------------------
-# Pedidos por usuario
+# Pedidos por usuario (paginado)
 # -------------------------
 class PedidosUsuarioView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    pagination_class = PedidosPagination
 
     def get(self, request):
+        estado = request.query_params.get("estado")
+        search = request.query_params.get("search")
+
         pedidos = (
             Pedido.objects
             .filter(usuario=request.user)
             .exclude(estado="pendiente")
-            .prefetch_related('detalles__producto')
+            .prefetch_related("detalles__producto")
         )
 
-        serializer = PedidoSerializer(
-            pedidos,
-            many=True,
-            context={"request": request}
-        )
-        return Response(serializer.data)
+        if estado and estado != "todos":
+            pedidos = pedidos.filter(estado=estado)
+
+        if search:
+            pedidos = pedidos.filter(
+                Q(id__icontains=search) |
+                Q(fecha_creacion__date__icontains=search)
+            )
+
+        pedidos = pedidos.order_by("-fecha_creacion")
+
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(pedidos, request)
+
+        serializer = PedidoSerializer(result_page, many=True, context={"request": request})
+        return paginator.get_paginated_response(serializer.data)
 
 
 # -------------------------
-# Pedidos empleados
+# Pedidos empleados (paginado + búsqueda + estado)
 # -------------------------
 class PedidosEmpleadoView(APIView):
-    permission_classes = [permissions.IsAuthenticated, IsEmpleado]
+    permission_classes = [IsAuthenticated, IsEmpleado]
+    pagination_class = PedidosPagination
 
     def get(self, request):
+        estado = request.query_params.get("estado")
+        search = request.query_params.get("search")
+
         pedidos = (
             Pedido.objects
             .exclude(estado="pendiente")
-            .prefetch_related('detalles__producto')
+            .prefetch_related("detalles__producto")
         )
 
-        serializer = PedidoSerializer(
-            pedidos,
-            many=True,
-            context={"request": request}
-        )
-        return Response(serializer.data)
+        if estado and estado != "todos":
+            pedidos = pedidos.filter(estado=estado)
+
+        if search:
+            pedidos = pedidos.filter(
+                Q(id__icontains=search) |
+                Q(usuario__email__icontains=search) |
+                Q(fecha_creacion__date__icontains=search)
+            )
+
+        pedidos = pedidos.order_by("-fecha_creacion")
+
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(pedidos, request)
+
+        serializer = PedidoSerializer(result_page, many=True, context={"request": request})
+        return paginator.get_paginated_response(serializer.data)
 
 
 # -------------------------
-# Pedidos admin
+# Pedidos admin (paginado + búsqueda + estado)
 # -------------------------
 class PedidosAdminView(APIView):
-    permission_classes = [permissions.IsAuthenticated, IsAdministrador]
+    permission_classes = [IsAuthenticated, IsAdministrador]
+    pagination_class = PedidosPagination
 
     def get(self, request):
-        pedidos = Pedido.objects.all().prefetch_related('detalles__producto')
+        estado = request.query_params.get("estado")
+        search = request.query_params.get("search")
 
-        serializer = PedidoSerializer(
-            pedidos,
-            many=True,
-            context={"request": request}
+        pedidos = (
+            Pedido.objects
+            .all()
+            .prefetch_related("detalles__producto")
         )
-        return Response(serializer.data)
+
+        if estado and estado != "todos":
+            pedidos = pedidos.filter(estado=estado)
+
+        if search:
+            pedidos = pedidos.filter(
+                Q(id__icontains=search) |
+                Q(usuario__email__icontains=search) |
+                Q(fecha_creacion__date__icontains=search)
+            )
+
+        pedidos = pedidos.order_by("-fecha_creacion")
+
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(pedidos, request)
+
+        serializer = PedidoSerializer(result_page, many=True, context={"request": request})
+        return paginator.get_paginated_response(serializer.data)
 
 
 # -------------------------
@@ -185,7 +276,9 @@ class ActualizarEstadoPedidoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
-        if request.user.rol in ["admin", "empleado"]:
+        # Permitir a admin/empleado modificar cualquier pedido; cliente solo el suyo
+        user = request.user
+        if getattr(user, "rol", "") in ["admin", "administrador", "empleado"]:
             pedido = get_object_or_404(Pedido, pk=pk)
         else:
             pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
@@ -199,9 +292,9 @@ class ActualizarEstadoPedidoView(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=200)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # -------------------------
@@ -238,4 +331,4 @@ class PedidosStatsView(APIView):
             for a in agregados
         ]
 
-        return Response({"data": result}, status=200)
+        return Response({"data": result}, status=status.HTTP_200_OK)

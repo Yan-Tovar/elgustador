@@ -117,6 +117,7 @@ export default function SideBar() {
           { text: "Carrusel", icon: icons.carrusel, path: "/admin/carrusel" },
           { text: "Productos", icon: icons.adminProductos, path: "/admin/productos" },
           { text: "Ofertas", icon: icons.ofertas, path: "/admin/ofertas" },
+          { text: "Empleado Pedidos", icon: icons.adminPedidos, path: "/empleado/pedidos" },
           { text: "Admin Pedidos", icon: icons.adminPedidos, path: "/admin/pedidos" },
           { text: "Admin Facturas", icon: icons.adminFacturas, path: "/admin/facturas" },
         ]
@@ -138,7 +139,7 @@ export default function SideBar() {
       ? [
           ...clientItems,
           { text: "Notas", icon: icons.notas, path: "/notas" },
-          { text: "Gestión Pedidos", icon: icons.adminPedidos, path: "/admin/pedidos" },
+          { text: "Gestion Pedidos", icon: icons.adminPedidos, path: "/empleado/pedidos" },
         ]
       : [];
 
