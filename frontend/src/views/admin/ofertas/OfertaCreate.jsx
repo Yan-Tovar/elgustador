@@ -1,6 +1,5 @@
 // views/admin/ofertas/OfertaCreate.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Box,
   Button,
@@ -13,6 +12,8 @@ import {
 } from "@mui/material";
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+import { fetchProductos } from "../../../services/productosService";
+import { createOferta } from "../../../services/ofertasService";
 
 export default function OfertaCreate() {
   const navigate = useNavigate();
@@ -30,11 +31,14 @@ export default function OfertaCreate() {
 
   const token = localStorage.getItem("access");
 
+  //  Cargar productos desde el servicio
   const loadProductos = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/api/productos/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setProductos(res.data);
+    try {
+      const res = await fetchProductos();
+      setProductos(res.data);
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    }
   };
 
   useEffect(() => {
@@ -44,9 +48,8 @@ export default function OfertaCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios.post(
-      "http://127.0.0.1:8000/api/ofertas/",
-      {
+    try {
+      await createOferta({
         producto,
         nombre,
         descripcion,
@@ -55,13 +58,14 @@ export default function OfertaCreate() {
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
         estado,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+      });
 
-    navigate("/admin/ofertas");
+      // Redirigir a la lista de ofertas
+      navigate("/admin/ofertas");
+    } catch (error) {
+      console.error("Error al crear la oferta:", error);
+      alert("Ocurrió un error al crear la oferta. Revisa la consola para más detalles.");
+    }
   };
 
   return (
@@ -82,6 +86,7 @@ export default function OfertaCreate() {
                 sx={{ mb: 2 }}
                 value={producto}
                 onChange={(e) => setProducto(e.target.value)}
+                required
               >
                 {productos.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
@@ -96,6 +101,7 @@ export default function OfertaCreate() {
                 sx={{ mb: 2 }}
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
+                required
               />
 
               <TextField

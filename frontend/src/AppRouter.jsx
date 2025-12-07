@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 
+import PublicDashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
@@ -69,6 +70,11 @@ export default function AppRouter() {
               RUTAS PÚBLICAS
         ===================================== */}
         <Route 
+          path="/catalogo" 
+          element={!user ? <PublicDashboardPage /> : <Navigate to="/" />} 
+        />
+
+        <Route 
           path="/login" 
           element={!user ? <LoginPage /> : <Navigate to="/" />} 
         />
@@ -94,7 +100,7 @@ export default function AppRouter() {
         <Route 
           path="/" 
           element={
-            !user ? <Navigate to="/login" replace  /> :
+            !user ? <Navigate to="/catalogo" replace  /> :
             user.rol === "admin" ? <AdminDashboard /> :
             user.rol === "empleado" ? <EmpleadoDashboard /> :
             <ClienteDashboard />

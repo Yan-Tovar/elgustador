@@ -9,6 +9,7 @@ import {
   IconButton,
   Tooltip,
   Stack,
+  Chip, // Agregado para el mensaje de stock bajo
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -25,7 +26,7 @@ import { CartAnimationContext } from "../../context/CartAnimationContext";
  * - producto
  * - cantidad
  * - onCantidadChange(productoId, nuevaCantidad, stock)
- * - onAdd(producto)  --> se llamará después de la animación
+ * - onAdd(producto)  --> se llamará después de la animación
  * - onDetalle(producto)
  */
 
@@ -43,8 +44,13 @@ export default function ProductosCard({
   const addBtnRef = useRef(null);
   const minusBtnRef = useRef(null);
 
-  // contador local para forzar re-render de pequeñas animaciones si hace falta
+  // Contador local para forzar re-render de pequeñas animaciones si hace falta
   const [animTrigger, setAnimTrigger] = useState(0);
+
+  // VALIDACIÓN DE ESTADO
+  const isLogged = !!onAdd; // Si onAdd está presente, el usuario está logueado (o se le permite agregar)
+  const isOutOfStock = producto.stock === 0;
+  const isLowStock = producto.stock > 0 && producto.stock < 5;
 
   // ---- BURBUJA ----
   const spawnBubble = (originEl, color = "green") => {
@@ -188,6 +194,7 @@ export default function ProductosCard({
           justifyContent: "center",
           alignItems: "center",
           overflow: "hidden",
+          position: 'relative', // Necesario para posicionar el Chip
         }}
       >
         <Box
@@ -203,6 +210,17 @@ export default function ProductosCard({
             userSelect: "none",
           }}
         />
+        
+        {/* 2. Mensaje de Stock Bajo (si es menor a 5) */}
+        {isLowStock && (
+            <Chip
+                label="Stock Bajo"
+                color="warning"
+                size="small"
+                sx={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}
+            />
+        )}
+
       </Box>
 
       {/* Contenido */}
@@ -237,57 +255,76 @@ export default function ProductosCard({
             </Typography>
           )}
         </Stack>
+        
+        {/* 3. Mensaje Producto No Disponible (si stock es cero) */}
+        {isOutOfStock && (
+            <Typography variant="body1" color="error" fontWeight="bold" sx={{ mt: 1 }}>
+                Producto no disponible
+            </Typography>
+        )}
 
-        {/* Botón de detalle */}
-        <Button
-          size="small"
-          variant="outlined"
-          color="black"
-          startIcon={<InfoIcon />}
-          fullWidth
-          sx={{ mt: 1 }}
-          onClick={() => onDetalle(producto)}
-        >
-          Ver detalle
-        </Button>
-
-        {/* Control de cantidad */}
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ mt: 2 }}
-        >
-          <IconButton
-            onClick={handleRemoveClick}
-            disabled={cantidad <= 1}
-            ref={minusBtnRef}
+        {/* 1. Botón de detalle (Se muestra solo si el usuario está logueado o si onDetalle existe y es el catálogo público) */}
+        {/* Aquí usaremos la lógica: si la vista es pública (onAdd es null) O si la vista es privada, siempre mostramos el detalle. */}
+        {isLogged && (
+          <Button
+            size="small"
+            variant="outlined"
+            // Nota: color="black" no es un color de tema estándar de MUI. Usaré 'default' o 'primary'. Usaré 'default' para mantener la intención.
+            color="default" 
+            startIcon={<InfoIcon />}
+            fullWidth
+            sx={{ mt: 1 }}
+            onClick={() => onDetalle(producto)}
           >
-            <RemoveIcon />
-          </IconButton>
+            Ver detalle
+          </Button>
+        )}
+        
+        {/* Separación visual para botones de carrito */}
+        {isLogged && <Box sx={{ mt: 2 }}/>} 
 
-          <Typography variant="h6">{cantidad}</Typography>
+        {/* Control de cantidad y Agregar al Carrito (Solo si el usuario está logueado) */}
+        {isLogged && (
+          <>
+            {/* Control de cantidad */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ mt: 2 }}
+            >
+              <IconButton
+                onClick={handleRemoveClick}
+                disabled={cantidad <= 1 || isOutOfStock} // Deshabilitar si está agotado
+                ref={minusBtnRef}
+              >
+                <RemoveIcon />
+              </IconButton>
 
-          <IconButton
-            onClick={handleAddClick}
-            disabled={cantidad >= producto.stock}
-            ref={addBtnRef}
-          >
-            <AddIcon />
-          </IconButton>
-        </Stack>
+              <Typography variant="h6">{cantidad}</Typography>
 
-        {/* Botón agregar al carrito */}
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{ mt: 2 }}
-          startIcon={<ShoppingCartIcon />}
-          onClick={handleAddToCart}
-          disabled={producto.stock === 0}
-        >
-          Agregar
-        </Button>
+              <IconButton
+                onClick={handleAddClick}
+                disabled={cantidad >= producto.stock || isOutOfStock} // Deshabilitar si está agotado
+                ref={addBtnRef}
+              >
+                <AddIcon />
+              </IconButton>
+            </Stack>
+
+            {/* Botón agregar al carrito */}
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+              startIcon={<ShoppingCartIcon />}
+              onClick={handleAddToCart}
+              disabled={isOutOfStock} // Deshabilitar si está agotado
+            >
+              Agregar
+            </Button>
+          </>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,6 +1,5 @@
 // views/admin/ofertas/OfertaEdit.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Box,
   Button,
@@ -13,6 +12,8 @@ import {
 } from "@mui/material";
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import { useNavigate, useParams } from "react-router-dom";
+import { fetchProductos } from "../../../services/productosService";
+import { fetchOfertaById, updateOferta } from "../../../services/ofertasService";
 
 export default function OfertaEdit() {
   const navigate = useNavigate();
@@ -31,26 +32,34 @@ export default function OfertaEdit() {
 
   const token = localStorage.getItem("access");
 
+  // 🔹 Cargar productos desde el servicio
   const loadProductos = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/api/productos/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setProductos(res.data);
+    try {
+      const res = await fetchProductos();
+      setProductos(res.data);
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    }
   };
 
+  // 🔹 Cargar la oferta existente
   const loadOferta = async () => {
-    const res = await axios.get(`http://127.0.0.1:8000/api/ofertas/${id}/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const res = await fetchOfertaById(id);
+      const data = res.data;
 
-    setProducto(res.data.producto.id);
-    setNombre(res.data.nombre);
-    setDescripcion(res.data.descripcion);
-    setDescuentoPorcentaje(res.data.descuento_porcentaje);
-    setDescuentoValor(res.data.descuento_valor);
-    setFechaInicio(res.data.fecha_inicio.slice(0, 16));
-    setFechaFin(res.data.fecha_fin.slice(0, 16));
-    setEstado(res.data.estado);
+      setProducto(data.producto.id);
+      setNombre(data.nombre);
+      setDescripcion(data.descripcion);
+      setDescuentoPorcentaje(data.descuento_porcentaje);
+      setDescuentoValor(data.descuento_valor);
+      setFechaInicio(data.fecha_inicio.slice(0, 16));
+      setFechaFin(data.fecha_fin.slice(0, 16));
+      setEstado(data.estado);
+    } catch (error) {
+      console.error("Error al cargar la oferta:", error);
+      alert("No se pudo cargar la oferta. Intenta recargar la página.");
+    }
   };
 
   useEffect(() => {
@@ -58,12 +67,12 @@ export default function OfertaEdit() {
     loadOferta();
   }, []);
 
+  // 🔹 Guardar cambios usando el servicio
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios.put(
-      `http://127.0.0.1:8000/api/ofertas/${id}/`,
-      {
+    try {
+      await updateOferta(id, {
         producto,
         nombre,
         descripcion,
@@ -72,13 +81,13 @@ export default function OfertaEdit() {
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
         estado,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+      });
 
-    navigate("/admin/ofertas");
+      navigate("/admin/ofertas");
+    } catch (error) {
+      console.error("Error al actualizar la oferta:", error);
+      alert("No se pudieron guardar los cambios. Verifica los datos.");
+    }
   };
 
   return (
@@ -90,6 +99,7 @@ export default function OfertaEdit() {
 
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
+            {/* Columna izquierda */}
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -98,6 +108,7 @@ export default function OfertaEdit() {
                 sx={{ mb: 2 }}
                 value={producto}
                 onChange={(e) => setProducto(e.target.value)}
+                required
               >
                 {productos.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
@@ -112,6 +123,7 @@ export default function OfertaEdit() {
                 sx={{ mb: 2 }}
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
+                required
               />
 
               <TextField
@@ -133,6 +145,7 @@ export default function OfertaEdit() {
               />
             </Grid>
 
+            {/* Columna derecha */}
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth

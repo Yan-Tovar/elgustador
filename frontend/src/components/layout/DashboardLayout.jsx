@@ -5,9 +5,11 @@ import SideBar from "./SideRolBar";
 import Navbar from "./Navbar";
 import FooterBottomSheet from "./Footer";
 import { CartAnimationProvider } from "../../context/CartAnimationContext";
+import NotificationsDrawer from "../notifications/NotificationsDrawer";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   return (
     <CartAnimationProvider>
@@ -16,6 +18,12 @@ export default function DashboardLayout({ children }) {
 
         {/* SIDEBAR */}
         <SideBar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        {/* PANEL DERECHO DE NOTIFICACIONES */}
+        <NotificationsDrawer
+          open={notifOpen}
+          onClose={() => setNotifOpen(false)}
+        />
 
         {/* CONTENIDO PRINCIPAL */}
         <Box
@@ -39,7 +47,10 @@ export default function DashboardLayout({ children }) {
             transition: "margin-left 0.3s ease",
           }}
         >
-          <Navbar onOpenSidebar={() => setSidebarOpen(true)} />
+          <Navbar
+            onOpenSidebar={() => setSidebarOpen(true)}
+            onOpenNotificaciones={() => setNotifOpen(true)}
+          />
 
           {/* CONTENEDOR RESPONSIVE DEL CONTENIDO */}
           <Container

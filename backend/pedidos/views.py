@@ -9,7 +9,9 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import timedelta
+from django.utils import timezone
 
+from notificaciones.services import crear_notificacion
 from rest_framework.pagination import PageNumberPagination
 
 from carrito.models import Carrito
@@ -32,7 +34,6 @@ class CrearPedidoDesdeCarritoView(APIView):
 
     def post(self, request):
         usuario = request.user
-
         carrito = get_object_or_404(Carrito, usuario=usuario)
 
         if carrito.items.count() == 0:
@@ -63,8 +64,15 @@ class CrearPedidoDesdeCarritoView(APIView):
                 precio_total=item.subtotal,
             )
 
-        return Response({"pedido_id": pedido.id}, status=status.HTTP_201_CREATED)
+        # Notificación inicial de bienvenida / completar compra
+        crear_notificacion(
+            usuario=usuario,
+            titulo="Completa tu compra",
+            mensaje="Tienes una compra pendiente. Completa tu pedido y obtén beneficios exclusivos.",
+            enviar_email=True
+        )
 
+        return Response({"pedido_id": pedido.id}, status=status.HTTP_201_CREATED)
 
 # -------------------------
 # ViewSet de pedidos
@@ -86,10 +94,10 @@ class PedidoViewSet(viewsets.ModelViewSet):
         is_empleado = getattr(user, "rol", "") == "empleado"
 
         if is_admin or is_empleado:
-            # Admin y empleado ven todos los pedidos (excluí pendiente si lo deseas)
-            return Pedido.objects.all().exclude(estado="pendiente")
-        # Cliente ve solo los suyos (excluye pendientes)
-        return Pedido.objects.filter(usuario=user).exclude(estado="pendiente")
+            # Admin y empleado ven todos los pedidos
+            return Pedido.objects.all()
+        # Cliente ve solo los suyos
+        return Pedido.objects.filter(usuario=user)    
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -276,12 +284,11 @@ class ActualizarEstadoPedidoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
-        # Permitir a admin/empleado modificar cualquier pedido; cliente solo el suyo
         user = request.user
         if getattr(user, "rol", "") in ["admin", "administrador", "empleado"]:
             pedido = get_object_or_404(Pedido, pk=pk)
         else:
-            pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
+            pedido = get_object_or_404(Pedido, pk=pk, usuario=user)
 
         serializer = PedidoEstadoSerializer(
             pedido,
@@ -292,10 +299,18 @@ class ActualizarEstadoPedidoView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+
+            # Notificación al usuario sobre el cambio de estado
+            crear_notificacion(
+                usuario=pedido.usuario,
+                titulo=f"Pedido #{pedido.id} actualizado",
+                mensaje=f"El estado de tu pedido ha cambiado a '{pedido.estado}'.",
+                enviar_email=True
+            )
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # -------------------------
 # Estadísticas de pedidos

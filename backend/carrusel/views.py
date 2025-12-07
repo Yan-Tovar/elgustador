@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import Carrusel
 from .serializers import CarruselSerializer
@@ -31,13 +32,13 @@ class CarruselViewSet(viewsets.ModelViewSet):
         return Carrusel.objects.filter(estado=True).order_by("orden")
 
     # -----------------------------
-    #  PERMISOS POR ACCIÓN
+    #   PERMISOS POR ACCIÓN
     # -----------------------------
     def get_permissions(self):
-        # Cliente y empleado pueden VER (list & retrieve)
+        # Carrusel público (Cualquiera puede verlo)
         if self.action in ["list", "retrieve"]:
-            return [IsEmpleado()]  # Cliente incluido
-
+            return [AllowAny()]
+        
         # Crear, modificar, eliminar → SOLO administrador
         return [IsAdministrador()]
 

@@ -14,6 +14,13 @@ from .serializers import (
     ProductoCreateUpdateSerializer,
 )
 
+# =======================================================
+# IMPORTACIONES DE NOTIFICACIONES Y USUARIOS
+# =======================================================
+from notificaciones.services import crear_notificacion
+from usuarios.models import Usuario 
+from django.db import transaction
+# =======================================================
 
 class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all().order_by("nombre")
@@ -43,6 +50,81 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
         # Usuarios ven solo activos
         return Producto.objects.filter(estado=True).order_by("-id")
+
+    # ====================================================================
+    # 1. NOTIFICACIÓN DE CREACIÓN
+    # ====================================================================
+    def perform_create(self, serializer):
+        producto = serializer.save()
+        
+        titulo = "🎉 ¡Nuevo Producto en el Catálogo! 🎉"
+        mensaje = f"Acabamos de añadir **{producto.nombre}** a nuestra colección. ¡Sé el primero en probarlo!"
+
+        @transaction.on_commit
+        def send_creation_notifications():
+            for usuario in Usuario.objects.all():
+                crear_notificacion(
+                    usuario=usuario,
+                    titulo=titulo,
+                    mensaje=mensaje,
+                    enviar_email=False
+                )
+
+        transaction.on_commit(send_creation_notifications)
+
+    # ====================================================================
+    # 2. NOTIFICACIÓN DE STOCK BAJO Y PRECIO MODIFICADO
+    # ====================================================================
+    def perform_update(self, serializer):
+        old_producto = self.get_object()
+        producto = serializer.save()
+
+        old_stock = old_producto.stock
+        new_stock = producto.stock
+        old_precio = old_producto.precio
+        new_precio = producto.precio
+
+        notifications_to_send = []
+
+        # --- Stock bajo ---
+        if old_stock >= 5 and new_stock < 5:
+            if new_stock > 0:
+                notifications_to_send.append({
+                    "titulo": " ¡Stock Agotándose! ",
+                    "mensaje": f"El stock de **{producto.nombre}** ha descendido a **{new_stock} unidades** ¡Date prisa antes de que se agote!",
+                })
+            elif new_stock == 0:
+                notifications_to_send.append({
+                    "titulo": " Producto Agotado ",
+                    "mensaje": f"El producto **{producto.nombre}** se ha agotado temporalmente.",
+                })
+
+        # --- Cambio de precio ---
+        if round(old_precio, 2) != round(new_precio, 2):
+            action = "subido" if new_precio > old_precio else "bajado"
+            notifications_to_send.append({
+                "titulo": " ¡Precio Actualizado! ",
+                "mensaje": f"El precio de **{producto.nombre}** ha {action} de ${old_precio} a **${new_precio}**.",
+            })
+
+        # Enviar notificaciones solo si hay cambios
+        if notifications_to_send:
+            def send_update_notifications():
+                for usuario in Usuario.objects.all():
+                    for notif in notifications_to_send:
+                        crear_notificacion(
+                            usuario=usuario,
+                            titulo=notif["titulo"],
+                            mensaje=notif["mensaje"],
+                            enviar_email=False
+                        )
+            # Aquí solo registramos la función, sin decorador
+            transaction.on_commit(send_update_notifications)
+
+
+    # ====================================================================
+    # Otros Métodos
+    # ====================================================================
 
     def destroy(self, request, *args, **kwargs):
         producto = self.get_object()
@@ -89,7 +171,7 @@ class InventarioEstadisticasView(APIView):
         mayor_stock = productos.order_by("-stock").first()
         menor_stock = productos.filter(stock__gt=0).order_by("stock").first()
 
-        # 💡 IMPORTANTE: Pasar context={'request': request}
+        #  IMPORTANTE: Pasar context={'request': request}
         mayor_stock_data = (
             ProductoSerializer(mayor_stock, context={"request": request}).data
             if mayor_stock else None

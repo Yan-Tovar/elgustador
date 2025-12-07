@@ -10,6 +10,8 @@ from .serializers import (
     UsuarioUpdateSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
+from notificaciones.services import crear_notificacion
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -18,10 +20,12 @@ def get_tokens_for_user(user):
         "access": str(refresh.access_token),
     }
 
+
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all().select_related("departamento", "municipio")
     serializer_class = UsuarioSerializer
     permission_classes = [IsAuthenticated]
+
 
 class UsuarioRegistroViewSet(viewsets.GenericViewSet):
     serializer_class = UsuarioRegistroSerializer
@@ -31,7 +35,19 @@ class UsuarioRegistroViewSet(viewsets.GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         usuario = serializer.save()
+
+        # =========================
+        # Crear notificación de bienvenida
+        # =========================
+        crear_notificacion(
+            usuario=usuario,
+            titulo="¡Bienvenido a El Gustador!",
+            mensaje="Te damos la bienvenida al sistema. Esperamos que tengas una excelente experiencia.",
+            enviar_email=True  
+        )
+
         return Response(UsuarioSerializer(usuario).data, status=status.HTTP_201_CREATED)
+
 
 class LoginViewSet(viewsets.GenericViewSet):
     serializer_class = UsuarioLoginSerializer
@@ -51,6 +67,7 @@ class LoginViewSet(viewsets.GenericViewSet):
             "user": UsuarioSerializer(user).data,
             **tokens
         })
+
 
 class UsuarioSelfViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]

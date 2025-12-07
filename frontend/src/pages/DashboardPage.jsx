@@ -1,48 +1,48 @@
-import { useEffect, useState, useContext } from "react";
+// src/pages/PublicDashboardPage.jsx
+import { useEffect, useState } from "react";
 import {
   Box,
   Grid,
-  Snackbar,
-  Alert,
   TextField,
   InputAdornment,
   Typography,
   Card,
   CardContent,
-  CardActions,
-  Button,
   Chip,
+  Snackbar, // Añadir Snackbar para posibles errores de carga
+  Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 
-import DashboardLayout from "../components/layout/DashboardLayout";
+// Reemplazamos DashboardLayout por el nuevo Layout
+import PublicLayout from "../components/layout/PublicLayout"; 
 
+// Servicios que pueden ser públicos
 import { fetchProductos, searchProductos } from "../services/productosService";
 import { fetchCategorias } from "../services/categoriasService";
 import { fetchOfertas } from "../services/ofertasService";
-import { addToCarrito } from "../services/carritoService";
 
-import { CarritoContext } from "../context/CarritoContext";
-
+// Componentes
 import ProductosCard from "../components/common/ProductosCard";
-import CategoriaCard from "../components/common/CategoriaCard";
 import CarruselComponent from "../components/common/CarruselComponent";
 
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 
-export default function ClienteDashboard() {
+// *************************************************************************
+// NOTA: Se ha ELIMINADO la lógica de CarritoContext, loadCarrito,
+// handleCantidadChange y handleAddToCarrito ya que el usuario NO está logueado.
+// *************************************************************************
+
+export default function PublicDashboardPage() {
   const navigate = useNavigate();
-  const { loadCarrito } = useContext(CarritoContext);
 
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [ofertas, setOfertas] = useState([]);
-  const [cantidades, setCantidades] = useState({});
   const [search, setSearch] = useState("");
+  // Mantenemos snackbar solo para mostrar posibles errores de carga
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+
 
   // Cargar datos al montar página
   useEffect(() => {
@@ -67,9 +67,11 @@ export default function ClienteDashboard() {
   const loadProductos = async () => {
     try {
       const res = await fetchProductos();
+      // NOTA: Los productos deben ser accesibles públicamente en el backend.
       setProductos(res.data);
     } catch (err) {
       console.error("Error cargando productos:", err);
+      setSnackbar({ open: true, message: "Error al cargar productos", severity: "error" });
     }
   };
 
@@ -100,32 +102,7 @@ export default function ClienteDashboard() {
     }
   };
 
-  // ============================ MANEJO DE CANTIDADES ============================
-  const handleCantidadChange = (productoId, value, stock) => {
-    let cantidad = Number(value);
-    if (cantidad < 1) cantidad = 1;
-    if (cantidad > stock) cantidad = stock;
-
-    setCantidades((prev) => ({ ...prev, [productoId]: cantidad }));
-  };
-
-  const handleAddToCarrito = async (producto) => {
-    const cantidad = cantidades[producto.id] || 1;
-    try {
-      const res = await addToCarrito({ producto_id: producto.id, cantidad });
-      await loadCarrito();
-      setSnackbar({
-        open: true,
-        message: res.data.warning ? res.data.message : "Producto agregado al carrito",
-        severity: res.data.warning ? "warning" : "success",
-      });
-      setCantidades((prev) => ({ ...prev, [producto.id]: 1 }));
-    } catch (err) {
-      console.error("Error al agregar al carrito:", err);
-      setSnackbar({ open: true, message: "Error al agregar al carrito", severity: "error" });
-    }
-  };
-
+  // El usuario es redirigido a la página de detalle, no hay función de "añadir al carrito"
   const handleDetalle = (producto) => navigate(`/producto/${producto.id}`);
 
   const handleOfertaClick = (oferta) => {
@@ -147,7 +124,7 @@ export default function ClienteDashboard() {
   };
 
   return (
-    <DashboardLayout>
+    <PublicLayout> {/* Usamos el nuevo layout */}
       <Box sx={{ padding: 1 }}>
         {/* CARRUSEL PRINCIPAL DE BANNERS */}
         <CarruselComponent /> 
@@ -170,58 +147,6 @@ export default function ClienteDashboard() {
           />
         </Box>
 
-        {/* CARRUSEL DE CATEGORÍAS */}
-        {categorias.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Slider {...sliderSettings}>
-              {categorias.map((cat) => (
-                <Box key={cat.id} sx={{ px: 1 }}>
-                  <CategoriaCard categoria={cat} />
-                </Box>
-              ))}
-            </Slider>
-          </Box>
-        )}
-
-        {/* OFERTAS */}
-        {ofertas.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Ofertas
-            </Typography>
-            <Grid container spacing={2}>
-              {ofertas.map((oferta) => (
-                <Grid item xs={12} sm={6} md={4} key={oferta.id}>
-                  <Card
-                    sx={{ cursor: "pointer" }}
-                    onClick={() => handleOfertaClick(oferta)}
-                  >
-                    <CardContent>
-                      <Typography variant="h6">{oferta.nombre}</Typography>
-                      <Typography variant="body2">
-                        {oferta.descuento_porcentaje
-                          ? `Descuento: ${oferta.descuento_porcentaje}%`
-                          : `Descuento: $${oferta.descuento_valor}`}
-                      </Typography>
-                      <Typography variant="body2">
-                        Desde: {new Date(oferta.fecha_inicio).toLocaleDateString()}
-                      </Typography>
-                      <Typography variant="body2">
-                        Hasta: {new Date(oferta.fecha_fin).toLocaleDateString()}
-                      </Typography>
-                      <Chip
-                        label={oferta.estado ? "Activa" : "Inactiva"}
-                        color={oferta.estado ? "success" : "default"}
-                        sx={{ mt: 1 }}
-                      />
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        )}
-
         {/* LISTA DE PRODUCTOS */}
         <Grid container spacing={2} justifyContent="center">
           {productos.map((prod) => (
@@ -235,11 +160,14 @@ export default function ClienteDashboard() {
               display="flex"
               justifyContent="center"
             >
+              {/* NOTA: ProductosCard debe ser modificado para NO mostrar 
+              campos de cantidad/añadir si onAdd es null o no existe */}
               <ProductosCard
                 producto={prod}
-                cantidad={cantidades[prod.id] || 1}
-                onCantidadChange={handleCantidadChange}
-                onAdd={handleAddToCarrito}
+                // Se pasan propiedades nulas para deshabilitar la funcionalidad del carrito
+                cantidad={null} 
+                onCantidadChange={null}
+                onAdd={null} 
                 onDetalle={handleDetalle}
               />
             </Grid>
@@ -255,6 +183,6 @@ export default function ClienteDashboard() {
           <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
         </Snackbar>
       </Box>
-    </DashboardLayout>
+    </PublicLayout>
   );
 }

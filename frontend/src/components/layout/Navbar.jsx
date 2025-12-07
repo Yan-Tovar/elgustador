@@ -17,20 +17,25 @@ import { useNavigate } from "react-router-dom";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 import Badge from "@mui/material/Badge";
 
 import { CartAnimationContext } from "../../context/CartAnimationContext";
 import { CarritoContext } from "../../context/CarritoContext";
+import useNotificaciones from "../../hooks/useNotificaciones";
 
 import DarkModeToggle from "../common/DarkModeToggle";
 import LogoutButton from "../auth/LogoutButton";
 
-export default function Navbar({ onOpenSidebar }) {
+export default function Navbar({ onOpenSidebar, onOpenNotificaciones }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const { cartRef } = useContext(CartAnimationContext);
   const { carrito } = useContext(CarritoContext);
+
+  const { notificaciones } = useNotificaciones();
+  const noLeidas = notificaciones.filter((n) => !n.leido).length;
 
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -98,8 +103,10 @@ export default function Navbar({ onOpenSidebar }) {
             </IconButton>
 
             {/* NOTIFICACIONES */}
-            <IconButton color="inherit" onClick={() => navigate("/notificaciones")}>
-              <NotificationsNoneOutlinedIcon />
+            <IconButton onClick={onOpenNotificaciones}>
+              <Badge badgeContent={noLeidas} color="error">
+                <NotificationsIcon />
+              </Badge>
             </IconButton>
 
             {/* Toggle Modo Claro / Oscuro */}

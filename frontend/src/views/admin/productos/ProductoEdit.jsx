@@ -1,7 +1,5 @@
 // src/views/admin/productos/ProductoEdit.jsx
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -9,35 +7,18 @@ import {
   Typography,
   MenuItem,
   Grid,
-  Stepper,
-  Step,
-  StepLabel,
-  Card,
-  CardContent
 } from "@mui/material";
-
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import TwoColumnInnerLayout from "../../../components/layout/TwoColumnInnerLayout";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchCategorias } from "../../../services/categoriasService";
+import { fetchProducto, updateProducto } from "../../../services/productosService";
 
 export default function ProductoEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = localStorage.getItem("access");
 
-  const [step, setStep] = useState(0);
-  const steps = [
-    "Datos Básicos",
-    "Datos Comerciales",
-    "Información Adicional",
-    "Imágenes",
-    "Confirmar",
-  ];
-
-  // ===================================
-  // Estados principales
-  // ===================================
   const [categorias, setCategorias] = useState([]);
-
   const [form, setForm] = useState({
     codigo: "",
     nombre: "",
@@ -52,9 +33,10 @@ export default function ProductoEdit() {
     datosNutricionales: "",
     ingredientes: "",
     instrucciones: "",
+    estado: true,
   });
 
-  // Imagenes actuales del backend
+  // Imágenes actuales del backend
   const [oldImg1, setOldImg1] = useState(null);
   const [oldImg2, setOldImg2] = useState(null);
   const [oldImg3, setOldImg3] = useState(null);
@@ -64,365 +46,121 @@ export default function ProductoEdit() {
   const [imagen2, setImagen2] = useState(null);
   const [imagen3, setImagen3] = useState(null);
 
-  // Previews (nuevas)
+  // Previews nuevas
   const [preview1, setPreview1] = useState(null);
   const [preview2, setPreview2] = useState(null);
   const [preview3, setPreview3] = useState(null);
 
-  // ===================================
-  // Cargar categorías
-  // ===================================
+  // =============================
+  // Cargar categorías y producto
+  // =============================
   const loadCategorias = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/api/categorias/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setCategorias(res.data);
+    try {
+      const res = await fetchCategorias();
+      setCategorias(res.data);
+    } catch (error) {
+      console.error("Error al cargar categorías:", error);
+    }
   };
 
-  // ===================================
-  // Cargar producto existente
-  // ===================================
-  const loadProducto = async () => {
-    const res = await axios.get(`http://127.0.0.1:8000/api/productos/gestion/${id}/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const loadProductoData = async () => {
+    try {
+      const res = await fetchProducto(id);
+      const p = res.data;
 
-    const p = res.data;
+      setForm({
+        codigo: p.codigo,
+        nombre: p.nombre,
+        marca: p.marca || "",
+        descripcion: p.descripcion || "",
+        categoria: p.categoria ? p.categoria.id : "",
+        precio: p.precio,
+        precioAnterior: p.precio_anterior || "",
+        stock: p.stock,
+        color: p.color || "",
+        peso: p.peso || "",
+        datosNutricionales: p.datos_nutricionales || "",
+        ingredientes: p.ingredientes || "",
+        instrucciones: p.instrucciones_uso || "",
+        estado: p.estado,
+      });
 
-    setForm({
-      codigo: p.codigo,
-      nombre: p.nombre,
-      marca: p.marca,
-      descripcion: p.descripcion,
-      categoria: p.categoria,
-      precio: p.precio,
-      precioAnterior: p.precio_anterior,
-      stock: p.stock,
-      color: p.color,
-      peso: p.peso,
-      datosNutricionales: p.datos_nutricionales,
-      ingredientes: p.ingredientes,
-      instrucciones: p.instrucciones,
-    });
-
-    // Cargar imágenes actuales
-    setOldImg1(p.imagen1 || null);
-    setOldImg2(p.imagen2 || null);
-    setOldImg3(p.imagen3 || null);
+      setOldImg1(p.imagen1 || null);
+      setOldImg2(p.imagen2 || null);
+      setOldImg3(p.imagen3 || null);
+    } catch (error) {
+      console.error("Error al cargar producto:", error);
+    }
   };
 
   useEffect(() => {
     loadCategorias();
-    loadProducto();
+    loadProductoData();
   }, []);
 
-  // ===================================
+  // =============================
   // Handlers
-  // ===================================
-  const handleChange = (field, value) => {
+  // =============================
+  const handleChange = useCallback((field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
+  }, []);
 
   const handleImagenChange = (file, index) => {
     if (!file) return;
-
     const url = URL.createObjectURL(file);
-
-    if (index === 1) {
-      setImagen1(file);
-      setPreview1(url);
-    } else if (index === 2) {
-      setImagen2(file);
-      setPreview2(url);
-    } else {
-      setImagen3(file);
-      setPreview3(url);
-    }
+    if (index === 1) { setImagen1(file); setPreview1(url); }
+    else if (index === 2) { setImagen2(file); setPreview2(url); }
+    else { setImagen3(file); setPreview3(url); }
   };
 
-  // ===================================
-  // Enviar actualización
-  // ===================================
+  // =============================
+  // Enviar formulario
+  // =============================
   const handleSubmit = async () => {
+    const cleanedForm = { ...form };
+    const nullableFields = [
+      "precioAnterior", "categoria", "marca", "color", "peso",
+      "descripcion", "datosNutricionales", "ingredientes", "instrucciones"
+    ];
+    nullableFields.forEach(field => {
+      if (cleanedForm[field] === "") cleanedForm[field] = null;
+    });
+
+    if (cleanedForm.precio !== null && cleanedForm.precio !== "") {
+      cleanedForm.precio = parseFloat(cleanedForm.precio);
+    }
+    if (cleanedForm.stock !== null && cleanedForm.stock !== "") {
+      cleanedForm.stock = parseInt(cleanedForm.stock, 10);
+    }
+
     const fd = new FormData();
+    Object.keys(cleanedForm).forEach((key) => {
+      let value = cleanedForm[key];
+      if (value === null) return;
+      if (key === "categoria") fd.append("categoria", value); // enviar ID
+      else if (typeof value === 'boolean') fd.append(key, value ? "True" : "False");
+      else fd.append(key, value);
+    });
 
-    Object.keys(form).forEach((key) => fd.append(key, form[key]));
-
-    // Solo enviar imágenes si el usuario las cambia
     if (imagen1) fd.append("imagen1", imagen1);
     if (imagen2) fd.append("imagen2", imagen2);
     if (imagen3) fd.append("imagen3", imagen3);
 
-    await axios.patch(
-      `http://127.0.0.1:8000/api/productos/gestion/${id}/`,
-      fd,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    navigate("/admin/productos");
-  };
-
-  // ===================================
-  // PASOS
-  // ===================================
-  const Paso1_DatosBasicos = () => (
-    <TwoColumnInnerLayout
-      left={
-        <Box>
-          <TextField
-            fullWidth
-            label="Código"
-            sx={{ mb: 2 }}
-            value={form.codigo}
-            onChange={(e) => handleChange("codigo", e.target.value)}
-          />
-
-          <TextField
-            fullWidth
-            label="Nombre"
-            sx={{ mb: 2 }}
-            value={form.nombre}
-            onChange={(e) => handleChange("nombre", e.target.value)}
-          />
-
-          <TextField
-            fullWidth
-            label="Marca"
-            sx={{ mb: 2 }}
-            value={form.marca}
-            onChange={(e) => handleChange("marca", e.target.value)}
-          />
-        </Box>
-      }
-      right={
-        <Box>
-          <TextField
-            select
-            fullWidth
-            label="Categoría"
-            sx={{ mb: 2 }}
-            value={form.categoria.id}
-            onChange={(e) => handleChange("categoria", e.target.value)}
-          >
-            {categorias.map((cat) => (
-              <MenuItem key={cat.id} value={cat.id}>
-                {cat.nombre}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Descripción"
-            value={form.descripcion}
-            onChange={(e) => handleChange("descripcion", e.target.value)}
-          />
-        </Box>
-      }
-    />
-  );
-
-  const Paso2_DatosComerciales = () => (
-    <TwoColumnInnerLayout
-      left={
-        <Box>
-          <TextField
-            fullWidth
-            type="number"
-            label="Precio"
-            sx={{ mb: 2 }}
-            value={form.precio}
-            onChange={(e) => handleChange("precio", e.target.value)}
-          />
-
-          <TextField
-            fullWidth
-            type="number"
-            label="Precio Anterior"
-            sx={{ mb: 2 }}
-            value={form.precioAnterior}
-            onChange={(e) => handleChange("precioAnterior", e.target.value)}
-          />
-
-          <TextField
-            fullWidth
-            type="number"
-            label="Stock"
-            value={form.stock}
-            onChange={(e) => handleChange("stock", e.target.value)}
-          />
-        </Box>
-      }
-      right={
-        <Box>
-          <TextField
-            fullWidth
-            label="Color"
-            sx={{ mb: 2 }}
-            value={form.color}
-            onChange={(e) => handleChange("color", e.target.value)}
-          />
-
-          <TextField
-            fullWidth
-            label="Peso"
-            value={form.peso}
-            onChange={(e) => handleChange("peso", e.target.value)}
-          />
-        </Box>
-      }
-    />
-  );
-
-  const Paso3_InfoAdicional = () => (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sx={{ my: 1 }}>
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          label="Datos Nutricionales"
-          value={form.datosNutricionales}
-          onChange={(e) => handleChange("datosNutricionales", e.target.value)}
-        />
-      </Grid>
-
-      <Grid item xs={12} sx={{ my: 1 }}>
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          label="Ingredientes"
-          value={form.ingredientes}
-          onChange={(e) => handleChange("ingredientes", e.target.value)}
-        />
-      </Grid>
-
-      <Grid item xs={12} sx={{ my: 1 }}>
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          label="Instrucciones de Uso"
-          value={form.instrucciones}
-          onChange={(e) => handleChange("instrucciones", e.target.value)}
-        />
-      </Grid>
-    </Grid>
-  );
-
-  const Paso4_Imagenes = () => (
-    <TwoColumnInnerLayout
-      left={
-        <Box>
-          <Grid container spacing={2}>
-            {[1, 2, 3].map((n) => (
-              <Grid item xs={12} md={4} key={n}>
-                <Typography>Imagen {n}</Typography>
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImagenChange(e.target.files[0], n)}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      }
-      right={
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            flexWrap: "wrap",
-            justifyContent: "center",
-            alignItems: "center",
-            p: 2,
-          }}
-        >
-          {/* Preview nueva o antigua */}
-          {/* Imagen 1 */}
-          {preview1 ? (
-            <img
-              src={preview1}
-              alt="preview1"
-              style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : oldImg1 ? (
-            <img
-              src={oldImg1}
-              alt="old1"
-              style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : null}
-
-          {/* Imagen 2 */}
-          {preview2 ? (
-            <img
-              src={preview2}
-              alt="preview2"
-              style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : oldImg2 ? (
-            <img
-              src={oldImg2}
-              alt="old2"
-              style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : null}
-
-          {/* Imagen 3 */}
-          {preview3 ? (
-            <img
-              src={preview3}
-              alt="preview3"
-              style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : oldImg3 ? (
-            <img
-              src={oldImg3}
-              alt="old3"
-              style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : null}
-        </Box>
-      }
-    />
-  );
-
-  const Paso5_Confirmar = () => (
-    <Card sx={{ p: 3 }}>
-      <CardContent>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Confirma la información actualizada
-        </Typography>
-
-        <pre style={{ background: "#f5f5f5", padding: 15, borderRadius: 8 }}>
-          {JSON.stringify(form, null, 2)}
-        </pre>
-      </CardContent>
-    </Card>
-  );
-
-  const renderStep = () => {
-    switch (step) {
-      case 0: return <Paso1_DatosBasicos />;
-      case 1: return <Paso2_DatosComerciales />;
-      case 2: return <Paso3_InfoAdicional />;
-      case 3: return <Paso4_Imagenes />;
-      case 4: return <Paso5_Confirmar />;
-      default: return null;
+    try {
+      await updateProducto(id, fd);
+      navigate("/admin/productos");
+    } catch (error) {
+      console.error("Error al actualizar producto:", error.response?.data);
+      const errorMsg = error.response?.data ? 
+                       JSON.stringify(error.response.data) : 
+                       "Ocurrió un error desconocido. Verifica la conexión y los campos.";
+      alert(`Error al actualizar el producto. Detalles: ${errorMsg}`);
     }
   };
 
+  // =============================
+  // Render
+  // =============================
   return (
     <DashboardLayout>
       <Box>
@@ -430,33 +168,179 @@ export default function ProductoEdit() {
           Editar Producto
         </Typography>
 
-        <Stepper activeStep={step} alternativeLabel sx={{ mb: 4 }}>
-          {steps.map((label) => (
-            <Step key={label}><StepLabel>{label}</StepLabel></Step>
-          ))}
-        </Stepper>
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+          <TwoColumnInnerLayout
+            left={
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  "& > div": { flex: "1 1 45%" },
+                  "@media (max-width:600px)": { "& > div": { flex: "1 1 100%" } },
+                }}
+              >
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Código"
+                    required
+                    value={form.codigo}
+                    onChange={(e) => handleChange("codigo", e.target.value)}
+                  />
+                </Box>
 
-        <Box sx={{ mb: 4 }}>{renderStep()}</Box>
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Nombre"
+                    required
+                    value={form.nombre}
+                    onChange={(e) => handleChange("nombre", e.target.value)}
+                  />
+                </Box>
 
-        <Grid container justifyContent="space-between">
-          <Button
-            disabled={step === 0}
-            onClick={prevStep}
-            variant="outlined"
-          >
-            Atrás
-          </Button>
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Marca"
+                    value={form.marca}
+                    onChange={(e) => handleChange("marca", e.target.value)}
+                  />
+                </Box>
 
-          {step < steps.length - 1 ? (
-            <Button variant="contained" onClick={nextStep}>
-              Siguiente
-            </Button>
-          ) : (
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+                <Box>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Categoría"
+                    value={form.categoria || ""}
+                    onChange={(e) => handleChange("categoria", e.target.value)}
+                  >
+                    <MenuItem value="">-- Seleccionar Categoría --</MenuItem>
+                    {categorias.map((cat) => (
+                      <MenuItem key={cat.id} value={cat.id}>
+                        {cat.nombre}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Box>
+
+                <Box sx={{ flex: "1 1 100%" }}>
+                  <TextField
+                    fullWidth
+                    label="Descripción"
+                    multiline
+                    rows={4}
+                    value={form.descripcion}
+                    onChange={(e) => handleChange("descripcion", e.target.value)}
+                  />
+                </Box>
+
+                <Box>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Precio"
+                    required
+                    value={form.precio}
+                    onChange={(e) => handleChange("precio", e.target.value)}
+                  />
+                </Box>
+
+                <Box>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Precio Anterior"
+                    value={form.precioAnterior}
+                    onChange={(e) => handleChange("precioAnterior", e.target.value)}
+                  />
+                </Box>
+
+                <Box>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Stock"
+                    required
+                    value={form.stock}
+                    onChange={(e) => handleChange("stock", e.target.value)}
+                  />
+                </Box>
+
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Color"
+                    value={form.color}
+                    onChange={(e) => handleChange("color", e.target.value)}
+                  />
+                </Box>
+
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Peso"
+                    value={form.peso}
+                    onChange={(e) => handleChange("peso", e.target.value)}
+                  />
+                </Box>
+              </Box>
+            }
+            right={
+              <Box>
+                <Box sx={{ mb: 2 }}>
+                  <TextField fullWidth multiline rows={3} label="Datos Nutricionales"
+                    value={form.datosNutricionales}
+                    onChange={(e) => handleChange("datosNutricionales", e.target.value)}
+                  />
+                </Box>
+                <Box sx={{ mb: 2 }}>
+                  <TextField fullWidth multiline rows={3} label="Ingredientes"
+                    value={form.ingredientes}
+                    onChange={(e) => handleChange("ingredientes", e.target.value)}
+                  />
+                </Box>
+                <Box sx={{ mb: 2 }}>
+                  <TextField fullWidth multiline rows={3} label="Instrucciones de Uso"
+                    value={form.instrucciones}
+                    onChange={(e) => handleChange("instrucciones", e.target.value)}
+                  />
+                </Box>
+
+                {[1,2,3].map((n) => (
+                  <Box key={n} sx={{ mb: 2 }}>
+                    <Typography>Imagen {n}</Typography>
+                    <input type="file" accept="image/*"
+                      onChange={(e) => handleImagenChange(e.target.files[0], n)}
+                    />
+                  </Box>
+                ))}
+
+                <Box sx={{ display:"flex", gap:2, flexWrap:"wrap", justifyContent:"center", alignItems:"center", p:2 }}>
+                  {preview1 ? <Box component="img" src={preview1} alt="Imagen 1" sx={{ width:80, height:80, objectFit:"cover", borderRadius:2, boxShadow:3 }}/> : oldImg1 && <Box component="img" src={oldImg1} alt="Imagen 1" sx={{ width:80, height:80, objectFit:"cover", borderRadius:2, boxShadow:3 }}/>}
+                  {preview2 ? <Box component="img" src={preview2} alt="Imagen 2" sx={{ width:80, height:80, objectFit:"cover", borderRadius:2, boxShadow:3 }}/> : oldImg2 && <Box component="img" src={oldImg2} alt="Imagen 2" sx={{ width:80, height:80, objectFit:"cover", borderRadius:2, boxShadow:3 }}/>}
+                  {preview3 ? <Box component="img" src={preview3} alt="Imagen 3" sx={{ width:80, height:80, objectFit:"cover", borderRadius:2, boxShadow:3 }}/> : oldImg3 && <Box component="img" src={oldImg3} alt="Imagen 3" sx={{ width:80, height:80, objectFit:"cover", borderRadius:2, boxShadow:3 }}/>}
+                  {!preview1 && !preview2 && !preview3 && !oldImg1 && !oldImg2 && !oldImg3 && (
+                    <Typography variant="body2" sx={{ opacity:0.6 }}>No hay imágenes seleccionadas</Typography>
+                  )}
+                </Box>
+              </Box>
+            }
+          />
+
+          <Grid container justifyContent="flex-end" sx={{ mt:3 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={!form.codigo || !form.nombre || !form.precio || !form.stock}
+            >
               Guardar Cambios
             </Button>
-          )}
-        </Grid>
+          </Grid>
+        </form>
       </Box>
     </DashboardLayout>
   );
