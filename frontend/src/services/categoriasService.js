@@ -14,3 +14,11 @@ export const updateCategoria = (categoriaId, data) => api.put(`categorias/${cate
 
 // Desactivar categoría (solo admin)
 export const deleteCategoria = (categoriaId) => api.delete(`categorias/${categoriaId}/`);
+
+// Variable de urls para iamgenes de categorias
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+export const getImagenUrl = (img) => {
+  if (!img) return "/default_categoria.png";
+  if (img.startsWith("http")) return img;
+  return `${API_BASE_URL}${img}`;
+};

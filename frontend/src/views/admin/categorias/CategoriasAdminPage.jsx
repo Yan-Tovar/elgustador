@@ -162,7 +162,7 @@ export default function CategoriasAdminPage() {
         right={(
           <Box
             sx={{
-              p: 3,
+              p: 1,
               borderRadius: 3,
               bgcolor: "background.paper",
               textAlign: "center",

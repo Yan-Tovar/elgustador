@@ -163,14 +163,13 @@ export default function FacturaPage() {
                 onDescargar={handleDescargar}
                 onEnviarCorreo={handleEnviarCorreo}
               />
-
-              <DetallePedidoTabla detalle={detallePedido} />
             </Box>
           }
           right={
             <Box>{pedido && <PedidoInfo pedido={pedido} />}</Box>
           }
         />
+        <DetallePedidoTabla detalle={detallePedido} />
       </Box>
     </DashboardLayout>
   );

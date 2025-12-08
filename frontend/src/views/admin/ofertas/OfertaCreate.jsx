@@ -1,4 +1,3 @@
-// views/admin/ofertas/OfertaCreate.jsx
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -6,14 +5,18 @@ import {
   TextField,
   Typography,
   MenuItem,
-  Grid,
   Switch,
   FormControlLabel,
+  Paper,
 } from "@mui/material";
-import DashboardLayout from "../../../components/layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+
+import DashboardLayout from "../../../components/layout/DashboardLayout";
+import TwoColumnInnerLayout from "../../../components/layout/TwoColumnInnerLayout";
+
 import { fetchProductos } from "../../../services/productosService";
 import { createOferta } from "../../../services/ofertasService";
+import { showAlert } from "../../../components/feedback/SweetAlert";
 
 export default function OfertaCreate() {
   const navigate = useNavigate();
@@ -29,15 +32,20 @@ export default function OfertaCreate() {
   const [fechaFin, setFechaFin] = useState("");
   const [estado, setEstado] = useState(true);
 
-  const token = localStorage.getItem("access");
-
-  //  Cargar productos desde el servicio
+  // ===============================
+  // Cargar productos
+  // ===============================
   const loadProductos = async () => {
     try {
       const res = await fetchProductos();
       setProductos(res.data);
     } catch (error) {
-      console.error("Error al cargar productos:", error);
+      console.error("Error al crear la oferta:", error);
+      showAlert(
+        "Error",
+        "Ocurrió un error al crear la oferta. Verifica los datos e inténtalo nuevamente.",
+        "error"
+      );
     }
   };
 
@@ -45,6 +53,9 @@ export default function OfertaCreate() {
     loadProductos();
   }, []);
 
+  // ===============================
+  // Submit
+  // ===============================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -60,14 +71,16 @@ export default function OfertaCreate() {
         estado,
       });
 
-      // Redirigir a la lista de ofertas
       navigate("/admin/ofertas");
     } catch (error) {
       console.error("Error al crear la oferta:", error);
-      alert("Ocurrió un error al crear la oferta. Revisa la consola para más detalles.");
+      alert("Ocurrió un error al crear la oferta.");
     }
   };
 
+  // ===============================
+  // UI
+  // ===============================
   return (
     <DashboardLayout>
       <Box>
@@ -76,100 +89,112 @@ export default function OfertaCreate() {
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            {/* Columna izquierda */}
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Producto"
-                sx={{ mb: 2 }}
-                value={producto}
-                onChange={(e) => setProducto(e.target.value)}
-                required
-              >
-                {productos.map((p) => (
-                  <MenuItem key={p.id} value={p.id}>
-                    {p.nombre}
-                  </MenuItem>
-                ))}
-              </TextField>
+          <TwoColumnInnerLayout
+            left={
+              <Paper sx={{ p: 3, borderRadius: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Información principal
+                </Typography>
 
-              <TextField
-                fullWidth
-                label="Nombre de la oferta"
-                sx={{ mb: 2 }}
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-              />
+                <TextField
+                  fullWidth
+                  select
+                  label="Producto"
+                  sx={{ mb: 2 }}
+                  value={producto}
+                  onChange={(e) => setProducto(e.target.value)}
+                  required
+                >
+                  {productos.map((p) => (
+                    <MenuItem key={p.id} value={p.id}>
+                      {p.nombre}
+                    </MenuItem>
+                  ))}
+                </TextField>
 
-              <TextField
-                fullWidth
-                label="Descuento (%)"
-                type="number"
-                sx={{ mb: 2 }}
-                value={descuentoPorcentaje}
-                onChange={(e) => setDescuentoPorcentaje(e.target.value)}
-              />
+                <TextField
+                  fullWidth
+                  label="Nombre de la oferta"
+                  sx={{ mb: 2 }}
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  required
+                />
 
-              <TextField
-                fullWidth
-                label="Descuento en valor ($)"
-                type="number"
-                sx={{ mb: 2 }}
-                value={descuentoValor}
-                onChange={(e) => setDescuentoValor(e.target.value)}
-              />
-            </Grid>
+                <TextField
+                  fullWidth
+                  label="Descripción"
+                  multiline
+                  rows={4}
+                  sx={{ mb: 2 }}
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
+                />
 
-            {/* Columna derecha */}
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Descripción"
-                multiline
-                rows={5}
-                sx={{ mb: 2 }}
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-              />
+                <TextField
+                  fullWidth
+                  label="Descuento (%)"
+                  type="number"
+                  sx={{ mb: 2 }}
+                  value={descuentoPorcentaje}
+                  onChange={(e) => setDescuentoPorcentaje(e.target.value)}
+                />
 
-              <TextField
-                fullWidth
-                type="datetime-local"
-                label="Fecha inicio"
-                InputLabelProps={{ shrink: true }}
-                sx={{ mb: 2 }}
-                value={fechaInicio}
-                onChange={(e) => setFechaInicio(e.target.value)}
-              />
+                <TextField
+                  fullWidth
+                  label="Descuento en valor ($)"
+                  type="number"
+                  sx={{ mb: 2 }}
+                  value={descuentoValor}
+                  onChange={(e) => setDescuentoValor(e.target.value)}
+                />
+              </Paper>
+            }
+            right={
+              <Paper sx={{ p: 3, borderRadius: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Configuración
+                </Typography>
 
-              <TextField
-                fullWidth
-                type="datetime-local"
-                label="Fecha fin"
-                InputLabelProps={{ shrink: true }}
-                sx={{ mb: 2 }}
-                value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
-              />
+                <TextField
+                  fullWidth
+                  type="datetime-local"
+                  label="Fecha inicio"
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ mb: 2 }}
+                  value={fechaInicio}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                />
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={estado}
-                    onChange={(e) => setEstado(e.target.checked)}
-                  />
-                }
-                label="Oferta activa"
-              />
-            </Grid>
-          </Grid>
+                <TextField
+                  fullWidth
+                  type="datetime-local"
+                  label="Fecha fin"
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ mb: 2 }}
+                  value={fechaFin}
+                  onChange={(e) => setFechaFin(e.target.value)}
+                />
 
-          <Button variant="contained" type="submit" sx={{ mt: 3 }}>
-            Guardar Oferta
-          </Button>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={estado}
+                      color="secondary"
+                      onChange={(e) => setEstado(e.target.checked)}
+                    />
+                  }
+                  label="Oferta activa"
+                />
+              </Paper>
+            }
+          />
+
+          <Box sx={{ mt: 3 }}>
+            <Button variant="contained" type="submit">
+              Guardar Oferta
+            </Button>
+          </Box>
         </form>
       </Box>
     </DashboardLayout>
