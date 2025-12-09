@@ -234,6 +234,7 @@ export default function ClienteDashboard() {
               key={prod.id}
               display="flex"
               justifyContent="center"
+              className="producto-card"
             >
               <ProductosCard
                 producto={prod}

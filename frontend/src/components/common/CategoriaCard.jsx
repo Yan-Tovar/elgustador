@@ -21,6 +21,7 @@ export default function CategoriaCard({ categoria }) {
           height: 90,
           margin: "0 auto",
           borderRadius: "50%",
+          border: "dotted gray 1px",
           overflow: "hidden",
           transition: "transform 0.25s",
           "&:hover": {

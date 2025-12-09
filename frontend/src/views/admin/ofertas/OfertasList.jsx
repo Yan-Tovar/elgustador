@@ -1,87 +1,261 @@
-// views/admin/ofertas/OfertasList.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
   Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Chip,
+  Stack,
+  useTheme,
+  useMediaQuery,
+  Divider
 } from "@mui/material";
-import DashboardLayout from "../../../components/layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../../../components/layout/DashboardLayout";
+import { fetchOfertas, deleteOferta } from "../../../services/ofertasService";
+import { exportTableExcel } from '../../../services/exportService';
+import TwoColumnInnerLayout from "../../../components/layout/TwoColumnInnerLayout";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function OfertasList() {
   const navigate = useNavigate();
   const [ofertas, setOfertas] = useState([]);
 
-  const token = localStorage.getItem("access");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const loadOfertas = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/api/ofertas/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setOfertas(res.data);
+    try {
+      const res = await fetchOfertas();
+      setOfertas(res.data);
+    } catch (error) {
+      console.error("Error cargando ofertas", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Eliminar esta oferta?")) return;
+
+    try {
+      await deleteOferta(id);
+      loadOfertas();
+    } catch (error) {
+      console.error("Error eliminando oferta", error);
+    }
   };
 
   useEffect(() => {
     loadOfertas();
   }, []);
 
+  const handleExport = () => {
+    exportTableExcel("ofertas", "oferta");
+  };
+
   return (
     <DashboardLayout>
-      <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h4">Ofertas</Typography>
-        <Button variant="contained" onClick={() => navigate("/admin/ofertas/nuevo")}>
-          Nueva Oferta
-        </Button>
-      </Box>
+      {/* HEADER */}
 
-      <Grid container spacing={3}>
-        {ofertas.map((oferta) => (
-          <Grid item xs={12} md={4} key={oferta.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">{oferta.nombre}</Typography>
+      <TwoColumnInnerLayout
+        left={
+          <Box>
+            <Divider sx={{fontSize: 20}}>Gestión Ofertas</Divider>
+          </Box>
+        }
+        right={
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              bgcolor: "background.paper",
+              textAlign: "center",
+              boxShadow: 2,
+              mb: 1
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary",
+                mb: 1,
+              }}
+            >
+              Panel Ofertas
+            </Typography>
 
-                <Typography variant="body2">
-                  Descuento:{" "}
-                  {oferta.descuento_porcentaje
-                    ? `${oferta.descuento_porcentaje}%`
-                    : `$${oferta.descuento_valor}`}
-                </Typography>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                }}
+                onClick={() => navigate("/admin/ofertas/nuevo")}
+              >
+                Crear +
+              </Button>
+              <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                Exportar
+              </Button>
+            </Box>
+          </Box>
+        }
+        
+      />
 
-                <Typography variant="body2">
-                  Desde: {new Date(oferta.fecha_inicio).toLocaleString()}
-                </Typography>
+      {/* TABLA */}
+      <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
+        <Table>
+          {!isMobile && (
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>Nombre</strong></TableCell>
+                <TableCell><strong>Descuento</strong></TableCell>
+                <TableCell><strong>Inicio</strong></TableCell>
+                <TableCell><strong>Fin</strong></TableCell>
+                <TableCell align="center"><strong>Estado</strong></TableCell>
+                <TableCell align="center"><strong>Acciones</strong></TableCell>
+              </TableRow>
+            </TableHead>
+          )}
 
-                <Typography variant="body2">
-                  Hasta: {new Date(oferta.fecha_fin).toLocaleString()}
-                </Typography>
+          <TableBody>
+            {ofertas.map((oferta) => (
+              <TableRow key={oferta.id}>
+                <TableCell colSpan={isMobile ? 6 : 1}>
+                  <Typography fontWeight={600}>
+                    {oferta.nombre}
+                  </Typography>
 
-                <Chip
-                  label={oferta.estado ? "Activa" : "Inactiva"}
-                  color={oferta.estado ? "success" : "default"}
-                  sx={{ mt: 1 }}
-                />
-              </CardContent>
+                  {isMobile && (
+                    <>
+                      <Typography variant="body2" mt={0.5}>
+                        Descuento:{" "}
+                        {oferta.descuento_porcentaje
+                          ? `${oferta.descuento_porcentaje}%`
+                          : `$${oferta.descuento_valor}`}
+                      </Typography>
 
-              <CardActions>
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={() => navigate(`/admin/ofertas/${oferta.id}/editar`)}
-                >
-                  Editar
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                      <Typography variant="body2">
+                        Desde:{" "}
+                        {new Date(oferta.fecha_inicio).toLocaleString()}
+                      </Typography>
+
+                      <Typography variant="body2">
+                        Hasta:{" "}
+                        {new Date(oferta.fecha_fin).toLocaleString()}
+                      </Typography>
+
+                      <Chip
+                        label={oferta.estado ? "Activa" : "Inactiva"}
+                        color={oferta.estado ? "success" : "default"}
+                        size="small"
+                        sx={{ mt: 1 }}
+                      />
+
+                      <Stack direction="row" spacing={1} mt={1}>
+                        {/* EDITAR */}
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="text"
+                          onClick={() =>
+                            navigate(`/admin/ofertas/${oferta.id}/editar`)
+                          }
+                          startIcon={!isMobile && <EditIcon />}
+                          sx={{
+                            minWidth: isMobile ? 36 : "auto",
+                            px: isMobile ? 1 : 2,
+                          }}
+                        >
+                          {!isMobile && "Editar"}
+                          {isMobile && <EditIcon />}
+                        </Button>
+
+                        {/* ELIMINAR */}
+                        <Button
+                          size="small"
+                          color="error"
+                          variant="contained"
+                          onClick={() => handleDelete(oferta.id)}
+                          startIcon={!isMobile && <DeleteIcon />}
+                          sx={{
+                            minWidth: isMobile ? 36 : "auto",
+                            px: isMobile ? 1 : 2,
+                          }}
+                        >
+                          {!isMobile && "Eliminar"}
+                          {isMobile && <DeleteIcon />}
+                        </Button>
+                      </Stack>
+                    </>
+                  )}
+                </TableCell>
+
+                {!isMobile && (
+                  <>
+                    <TableCell>
+                      {oferta.descuento_porcentaje
+                        ? `${oferta.descuento_porcentaje}%`
+                        : `$${oferta.descuento_valor}`}
+                    </TableCell>
+
+                    <TableCell>
+                      {new Date(oferta.fecha_inicio).toLocaleString()}
+                    </TableCell>
+
+                    <TableCell>
+                      {new Date(oferta.fecha_fin).toLocaleString()}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Chip
+                        label={oferta.estado ? "Activa" : "Inactiva"}
+                        color={oferta.estado ? "success" : "default"}
+                        size="small"
+                      />
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Stack direction="row" spacing={1} justifyContent="center">
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="text"
+                          onClick={() =>
+                            navigate(`/admin/ofertas/${oferta.id}/editar`)
+                          }
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="small"
+                          color="error"
+                          variant="contained"
+                          onClick={() => handleDelete(oferta.id)}
+                        >
+                          Eliminar
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </DashboardLayout>
   );
 }

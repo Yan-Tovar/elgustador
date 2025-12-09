@@ -28,3 +28,11 @@ export const fetchInventarioEstadisticas = () =>
 // REPORTES INVENTARIO (Admin)
 export const fetchInventarioReportes = () => 
   api.get("productos/reportes/");
+
+// Variable de entorno para imagenes:
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+export const getImagenUrl = (img, fallback = "https://via.placeholder.com/400") => {
+  if (!img) return fallback;
+  if (typeof img === "string" && img.startsWith("http")) return img;
+  return `${API_BASE_URL}${img}`;
+};

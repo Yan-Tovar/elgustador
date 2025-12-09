@@ -15,6 +15,7 @@ import ProductoDetallePage from "./pages/ProductoDetallePage";
 import CategoriasPage from "./pages/CategoriasPage";
 import DetalleCategoria from "./pages/DetalleCategoria";
 import PerfilUsuarioPage from "./pages/PerfilUsuarioPage";
+import PqrsAnonimoPage from "./pages/PqrsAnonimoPage";
 
 // CRUD Admin
 import CategoriasAdminPage  from "./views/admin/categorias/CategoriasAdminPage";
@@ -36,6 +37,10 @@ import CarruselAdminPage from "./views/admin/carrusel/CarruselAdminPage";
 
 import DepartamentoPage from "./views/admin/Departamentos/DepartamentoPage";
 import MunicipioPage from "./views/admin/municipios/MunicipioPage";
+
+import UsuariosList from "./views/admin/usuarios/UsuariosList";
+import UsuariosStatsPage from "./views/admin/usuarios/UsuariosStatsPage";
+import AdminPqrs from "./views/admin/pqrs/AdminPqrs";
 
 // CRUD Notas (cualquier usuario logueado)
 import NotasList from "./views/notas/NotasList";
@@ -94,16 +99,24 @@ export default function AppRouter() {
           element={!user ? <PasswordResetConfirm /> : <Navigate to="/" />} 
         />
 
+        <Route 
+          path="/pqrs" 
+          element={!user ? <PqrsAnonimoPage /> : <Navigate to="/" />} 
+        />
+
         {/* =====================================
               REDIRECCIÓN POR ROL
         ===================================== */}
         <Route 
           path="/" 
           element={
-            !user ? <Navigate to="/catalogo" replace  /> :
-            user.rol === "admin" ? <AdminDashboard /> :
-            user.rol === "empleado" ? <EmpleadoDashboard /> :
-            <ClienteDashboard />
+            user ? (
+              user.rol === "admin" ? <AdminDashboard /> :
+              user.rol === "empleado" ? <EmpleadoDashboard /> :
+              <ClienteDashboard />
+            ) : (
+              <Navigate to="/catalogo" replace />
+            )
           }
         />
 
@@ -269,6 +282,36 @@ export default function AppRouter() {
           element={
             <PrivateRoute 
               component={MunicipioPage} 
+              roles={['admin']} 
+            />
+          } 
+        />
+
+        <Route 
+          path="/admin/usuarios" 
+          element={
+            <PrivateRoute 
+              component={UsuariosList} 
+              roles={['admin']} 
+            />
+          } 
+        />
+
+        <Route 
+          path="/admin/usuarios/estadisticas" 
+          element={
+            <PrivateRoute 
+              component={UsuariosStatsPage} 
+              roles={['admin']} 
+            />
+          } 
+        />
+
+        <Route 
+          path="/admin/pqrs" 
+          element={
+            <PrivateRoute 
+              component={AdminPqrs} 
               roles={['admin']} 
             />
           } 

@@ -3,7 +3,7 @@ from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 signer = TimestampSigner()
 
 # Tiempo máximo que será válido el token (en segundos)
-TOKEN_EXPIRATION_SECONDS = 1800  # 30 minutos
+TOKEN_EXPIRATION_SECONDS = 7 * 24 * 60 * 60 #Una Semana
 
 # =====================================================
 #                     GENERAR TOKEN

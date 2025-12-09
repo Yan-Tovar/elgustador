@@ -6,7 +6,8 @@ import {
   Snackbar,
   Alert,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Divider
 } from '@mui/material';
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -23,6 +24,7 @@ import {
   updateCategoria,
   deleteCategoria,
 } from '../../../services/categoriasService';
+import { exportTableExcel } from '../../../services/exportService';
 
 import { showConfirm, showToast } from '../../../components/feedback/SweetAlert';
 
@@ -127,15 +129,17 @@ export default function CategoriasAdminPage() {
     }
   };
 
+  const handleExport = () => {
+    exportTableExcel("categorias", "categoria");
+  };
+
   return (
     <DashboardLayout>
 
       <TwoColumnInnerLayout
         left={(
           <Box>
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold" }}>
-              Gestión de Categorias
-            </Typography>
+            <Divider sx={{fontSize: 20}}>Gestión Categorías</Divider>
             {/* BUSCADOR */}
             <Box sx={{ mb: 3 }}>
               <TextField
@@ -162,7 +166,7 @@ export default function CategoriasAdminPage() {
         right={(
           <Box
             sx={{
-              p: 3,
+              p: 1,
               borderRadius: 3,
               bgcolor: "background.paper",
               textAlign: "center",
@@ -176,15 +180,24 @@ export default function CategoriasAdminPage() {
             <Typography variant="body1" sx={{ mb: 3 }}>
               Total de categorías: <strong>{totalCategorias}</strong>
             </Typography>
-
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={{ px: 3, py: 1, borderRadius: 2, fontWeight: "bold" }}
-              onClick={() => setOpenCreate(true)}
-            >
-              Crear Categoría
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                }}
+                onClick={() => setOpenCreate(true)}
+              >
+                Crear +
+              </Button>
+              <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                Exportar
+              </Button>
+            </Box>
           </Box>
         )}
       />

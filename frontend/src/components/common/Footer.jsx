@@ -25,6 +25,10 @@ export default function Footer() {
   const navigate = useNavigate();
   const [showContent, setShowContent] = useState(true);
 
+  const enviarPqrs = () => {
+    navigate("/pqrs");
+  };
+
   return (
     <Box
       component="footer"
@@ -209,15 +213,27 @@ export default function Footer() {
             </Typography>
 
             <Stack spacing={1} sx={{ alignItems: { xs: "center", sm: "flex-start" } }}>
-              {["Enviar PQRS", "Califícanos", "Centro de seguridad"].map((txt) => (
                 <Typography
-                  key={txt}
+                  variant="body2"
+                  sx={{ cursor: "pointer", "&:hover": { color: "#ff3c00" } }}
+                  onClick={enviarPqrs}
+                >
+                  Enviar PQRS
+                </Typography>
+                <Typography
                   variant="body2"
                   sx={{ cursor: "pointer", "&:hover": { color: "#ff3c00ff" } }}
+                  onclick={{enviarPqrs}}
                 >
-                  {txt}
+                  Calificanos
                 </Typography>
-              ))}
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: "pointer", "&:hover": { color: "#ff3c00ff" } }}
+                  onclick={{enviarPqrs}}
+                >
+                  Centro de Ayuda
+                </Typography>
             </Stack>
           </Grid>
 

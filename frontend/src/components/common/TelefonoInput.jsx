@@ -51,6 +51,7 @@ export default function TelefonoInput({
       name={name}
       value={value}
       onChange={handleChange}
+      color="secondary"
       margin="normal"
       error={Boolean(error)}
       helperText={error || " "}

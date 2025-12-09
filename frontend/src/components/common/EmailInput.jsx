@@ -30,6 +30,7 @@ export default function EmailInput({ value, onChange, required = true, label = "
         name={name}
         value={value}
         onChange={handleChange}
+        color="secondary"
         required={required}
         error={Boolean(error)}
         helperText={error || " "}

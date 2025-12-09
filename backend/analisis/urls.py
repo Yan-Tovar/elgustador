@@ -1,9 +1,9 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-# analisis/urls.py
+# usuarios/urls_exports.py
 from django.urls import path
-from .views import AnalisisView
+from .views_export import ExportModelExcelView
 
 urlpatterns = [
-    path("dashboard/", AnalisisView.as_view(), name="analisis-dashboard"),
+    # Endpoint genérico para exportar cualquier tabla de la base de datos a Excel
+    # Se pasa como query params: ?app=<nombre_app>&model=<nombre_modelo>
+    path("exportar/", ExportModelExcelView.as_view(), name="export-model-excel"),
 ]

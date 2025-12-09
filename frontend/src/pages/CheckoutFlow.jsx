@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { crearPedidoDesdeCarrito, getPedido } from "../services/pedidosService";
 import { registrarPago, simulatePago } from "../services/pagosService";
+import { fetchProductos } from "../services/productosService";
+import ProductosSugeridos from "../components/common/ProductosSugeridos";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import ButtonWithHand from "../components/common/ButtonWithHand";
 
-import { Box, Button, Typography, Stepper, Step, StepLabel } from "@mui/material";
+import { Box, Button, Typography, Stepper, Step, StepLabel, Grid, Stack } from "@mui/material";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function CheckoutFlow() {
@@ -16,6 +19,22 @@ export default function CheckoutFlow() {
   const [pedidoId, setPedidoId] = useState(pedidoParam || null);
   const [pedido, setPedido] = useState(null);
   const [loadingPedido, setLoadingPedido] = useState(false);
+
+  const [productosSugeridos, setProductosSugeridos] = useState([]);
+
+  useEffect(() => {
+    const cargarProductos = async () => {
+      try {
+        const lista = await fetchProductos();
+        setProductosSugeridos(lista); 
+      } catch (e) {
+        console.error(e);
+        setProductosSugeridos([]);
+      }
+    };
+
+    cargarProductos();
+  }, []);
 
   // ========================================================
   // PASO 1 — CREAR PEDIDO DESDE EL CARRITO
@@ -97,10 +116,79 @@ export default function CheckoutFlow() {
 
   return (
     <DashboardLayout>
-      <Box p={4}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Checkout
-        </Typography>
+      <Box p={1}>
+        <Box sx={{display: "flex", justifyContent: "center", mb: 2,}}>
+          <Typography sx={{}} variant="h5">Checkout, ¡Completa tu Compra!</Typography>
+        </Box>
+        
+        <Grid container spacing={2} justifyContent="center">
+          {[
+            {
+              img: "productosIconoVerde.png",
+              title: "Variedad de productos",
+              subtitle: "Diversidad de precios",
+            },
+            {
+              img: "camionIconoVerde.png",
+              title: "Envíos Nacionales",
+              subtitle: "Nivel Colombia",
+            },
+            {
+              img: "tarjetaIconoVerde.png",
+              title: "Medios de Pago",
+              subtitle: "Diferentes Opciones",
+            },
+            {
+              img: "verificadoIconoVerde.png",
+              title: "Entrega garantizada",
+              subtitle: "Seguimiento de pedidos",
+            },
+          ].map((item, i) => (
+            <Grid item xs={6} sm={6} md={3} key={i}>
+              <Stack
+                direction={{ xs: "column", sm: "column", md: "row" }}
+                spacing={1}
+                alignItems="center"
+                textAlign={{ xs: "center", md: "left" }}
+              >
+                <Box
+                  component="img"
+                  src={`/${item.img}`}
+                  alt={item.title}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    objectFit: "contain",
+                    mb: { xs: 1, md: 0 },
+                  }}
+                />
+
+                <Box>
+                  <Typography
+                    variant="body1"
+                    fontWeight="bold"
+                    sx={{
+                      color: "rgba(43, 110, 57, 0.94)",
+                      fontSize: { xs: "0.85rem", sm: "0.9rem" },
+                    }}
+                  >
+                    {item.title}
+                  </Typography>
+
+                  {item.subtitle && (
+                    <Typography
+                      variant="caption"
+                      color="text.primary"
+                      sx={{ fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
+                    >
+                      {item.subtitle}
+                    </Typography>
+                  )}
+                </Box>
+              </Stack>
+            </Grid>
+          ))}
+        </Grid>
 
         {/* STEPPER REDUCIDO A 3 PASOS */}
         <Stepper activeStep={activeStep} sx={{ my: 3 }}>
@@ -111,11 +199,26 @@ export default function CheckoutFlow() {
 
         {/* PASO 1 — CREAR PEDIDO */}
         {activeStep === 0 && (
-          <Button variant="contained" onClick={crearPedido}>
-            Crear Pedido
-          </Button>
+          <Box >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <ButtonWithHand >
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{width: "90vw"}}
+                  onClick={crearPedido}
+                >
+                  Continuar con el pedido
+                </Button>
+              </ButtonWithHand>
+            </Box>
+            
+            <ProductosSugeridos
+              productos={productosSugeridos}
+              onVerProducto={(id) => navigate(`/producto/${id}`)}
+            />
+          </Box>
         )}
-
         {/* PASO 2 — CARGANDO */}
         {activeStep === 1 && (
           <Typography>Cargando información del pedido...</Typography>

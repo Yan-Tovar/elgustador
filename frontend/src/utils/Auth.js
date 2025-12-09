@@ -8,14 +8,19 @@ export function clearAuthStorage() {
   localStorage.removeItem("user");
 }
 
+// URL base desde .env
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL ;
+
 // Cierra sesión en el backend invalidando refresh token
 export async function logoutBackend() {
   const refresh = localStorage.getItem("refresh");
   const token = localStorage.getItem("access");
 
+  if (!refresh || !token) return;
+
   try {
     await axios.post(
-      "http://127.0.0.1:8000/api/usuarios/usuarios/logout/",
+      `${API_BASE_URL}/api/usuarios/usuarios/logout/`,
       { refresh },
       {
         headers: {
