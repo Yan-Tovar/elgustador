@@ -8,3 +8,8 @@ class PqrsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PQRS
         fields = '__all__'
+
+class PQRSUpdateEstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PQRS
+        fields = ['estado']  

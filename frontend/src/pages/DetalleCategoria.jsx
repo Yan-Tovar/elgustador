@@ -122,7 +122,7 @@ export default function DetalleCategoria() {
               height: 120,
               borderRadius: "50%",
               objectFit: "cover",
-              border: `1px solid ${theme.palette.divider}`,
+              border: `2px dotted gray`,
               padding: 1
             }}
           />

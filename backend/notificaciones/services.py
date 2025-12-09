@@ -30,7 +30,7 @@ def crear_notificacion(usuario, titulo, mensaje, enviar_email=False):
         <html>
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 20px; color: #333;">
             <!-- Encabezado -->
-            <div style="background-color: #4a90e2; color: white; padding: 15px 20px; border-radius: 8px 8px 0 0;">
+            <div style="background-color: #ff4500; color: white; padding: 15px 20px; border-radius: 8px 8px 0 0;">
                 <h2 style="margin:0;">{titulo}</h2>
             </div>
 

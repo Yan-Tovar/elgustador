@@ -109,11 +109,9 @@ export default function Navbar({ onOpenSidebar, onOpenNotificaciones }) {
               </Badge>
             </IconButton>
 
-            {/* Toggle Modo Claro / Oscuro */}
-            <DarkModeToggle />
 
             {/* PERFIL */}
-            <IconButton color="inherit" onClick={handleOpenMenu}>
+            <IconButton color="inherit" onClick={handleOpenMenu} id="navbar-user">
               <AccountCircle />
             </IconButton>
 
@@ -135,6 +133,10 @@ export default function Navbar({ onOpenSidebar, onOpenNotificaciones }) {
                 }}
               >
                 Cambiar Dirección
+              </MenuItem>
+
+              <MenuItem>
+                Tema <DarkModeToggle />
               </MenuItem>
 
               <MenuItem onClick={handleCloseMenu}>

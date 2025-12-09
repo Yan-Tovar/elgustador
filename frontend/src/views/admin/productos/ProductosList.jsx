@@ -11,6 +11,7 @@ import {
   CardContent,
   Tooltip,
   Stack,
+  Divider
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -22,7 +23,9 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchProductos,
   searchProductos,
+  getImagenUrl
 } from "../../../services/productosService";
+import { exportTableExcel } from '../../../services/exportService';
 
 export default function ProductosList() {
   const navigate = useNavigate();
@@ -41,6 +44,10 @@ export default function ProductosList() {
     } catch (error) {
       console.error("Error cargando productos:", error);
     }
+  };
+
+  const handleExport = () => {
+    exportTableExcel("productos", "producto");
   };
 
   // -------------------------
@@ -69,12 +76,6 @@ export default function ProductosList() {
     return () => clearTimeout(delay);
   }, [search]);
 
-  // Helper de imagen
-  const getImagenUrl = (img) => {
-    if (!img) return "https://via.placeholder.com/400";
-    if (img.startsWith("http")) return img;  
-    return `http://127.0.0.1:8000${img}`;
-  };
 
   const th = {
   padding: "12px 14px",
@@ -99,16 +100,11 @@ const tdCenter = {
   return (
     <DashboardLayout>
       <Box>
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Productos
-        </Typography>
-
         
-
         <TwoColumnInnerLayout
           left={
             <Box>
-
+              <Divider sx={{fontSize: 20}}>Gestión Productos</Divider>
               {/* BUSCADOR */}
               <TextField
                 placeholder="Buscar productos..."
@@ -124,164 +120,17 @@ const tdCenter = {
                   ),
                 }}
               />
-
-              {/* ============================== */}
-              {/* TABLA CON SCROLL HORIZONTAL   */}
-              {/* ============================== */}
-              <Box
-                sx={{
-                  width: "100%",
-                  overflowX: "auto",
-                  borderRadius: 2,
-                  border: "1px solid #ddd",
-                  boxShadow: 1,
-                }}
-              >
-                <table
-                  style={{
-                    width: "100%",
-                    minWidth: "900px",
-                    borderCollapse: "collapse",
-                  }}
-                >
-                  <thead>
-                    <tr style={{ background: "#f4f4f4" }}>
-                      <th style={th}>ID</th>
-                      <th style={th}>Imagen</th>
-                      <th style={th}>Nombre</th>
-                      <th style={th}>Precio</th>
-                      <th style={th}>Stock</th>
-                      <th style={th}>Categoría</th>
-                      <th style={th}>Estado</th>
-                      <th style={th}>Acciones</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {productos.map((prod) => (
-                      <tr key={prod.id} style={{ borderBottom: "1px solid #eee" }}>
-                        <td style={tdCenter}>{prod.id}</td>
-
-                        {/* Imagen */}
-                        <td style={tdCenter}>
-                          <img
-                            src={getImagenUrl(prod.imagen1)}
-                            alt={prod.nombre}
-                            width="55"
-                            height="55"
-                            style={{
-                              objectFit: "contain",
-                              borderRadius: "6px",
-                              background: "#fff",
-                            }}
-                          />
-                        </td>
-
-                        {/* Nombre */}
-                        <td style={{ ...td, maxWidth: 180 }}>
-                          <Tooltip title={prod.nombre}>
-                            <span
-                              style={{
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                display: "block",
-                              }}
-                            >
-                              {prod.nombre}
-                            </span>
-                          </Tooltip>
-                        </td>
-
-                        {/* Precio */}
-                        <td style={tdCenter}>
-                          <b>${prod.precio}</b>
-                          {prod.precio_anterior && (
-                            <span style={{ textDecoration: "line-through", color: "gray", marginLeft: 4 }}>
-                              ${prod.precio_anterior}
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Stock */}
-                        <td style={tdCenter}>
-                          {prod.stock ?? (
-                            <span style={{ color: "gray" }}>—</span>
-                          )}
-                        </td>
-
-                        {/* Categoría */}
-                        <td style={tdCenter}>
-                          {prod.categoria_nombre ?? "Sin categoría"}
-                        </td>
-
-                        {/* Estado */}
-                        <td style={tdCenter}>
-                          <span
-                            style={{
-                              padding: "4px 10px",
-                              borderRadius: "12px",
-                              fontWeight: "bold",
-                              color: "#fff",
-                              background: prod.estado ? "green" : "red",
-                            }}
-                          >
-                            {prod.estado ? "Activo" : "Inactivo"}
-                          </span>
-                        </td>
-
-                        {/* Acciones */}
-                        <td style={tdCenter}>
-                          <Stack direction="row" spacing={1} justifyContent="center">
-
-                            {/* Ver Detalle */}
-                            <Button
-                              size="small"
-                              color="info"
-                              variant="outlined"
-                              onClick={() => navigate(`/admin/productos/${prod.id}`)}
-                            >
-                              Ver
-                            </Button>
-
-                            {/* Editar */}
-                            <Button
-                              size="small"
-                              color="secondary"
-                              variant="contained"
-                              onClick={() => navigate(`/admin/productos/${prod.id}/editar`)}
-                            >
-                              Editar
-                            </Button>
-
-                            {/* Eliminar */}
-                            <Button
-                              size="small"
-                              color="error"
-                              variant="outlined"
-                              onClick={() => navigate(`/admin/productos/${prod.id}/eliminar`)}
-                            >
-                              Eliminar
-                            </Button>
-
-                          </Stack>
-                        </td>
-
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Box>
             </Box>
           }
           right={
             <Box
               sx={{
-                p: 3,
+                p: 1,
                 borderRadius: 3,
                 bgcolor: "background.paper",
                 textAlign: "center",
                 boxShadow: 2,
+                mb: 2
               }}
             >
               <Typography
@@ -317,12 +166,166 @@ const tdCenter = {
                   }}
                   onClick={() => navigate("/admin/productos/nuevo")}
                 >
-                  Crear Producto
+                  Crear +
+                </Button>
+                <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                  Exportar
                 </Button>
               </Box>
             </Box>
           }
         />
+
+          <Box>
+
+            {/* ============================== */}
+            {/* TABLA CON SCROLL HORIZONTAL   */}
+            {/* ============================== */}
+            <Box
+              sx={{
+                width: "100%",
+                overflowX: "auto",
+                borderRadius: 2,
+                border: "1px solid #ddd",
+                boxShadow: 1,
+              }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  minWidth: "900px",
+                  borderCollapse: "collapse",
+                }}
+              >
+                <thead>
+                  <tr style={{ background: "#f4f4f4" }}>
+                    <th style={th}>ID</th>
+                    <th style={th}>Imagen</th>
+                    <th style={th}>Nombre</th>
+                    <th style={th}>Precio</th>
+                    <th style={th}>Stock</th>
+                    <th style={th}>Categoría</th>
+                    <th style={th}>Estado</th>
+                    <th style={th}>Acciones</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {productos.map((prod) => (
+                    <tr key={prod.id} style={{ borderBottom: "1px solid #eee" }}>
+                      <td style={tdCenter}>{prod.id}</td>
+
+                      {/* Imagen */}
+                      <td style={tdCenter}>
+                        <img
+                          src={getImagenUrl(prod.imagen1)}
+                          alt={prod.nombre}
+                          width="55"
+                          height="55"
+                          style={{
+                            objectFit: "contain",
+                            borderRadius: "6px",
+                            background: "#fff",
+                          }}
+                        />
+                      </td>
+
+                      {/* Nombre */}
+                      <td style={{ ...td, maxWidth: 180 }}>
+                        <Tooltip title={prod.nombre}>
+                          <span
+                            style={{
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "block",
+                            }}
+                          >
+                            {prod.nombre}
+                          </span>
+                        </Tooltip>
+                      </td>
+
+                      {/* Precio */}
+                      <td style={tdCenter}>
+                        <b>${prod.precio}</b>
+                        {prod.precio_anterior && (
+                          <span style={{ textDecoration: "line-through", color: "gray", marginLeft: 4 }}>
+                            ${prod.precio_anterior}
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Stock */}
+                      <td style={tdCenter}>
+                        {prod.stock ?? (
+                          <span style={{ color: "gray" }}>—</span>
+                        )}
+                      </td>
+
+                      {/* Categoría */}
+                      <td style={tdCenter}>
+                        {prod.categoria_nombre ?? "Sin categoría"}
+                      </td>
+
+                      {/* Estado */}
+                      <td style={tdCenter}>
+                        <span
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "12px",
+                            fontWeight: "bold",
+                            color: "#fff",
+                            background: prod.estado ? "green" : "red",
+                          }}
+                        >
+                          {prod.estado ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+
+                      {/* Acciones */}
+                      <td style={tdCenter}>
+                        <Stack direction="row" spacing={1} justifyContent="center">
+
+                          {/* Ver Detalle */}
+                          <Button
+                            size="small"
+                            color="info"
+                            variant="outlined"
+                            onClick={() => navigate(`/producto/${prod.id}`)}
+                          >
+                            Ver
+                          </Button>
+
+                          {/* Editar */}
+                          <Button
+                            size="small"
+                            color="secondary"
+                            variant="contained"
+                            onClick={() => navigate(`/admin/productos/${prod.id}/editar`)}
+                          >
+                            Editar
+                          </Button>
+
+                          {/* Eliminar */}
+                          <Button
+                            size="small"
+                            color="error"
+                            variant="outlined"
+                            onClick={() => navigate(`/admin/productos/${prod.id}/eliminar`)}
+                          >
+                            Eliminar
+                          </Button>
+
+                        </Stack>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Box>
+          </Box>
       </Box>
     </DashboardLayout>
   );

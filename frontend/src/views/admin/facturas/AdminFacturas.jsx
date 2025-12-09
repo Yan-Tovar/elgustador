@@ -31,7 +31,7 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 
-// 🔥 Servicios actualizados
+import { exportTableExcel } from '../../../services/exportService';
 import {
   getFacturasAdmin,
   descargarFacturaPDF,
@@ -185,6 +185,10 @@ export default function AdminFacturas() {
     }
   };
 
+  const handleExport = () => {
+    exportTableExcel("facturas", "factura");
+  };
+
   return (
     <DashboardLayout>
       <Box p={3}>
@@ -334,6 +338,9 @@ export default function AdminFacturas() {
             onClick={exportarCSV}
           >
             Exportar CSV
+          </Button>
+          <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+            Exportar Excel Completo
           </Button>
         </Stack>
 

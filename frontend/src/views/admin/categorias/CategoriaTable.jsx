@@ -12,6 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoDisturbOn from "@mui/icons-material/DoDisturbOn";
+import { getImagenUrl } from "../../../services/categoriasService";
 
 export default function CategoriaTable({
   categorias,
@@ -38,11 +39,6 @@ export default function CategoriaTable({
     textAlign: "center",
   };
 
-  const getImagenUrl = (img) => {
-    if (!img) return "/default_categoria.png";
-    if (img.startsWith("http")) return img;
-    return `http://127.0.0.1:8000${img}`;
-  };
 
   return (
     <Box>

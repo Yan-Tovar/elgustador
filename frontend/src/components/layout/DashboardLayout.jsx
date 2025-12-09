@@ -1,23 +1,51 @@
 // src/components/layout/DashboardLayout.jsx
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Box, CssBaseline, Container } from "@mui/material";
 import SideBar from "./SideRolBar";
 import Navbar from "./Navbar";
 import FooterBottomSheet from "./Footer";
 import { CartAnimationProvider } from "../../context/CartAnimationContext";
 import NotificationsDrawer from "../notifications/NotificationsDrawer";
+import OnboardingTutorial from "../common/OnboardingTutorial";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
+  const { user } = useContext(AuthContext);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Verifica si el tutorial ya fue mostrado
+    const tutorialDone = localStorage.getItem("tutorial_done");
+
+    if (!tutorialDone) {
+      // Solo mostrar el tutorial la primera vez después del login
+      setShowTutorial(true);
+    }
+  }, [user]);
+
+  const handleTutorialClose = () => {
+    setShowTutorial(false);
+    localStorage.setItem("tutorial_done", "true"); // Marca que ya lo vio
+  };
+
   return (
     <CartAnimationProvider>
+      {showTutorial && (
+      <OnboardingTutorial
+        open={showTutorial}
+        onClose={handleTutorialClose}
+      />
+      )}
       <Box sx={{ display: "flex", width: "100%" }}>
         <CssBaseline />
 
         {/* SIDEBAR */}
-        <SideBar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <SideBar id="sidebar-menu" open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* PANEL DERECHO DE NOTIFICACIONES */}
         <NotificationsDrawer

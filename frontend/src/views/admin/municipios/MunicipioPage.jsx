@@ -1,6 +1,6 @@
 // pages/MunicipioPage.jsx
 import { useEffect, useState } from "react";
-import { Box, Button, Typography, Dialog, DialogContent, TextField } from "@mui/material";
+import { Box, Button, Typography, Dialog, DialogContent, TextField, Divider } from "@mui/material";
 
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import TwoColumnInnerLayout from "../../../components/layout/TwoColumnInnerLayout";
@@ -15,6 +15,7 @@ import {
   deleteMunicipio,
   buscarMunicipios,
 } from "../../../services/MunicipioService";
+import { exportTableExcel } from '../../../services/exportService';
 
 import { showConfirm, showAlert, showToast } from "../../../components/feedback/SweetAlert";
 
@@ -36,7 +37,7 @@ export default function MunicipioPage() {
     fetchMunicipios();
   }, []);
 
-  // 🔍 Buscar automáticamente
+  //  Buscar automáticamente
   const handleSearch = async (value) => {
     setSearch(value);
 
@@ -86,6 +87,10 @@ export default function MunicipioPage() {
     fetchMunicipios();
   };
 
+  const handleExport = () => {
+    exportTableExcel("productos", "producto");
+  };
+
   return (
     <DashboardLayout>
       <Box sx={{ p: 3 }}>
@@ -93,9 +98,7 @@ export default function MunicipioPage() {
         <TwoColumnInnerLayout
           left={
             <Box>
-              <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold" }}>
-                Gestión de Municipios
-              </Typography>
+              <Divider sx={{fontSize: 20}}>Gestión Municipios</Divider>
               <TextField
                 color="secondary"
                 label="Buscar municipio..."
@@ -150,7 +153,10 @@ export default function MunicipioPage() {
                   }}
                   onClick={handleCreate}
                 >
-                  Crear Municipio
+                  Crear +
+                </Button>
+                <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                  Exportar
                 </Button>
               </Box>
             </Box>

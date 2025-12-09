@@ -1,6 +1,6 @@
 // pages/DepartamentoPage.jsx
 import { useEffect, useState } from "react";
-import { Box, Button, Typography, Dialog, DialogContent, TextField } from "@mui/material";
+import { Box, Button, Typography, Dialog, DialogContent, TextField, Divider } from "@mui/material";
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import TwoColumnInnerLayout from "../../../components/layout/TwoColumnInnerLayout";
 
@@ -14,6 +14,7 @@ import {
   deleteDepartamento,
   buscarDepartamentos, 
 } from "../../../services/DepartamentoService";
+import { exportTableExcel } from '../../../services/exportService';
 
 import { showConfirm, showAlert, showToast } from "../../../components/feedback/SweetAlert";
 
@@ -84,15 +85,17 @@ export default function DepartamentoPage() {
     fetchDepartamentos();
   };
 
+  const handleExport = () => {
+    exportTableExcel("productos", "producto");
+  };
+
   return (
     <DashboardLayout>
       <Box sx={{ p: 3 }}>
         <TwoColumnInnerLayout
           left={
             <Box>
-              <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold" }}>
-                Gestión de Departamentos
-              </Typography>
+              <Divider sx={{fontSize: 20}}>Gestión Departamentos</Divider>
               {/*  Barra de búsqueda */}
               <TextField
                 label="Buscar departamento..."
@@ -148,7 +151,10 @@ export default function DepartamentoPage() {
                   }}
                   onClick={handleCreate}
                 >
-                  Crear Departamento
+                  Crear +
+                </Button>
+                <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                  Exportar
                 </Button>
               </Box>
             </Box>

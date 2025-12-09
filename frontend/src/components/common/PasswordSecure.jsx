@@ -41,6 +41,7 @@ export default function PasswordSecure({ onValid, passwordValue = "", confirmVal
         type="password"
         value={password}
         onChange={handlePasswordChange}
+        color="secondary"
         required
         fullWidth
         margin="normal"
@@ -53,6 +54,7 @@ export default function PasswordSecure({ onValid, passwordValue = "", confirmVal
         type="password"
         value={confirm}
         onChange={handleConfirmChange}
+        color="secondary"
         required
         fullWidth
         margin="normal"

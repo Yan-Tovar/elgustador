@@ -57,7 +57,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         producto = serializer.save()
         
-        titulo = "🎉 ¡Nuevo Producto en el Catálogo! 🎉"
+        titulo = " ¡Nuevo Producto en el Catálogo! "
         mensaje = f"Acabamos de añadir **{producto.nombre}** a nuestra colección. ¡Sé el primero en probarlo!"
 
         @transaction.on_commit

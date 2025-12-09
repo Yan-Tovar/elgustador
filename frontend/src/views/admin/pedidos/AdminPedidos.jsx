@@ -40,6 +40,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import CustomSnackbar from "../../../components/common/CustomSnackbar";
+import { exportTableExcel } from '../../../services/exportService';
 import { showAlert,  showConfirm, showToast } from "../../../components/feedback/SweetAlert";
 
 import {
@@ -190,6 +191,10 @@ export default function AdminPedidos() {
     }
   };
 
+  const handleExport = () => {
+    exportTableExcel("pedidos", "pedido");
+  };
+
   // Render
   if (loading) {
     return (
@@ -232,11 +237,12 @@ export default function AdminPedidos() {
                   <Button
                     variant={estadoFiltro === btn.value ? "contained" : "outlined"}
                     size="small"
+                    color="secondary"
                     onClick={() => {
                       setEstadoFiltro(btn.value);
                       setPage(1);
                     }}
-                    sx={{ borderRadius: 3, minWidth: 40, padding: "6px 10px" }}
+                    sx={{ borderRadius: 3, minWidth: 40, padding: "3px 5px" }}
                   >
                     {btn.icon}
                   </Button>
@@ -293,6 +299,19 @@ export default function AdminPedidos() {
               Buscar
             </Button>
           </Box>
+            <Button
+              variant="contained"
+              size="small"
+              color="secondary"
+              sx={{
+                borderRadius: 3,
+                textTransform: "none",
+                boxShadow: "secondary"
+              }}
+              onClick={handleExport}
+            >
+              Descargar Excel
+            </Button>
         </Box>
 
         {/* Tabla con overflow horizontal en móvil */}

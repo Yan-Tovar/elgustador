@@ -13,7 +13,7 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 
 import { fetchCategorias } from "../services/categoriasService";
 
-import CategoriaCard from "../components/common/CategoriaCard"; // ajusta si tu ruta es distinta
+import CategoriaCard from "../components/common/CategoriaCard"; 
 
 export default function CategoriasPage() {
   const [categorias, setCategorias] = useState([]);

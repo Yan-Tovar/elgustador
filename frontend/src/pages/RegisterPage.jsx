@@ -6,7 +6,8 @@ import {
   Typography,
   TextField,
   Alert,
-  Stack
+  Stack,
+  Divider
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -234,9 +235,7 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit}>
         {step === 1 && (
           <>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Paso 1 — Datos personales
-            </Typography>
+            <Divider variant="subtitle1" sx={{ mb: 1 }}>Paso 1 — Datos personales</Divider>
             <IdentificacionInput value={form.identificacion} onChange={handleChange} />
             <TextoSoloLetrasInput label="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
             <TextoSoloLetrasInput label="Apellido" name="apellido" value={form.apellido} onChange={handleChange} />
@@ -245,9 +244,7 @@ export default function RegisterPage() {
 
         {step === 2 && (
           <>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Paso 2 — Contraseña
-            </Typography>
+            <Divider variant="subtitle1" sx={{ mb: 1 }}>Paso 2 — Contraseña</Divider>
             <PasswordSecure
               onValid={(pwd) =>
                 setForm((prev) => ({
@@ -262,10 +259,8 @@ export default function RegisterPage() {
 
         {step === 3 && (
           <>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Paso 3 — Dirección
-            </Typography>
-            <TextField select fullWidth label="Departamento" name="departamento" value={form.departamento} onChange={handleChange} required margin="normal">
+            <Divider variant="subtitle1" sx={{ mb: 1 }}>Paso 3 — Dirección</Divider>
+            <TextField select color="secondary" fullWidth label="Departamento" name="departamento" value={form.departamento} onChange={handleChange} required margin="normal">
               {departamentos.map((dep) => (
                 <MenuItem key={dep.id} value={dep.id}>
                   {dep.nombre}
@@ -273,7 +268,7 @@ export default function RegisterPage() {
               ))}
             </TextField>
 
-            <TextField select fullWidth label="Municipio" name="municipio" value={form.municipio} onChange={handleChange} required margin="normal">
+            <TextField select color="secondary" fullWidth label="Municipio" name="municipio" value={form.municipio} onChange={handleChange} required margin="normal">
               {municipiosFiltrados.map((mun) => (
                 <MenuItem key={mun.id} value={mun.id}>
                   {mun.nombre}
@@ -281,15 +276,13 @@ export default function RegisterPage() {
               ))}
             </TextField>
 
-            <TextField fullWidth label="Dirección detallada" name="direccion_detallada" value={form.direccion_detallada} onChange={handleChange} margin="normal" />
+            <TextField color="secondary" fullWidth label="Dirección detallada" name="direccion_detallada" value={form.direccion_detallada} onChange={handleChange} margin="normal" placeholder="Barrio, Calle, Número, Torre, Casa, Piso, Etc" />
           </>
         )}
 
         {step === 4 && (
           <>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Paso 4 — Comunicación
-            </Typography>
+            <Divider variant="subtitle1" sx={{ mb: 1 }}>Paso 4 — Comunicación</Divider>
             <EmailInput label="Correo electrónico" name="email" value={form.email} onChange={handleChange} />
             <TelefonoInput value={form.telefono} onChange={handleChange} label="Teléfono" name="telefono" />
           </>
@@ -297,10 +290,7 @@ export default function RegisterPage() {
 
         {step === 5 && (
           <>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Paso 5 — Verificación de correo
-            </Typography>
-
+            <Divider variant="subtitle1" sx={{ mb: 1 }}>Paso 5 — Verificación de correo</Divider>
             <SixDigitCodeInput
               value={form.emailCode}
               onChange={(val) => setForm({ ...form, emailCode: val })}
@@ -311,9 +301,12 @@ export default function RegisterPage() {
 
         <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
           {step > 1 && (
-            <Button variant="outlined" onClick={handleBack} disabled={loading}>
-              Atrás
-            </Button>
+            <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+              <Button color="text" variant="outlined" onClick={handleBack} disabled={loading}>
+                Atrás
+              </Button>
+              <br/>
+            </Box>
           )}
 
           {step < 5 ? (
