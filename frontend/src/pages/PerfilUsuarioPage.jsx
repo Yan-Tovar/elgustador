@@ -13,6 +13,8 @@ import ModalDatosPersonales from "../components/common/perfil/modals/ModalDatosP
 import ModalEmail from "../components/common/perfil/modals/ModalEmail";
 import ModalTelefono from "../components/common/perfil/modals/ModalTelefono";
 import ModalDireccion from "../components/common/perfil/modals/ModalDireccion";
+import PqrsModal from "../components/common/PqrsModal";
+import { showToast } from "../components/feedback/SweetAlert";
 
 import { Box, Card, Typography, CircularProgress } from "@mui/material";
 
@@ -21,6 +23,7 @@ export default function PerfilUsuarioDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [modal, setModal] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -157,6 +160,48 @@ export default function PerfilUsuarioDashboard() {
                 <Typography variant="body2" fontWeight="bold">
                   {maskEmail(usuario.email)}
                 </Typography>
+              </Box>
+            </Card>
+
+            <Card 
+              sx={{ 
+                p: 3, 
+                display: "flex", 
+                mb: 3,
+                borderRadius: "25px",
+                border: "dashed gray 1px",                
+              }}
+              onClick={() => setOpenModal(true)}
+            >
+              <Box
+                component="img"
+                src="/pqrs.png"
+                sx={{
+                  width: 70,
+                  height: "auto",
+                  objectFit: "contain",
+                  borderRadius: 2,
+                  mx: 1,
+                }}
+              />
+              <Box>
+                <Typography variant="text" fontWeight="bold">
+                  Enviar un PQRS
+                </Typography>
+                <Typography variant="body2" mt={2}>
+                  ¡Escribe aquello que quieres!
+                  Tu información está protegida.
+                </Typography>
+
+                <PqrsModal
+                  open={openModal}
+                  onClose={() => setOpenModal(false)}
+                  onSuccess={() => {
+                    setOpenModal(false);             // Cierra el modal
+                    showToast("PQRS enviado correctamente", "success"); // Muestra toast
+                  }}
+                />
+
               </Box>
             </Card>
           </>

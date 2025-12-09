@@ -33,4 +33,5 @@ asgiref==3.10.0
 sqlparse==0.5.3
 tzdata==2025.2
 
+pandas>=2.0.0
 openpyxl>=3.0.0

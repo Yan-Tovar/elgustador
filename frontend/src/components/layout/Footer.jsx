@@ -40,7 +40,7 @@ export default function Footer() {
         pb: 4,
         maxHeight: "95vh",
         overflow: "hidden",
-        top:"85vh",
+        top:"95vh",
         mt: "auto",
       }}
     >

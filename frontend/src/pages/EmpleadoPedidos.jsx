@@ -236,6 +236,7 @@ export default function EmpleadoPedidos() {
                   <Button
                     variant={estadoFiltro === btn.value ? "contained" : "outlined"}
                     size="small"
+                    color="secondary"
                     onClick={() => {
                       setEstadoFiltro(btn.value);
                       setPage(1);

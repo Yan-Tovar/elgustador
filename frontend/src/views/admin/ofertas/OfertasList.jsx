@@ -14,10 +14,13 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
+  Divider
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../components/layout/DashboardLayout";
 import { fetchOfertas, deleteOferta } from "../../../services/ofertasService";
+import { exportTableExcel } from '../../../services/exportService';
+import TwoColumnInnerLayout from "../../../components/layout/TwoColumnInnerLayout";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -52,27 +55,64 @@ export default function OfertasList() {
     loadOfertas();
   }, []);
 
+  const handleExport = () => {
+    exportTableExcel("ofertas", "oferta");
+  };
+
   return (
     <DashboardLayout>
       {/* HEADER */}
-      <Box
-        sx={{
-          mb: 3,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 1,
-        }}
-      >
-        <Typography variant="h4">Ofertas</Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate("/admin/ofertas/nuevo")}
-        >
-          Nueva Oferta
-        </Button>
-      </Box>
+
+      <TwoColumnInnerLayout
+        left={
+          <Box>
+            <Divider sx={{fontSize: 20}}>Gestión Ofertas</Divider>
+          </Box>
+        }
+        right={
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              bgcolor: "background.paper",
+              textAlign: "center",
+              boxShadow: 2,
+              mb: 1
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary",
+                mb: 1,
+              }}
+            >
+              Panel Ofertas
+            </Typography>
+
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                }}
+                onClick={() => navigate("/admin/ofertas/nuevo")}
+              >
+                Crear +
+              </Button>
+              <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                Exportar
+              </Button>
+            </Box>
+          </Box>
+        }
+        
+      />
 
       {/* TABLA */}
       <TableContainer component={Paper} sx={{ borderRadius: 3 }}>

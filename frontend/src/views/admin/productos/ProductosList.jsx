@@ -11,6 +11,7 @@ import {
   CardContent,
   Tooltip,
   Stack,
+  Divider
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -24,6 +25,7 @@ import {
   searchProductos,
   getImagenUrl
 } from "../../../services/productosService";
+import { exportTableExcel } from '../../../services/exportService';
 
 export default function ProductosList() {
   const navigate = useNavigate();
@@ -42,6 +44,10 @@ export default function ProductosList() {
     } catch (error) {
       console.error("Error cargando productos:", error);
     }
+  };
+
+  const handleExport = () => {
+    exportTableExcel("productos", "producto");
   };
 
   // -------------------------
@@ -98,9 +104,7 @@ const tdCenter = {
         <TwoColumnInnerLayout
           left={
             <Box>
-              <Typography variant="h4" sx={{ mb: 3 }}>
-                Productos
-              </Typography>
+              <Divider sx={{fontSize: 20}}>Gestión Productos</Divider>
               {/* BUSCADOR */}
               <TextField
                 placeholder="Buscar productos..."
@@ -162,7 +166,10 @@ const tdCenter = {
                   }}
                   onClick={() => navigate("/admin/productos/nuevo")}
                 >
-                  Crear Producto
+                  Crear +
+                </Button>
+                <Button variant="contained" color="primary" sx={{ml: 1}} onClick={handleExport}>
+                  Exportar
                 </Button>
               </Box>
             </Box>

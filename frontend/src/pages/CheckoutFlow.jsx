@@ -6,6 +6,7 @@ import { registrarPago, simulatePago } from "../services/pagosService";
 import { fetchProductos } from "../services/productosService";
 import ProductosSugeridos from "../components/common/ProductosSugeridos";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import ButtonWithHand from "../components/common/ButtonWithHand";
 
 import { Box, Button, Typography, Stepper, Step, StepLabel, Grid, Stack } from "@mui/material";
 import { PayPalButtons } from "@paypal/react-paypal-js";
@@ -198,17 +199,20 @@ export default function CheckoutFlow() {
 
         {/* PASO 1 — CREAR PEDIDO */}
         {activeStep === 0 && (
-          <Box>
-            <Button
-              variant="contained"
-              color="secondary"
-              fullWidth
-              onClick={crearPedido}
-            >
-              Continuar con el pedido
-            </Button>
-
-            {/* PRODUCTOS SUGERIDOS */}
+          <Box >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <ButtonWithHand >
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{width: "90vw"}}
+                  onClick={crearPedido}
+                >
+                  Continuar con el pedido
+                </Button>
+              </ButtonWithHand>
+            </Box>
+            
             <ProductosSugeridos
               productos={productosSugeridos}
               onVerProducto={(id) => navigate(`/producto/${id}`)}

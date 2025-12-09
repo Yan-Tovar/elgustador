@@ -111,7 +111,7 @@ export default function Navbar({ onOpenSidebar, onOpenNotificaciones }) {
 
 
             {/* PERFIL */}
-            <IconButton color="inherit" onClick={handleOpenMenu}>
+            <IconButton color="inherit" onClick={handleOpenMenu} id="navbar-user">
               <AccountCircle />
             </IconButton>
 

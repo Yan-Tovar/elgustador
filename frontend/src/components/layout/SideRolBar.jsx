@@ -24,6 +24,7 @@ import {
   LocalOffer,
   NotesOutlined,
   Receipt,
+  People,
   PersonPin,
   ExpandLess,
   ExpandMore,
@@ -33,6 +34,7 @@ import {
   MapOutlined,
   FolderCopy,
   Checklist,
+  Note
 } from "@mui/icons-material";
 
 import { useContext, useEffect, useState } from "react";
@@ -77,7 +79,9 @@ export default function SideBar() {
     carrusel: <FolderCopy />,
     adminPedidos: <Checklist />,
     adminFacturas: <Receipt />,
+    adminUsuarios: <People />,
     dashboard: <Home />,
+    adminPqrs: <Note />,
   };
 
   // -----------------------------
@@ -120,11 +124,14 @@ export default function SideBar() {
           { text: "Empleado Pedidos", icon: icons.adminPedidos, path: "/empleado/pedidos" },
           { text: "Admin Pedidos", icon: icons.adminPedidos, path: "/admin/pedidos" },
           { text: "Admin Facturas", icon: icons.adminFacturas, path: "/admin/facturas" },
+          { text: "Usuarios", icon: icons.adminUsuarios, path: "/admin/usuarios" },
+          { text: "Pqrs", icon: icons.adminPqrs, path: "/admin/pqrs" },
         ]
       : [];
 
   // CLIENTE siempre ve estos (menos Notas)
   const clientItems = [
+    { text: "Inicio", icon: icons.productos, path: "/" },
     { text: "Productos", icon: icons.productos, path: "/productos" },
     { text: "Categorías", icon: icons.categorias, path: "/categorias" },
     { text: "Carrito", icon: icons.carrito, path: "/carrito" },
@@ -147,7 +154,7 @@ export default function SideBar() {
   // SIDEBAR CONTENT
   // -----------------------------
   const drawerContent = (
-    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <Box   sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Toolbar sx={{ bgcolor: theme.palette.background.paper }}>
         <Typography variant="h6" fontWeight="bold">
           Hola {primerNombre}
@@ -156,7 +163,7 @@ export default function SideBar() {
 
       <Divider />
 
-      <Box sx={{ overflowY: "auto", flexGrow: 1 }}>
+      <Box id="sidebar-menu" sx={{ overflowY: "auto", flexGrow: 1 }}>
         <List>
           {/* ADMIN ITEMS */}
           {user?.rol === "admin" && (
@@ -181,6 +188,7 @@ export default function SideBar() {
                     navigate(item.path);
                     if (isMobile) toggleDrawer();
                   }}
+                  sx={{cursor: "pointer"}}
                 >
                   <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
                     {item.icon}
@@ -196,7 +204,7 @@ export default function SideBar() {
           {/* ADMIN → botón Usuario desplegable */}
           {user?.rol === "admin" && (
             <>
-              <ListItem button onClick={() => setOpenUserMenu(!openUserMenu)}>
+              <ListItem button onClick={() => setOpenUserMenu(!openUserMenu)} sx={{cursor: "pointer"}}>
                 <ListItemIcon sx={{ color: theme.palette.info.main }}>
                   <PersonPin />
                 </ListItemIcon>
@@ -209,7 +217,7 @@ export default function SideBar() {
                   <ListItem
                     button
                     key={item.text}
-                    sx={{ pl: 4 }}
+                    sx={{ pl: 4, cursor: "pointer" }}
                     onClick={() => navigate(item.path)}
                   >
                     <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
@@ -229,6 +237,7 @@ export default function SideBar() {
                 button
                 key={item.text}
                 onClick={() => navigate(item.path)}
+                sx={{cursor: "pointer"}}
               >
                 <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                   {item.icon}
@@ -244,6 +253,7 @@ export default function SideBar() {
                 button
                 key={item.text}
                 onClick={() => navigate(item.path)}
+                sx={{cursor: "pointer"}}
               >
                 <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                   {item.icon}
@@ -278,6 +288,7 @@ export default function SideBar() {
             left: 10,
             zIndex: theme.zIndex.drawer + 3,
           }}
+          id="mobile-sidebar-toggle"
         >
           <MenuIcon />
         </IconButton>
@@ -286,6 +297,7 @@ export default function SideBar() {
       {/* Desktop */}
       {!isMobile && (
         <Drawer
+          id="sidebar-menu"
           variant="permanent"
           sx={{
             width: drawerWidth,

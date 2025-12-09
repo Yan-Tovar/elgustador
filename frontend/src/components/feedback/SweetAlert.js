@@ -71,7 +71,7 @@ export const showConfirm = async (
 export const showToast = (message, icon = "success") => {
   return MySwal.fire({
     toast: true,
-    position: "top-end",
+    position: "bottom-right",
     icon,
     title: message,
     showConfirmButton: false,

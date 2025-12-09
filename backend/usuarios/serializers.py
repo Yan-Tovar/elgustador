@@ -68,3 +68,21 @@ class UsuarioUpdateSerializer(serializers.ModelSerializer):
             "municipio": {"required": False},
             "departamento": {"required": False},
         }
+        
+class UsuarioRolUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = ["rol"]
+
+class UsuariosPorRolSerializer(serializers.Serializer):
+    rol = serializers.CharField()
+    total = serializers.IntegerField()
+
+
+class UsuariosPorMesSerializer(serializers.Serializer):
+    mes = serializers.CharField()
+    total = serializers.IntegerField()
+
+
+class UsuariosSesionSerializer(serializers.Serializer):
+    total_en_sesion = serializers.IntegerField()
